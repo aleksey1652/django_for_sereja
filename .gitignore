@@ -34,11 +34,6 @@ MANIFEST
 *.spec
 
 # Installer logs
-# Text backup files
-*.bak
-
-#Database
-*.sqlite3
 pip-log.txt
 pip-delete-this-directory.txt
 
@@ -132,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+# Text backup files
+*.bak
+
+#Database
+*.sqlite3
