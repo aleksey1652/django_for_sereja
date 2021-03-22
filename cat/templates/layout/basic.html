@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type"content="text/html;charset=UTF-8">
+    <title>{% block title %}Main{% endblock %} - Dashboard</title>
+    <link rel="stylesheet" typec"text/css"
+    href="{% static 'bboard/style.css' %}">
+</head>
+<body>
+  <header>
+    <h1>Dashboard</h1>
+  </header>
+  <nav>
+    <a href="{% url 'index' %}">Main</a>
+    <a href="{% url 'add_save' %}">Add</a>
+    {% for r in rubrics %}
+    <a href="{% url 'by_rubric' r.pk %}">{{ r.name }}</a>
+    {% endfor %}
+  </nav>
+  <section>
+  {% block content %}
+  {% endblock %}
+  </section>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px
+">
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;height:70px;background-color: #F5DEB3;" href="{{comp1_.url_computers}}">{{ comp1_.pc_assembly.sites.name_sites|truncatechars:30 }}:  {{comp1_.name_computers|truncatechars:30}}:  {{ usd1 }} usd</a>
+        </li>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.proc_computers.0|truncatechars:30}} Min Price: {{comp1.proc_computers.2|truncatechars:30}} In comps: {{ comp1.proc_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.proc_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.mb_computers.0|truncatechars:30}}     Min Price: {{comp1.mb_computers.2|truncatechars:30}} In comps: {{ comp1.mb_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.mb_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.mem_computers.0|truncatechars:30}}     Min Price: {{comp1.mem_computers.2|truncatechars:30}} In comps: {{ comp1.mem_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.mem_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.video_computers.0|truncatechars:30}}     Min Price: {{comp1.video_computers.2|truncatechars:30}} In comps: {{ comp1.video_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.video_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.hdd1.0|truncatechars:30}}     Min Price: {{comp1.hdd1.2|truncatechars:30}} In comps: {{ comp1.hdd1.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.hdd1.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          {% if comp1.hdd2 %}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.hdd2.0|truncatechars:30}}     Min Price: {{comp1.hdd2.2|truncatechars:30}} In comps: {{ comp1.hdd2.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.hdd2.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            {% endif %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.case_computers.0|truncatechars:30}}     Min Price: {{comp1.case_computers.2|truncatechars:30}} In comps: {{ comp1.case_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.case_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.ps_computers.0|truncatechars:30}}     Min Price: {{comp1.ps_computers.2|truncatechars:30}} In comps: {{ comp1.ps_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.ps_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp1.cool_computers_computers.0|truncatechars:30}}     Min Price: {{comp1.cool_computers.2|truncatechars:30}} In comps: {{ comp1.cool_computers.3 }}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in comp1.cool_computers.1%}
+              <a class="dropdown-item" href="">{{ dd.providers.name_provider }}  status: {{ dd.availability_parts }}  cost: {{ dd.providerprice_parts }}</a>
+              {% endfor %}
+            </div>
+          </div>
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Compare</a>
+        </li>
+    </div>
+      <div class="col">
+        <li class="navbar-text">
+            <a class="btn btn-outline-secondary text-info" style="width: 280px;height:70px;background-color: #F5DEB3;" href="{{comp2_.url_computers}}">{{ comp2_.pc_assembly.sites.name_sites|truncatechars:30 }}:  {{comp2_.name_computers|truncatechars:30}}:  {{ usd2 }} usd</a>
+          </li>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.proc_computers.0|truncatechars:30}}     Min Price: {{comp2.proc_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.mb_computers.0|truncatechars:30}}     Min Price: {{comp2.mb_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.mem_computers.0|truncatechars:30}}     Min Price: {{comp2.mem_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.video_computers.0|truncatechars:30}}     Min Price: {{comp2.video_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.hdd1.0|truncatechars:30}}     Min Price: {{comp2.hdd1.2|truncatechars:30}}</h1></a>
+            </div>
+            {% if comp2.hdd2 %}
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.hdd2.0|truncatechars:30}}     Min Price: {{comp2.hdd2.2|truncatechars:30}}</h1></a>
+              </div>
+            {% endif %}
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.case_computers.0|truncatechars:30}}     Min Price: {{comp2.case_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.ps_computers.0|truncatechars:30}}     Min Price: {{comp2.ps_computers.2|truncatechars:30}}</h1></a>
+            </div>
+            <div class="dropdown">
+              <a class="btn btn-outline-secondary " style="width: 280px;height:70px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{comp2.cool_computers.0|truncatechars:30}}     Min Price: {{comp2.cool_computers.2|truncatechars:30}}</h1></a>
+      </div>
+      </div>
+  </div>
+</div>
+</nav>
+{% endblock %}
