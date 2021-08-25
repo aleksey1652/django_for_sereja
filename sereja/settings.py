@@ -20,8 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = '@r+%6h(6pu-yszhl=k)^g5@=yq8n_0xa6pd)qr=jg=+@-on&*n'
-SECRET_KEY = os.environ.get('SECRET_KEY', '@r+%6h(6pu-yszhl=k)^g5@=yq8n_0xa6pd)qr=jg=+@-on&*n')
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
@@ -99,7 +98,7 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql_psycopg2"),
         "NAME": os.environ.get("SQL_DATABASE", "ser_db"),
         "USER": os.environ.get("SQL_USER", "ser"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "01021979a"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", ""),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
@@ -156,7 +155,7 @@ EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = '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'
+EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = ''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #app = Celery('sereja',broker='redis://localhost:6379/0', backend='redis://localhost:6379/1')
