@@ -1,0 +1,234 @@
+{% extends 'cat/m.html' %}
+{% block main_section %}
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-danger mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1390px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 2000px
+">
+<h6>Home>></h6><h5>Computer_assembly_page</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 2000px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Computer's_assembly</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'assembly_page' 'itblok' %}">IT_BLOK</a>
+        <a class="dropdown-item" href="{% url 'assembly_page' 'versum' %}">VERSUM</a>
+        <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price 1 %}">Group_Update</a>
+      </div>
+    </li>
+    <li>
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+    </form>
+    </span>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Active_list</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in act %}
+          <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 70px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Reserve_list</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in reserve %}
+          <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>AMDcpu</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Acpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Acpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>IntelCPU</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Icpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Icpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>GPU</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Vid %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Vid %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Amb</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Imb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Imb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Imb</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Amb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Amb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Mem</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Mem %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Mem %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Ps</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Ps %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Ps %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Case</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Case %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Case %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Ssd</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Ssd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Ssd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Hdd</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Hdd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Hdd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+  </ul>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;width: 1390px">
+<form class="form" method="post" action="{% url 'pc_assembly_page_advanced' page_id price 0 %}">
+{% csrf_token %}
+{% for d in act %}
+<div class="form-check">
+<input class="form-check-input" type="checkbox" value={{ d.pk }} name={{ d.pk }}>
+<label class="form-check-label" for="flexCheckDefault">
+<a class="btn btn-outline-secondary" style="background-color: #F5DEB3;" href="{% url 'assembly' d.pk %}">
+{{ d.name_computers }} <mark>Active:{{ d.is_active }}</mark>
+</a>
+</label>
+</div>
+{% endfor %}
+<a class="nav-link  text-dark " aria-haspopup="true" aria-expanded="false"><h5>Choose new parts</h5></a>
+{% if act %}
+{% for m in grp %}
+<div class="form-check">
+<input class="form-check-input" type="radio" value={{ m.pk }} name="parts">
+<label class="form-check-label" for="flexCheckDefault">
+  <a class="btn btn-outline-secondary" style="background-color: #F5DEB3;" href="">
+  {{ m.name_parts }}
+  </a>
+</label>
+</div>
+{% endfor %}
+{% endif %}
+<button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Change</button>
+</form>
+</nav>
+
+{% endblock %}
