@@ -1,0 +1,36 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% block content_title %}
+    <h1> {{ extra_data.comp }} </h1>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+{% if extra_data.proc %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{% if extra_data.proc.2 %}{{ extra_data.proc.0 }}{% else %}{{ extra_data.proc.1 }}{% endif %}
+</form>
+{% endif %}
+{% if extra_data.mb %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{% if extra_data.mb.2 %}{{ extra_data.mb.0 }}{% else %}{{ extra_data.mb.1 }}{% endif %}
+</form>
+{% endif %}
+{% if extra_data.mem %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ extra_data.mem }}
+</form>
+{% endif %}
+{% if extra_data.video %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ extra_data.video }}
+</form>
+{% endif %}
+{{ extra_data.first.discr }}
+{% endblock %}

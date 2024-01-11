@@ -1,0 +1,115 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% block content_title %}
+    {% if queryset_comps %}
+    {% for comp in queryset_comps %}
+    <h1><strong>VERSUM:{{ comp.comp.name_computers }}</strong>, {{ comp.comp.price_computers }} $</h1>
+      {% endfor %}
+    <h1>Ниже - компьютеры АРТЛАЙН </h1>
+    {% endif %}
+  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<style>
+.box div { width:400px; display:inline-block; }
+.box2 div { width:600px; display:inline-block; }
+.box_in div { width:100px; display:inline-block; }
+.box_in_in div { width:100px; display:inline-block; }
+</style>
+{% for art in art_list %}
+
+<h1> Данные для сравнения: </h1>
+  <div class="form-row">
+
+<div>
+  <div class="box2">
+<div>
+  <b>Название</b>
+</div>
+<div>
+  <div class="box_in_in">
+    <div>
+      <b>VERSUM</b>
+    </div>
+    <div>
+      <b>ARTLINE</b>
+    </div>
+    <div>
+      <b>ВИДЕО</b>
+    </div>
+    <div>
+      <b>VERSUM - ВИДЕО</b>
+    </div>
+    <div>
+      <b>ARTLINE - ВИДЕО(формула)</b>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+
+  </div>
+</div>
+
+  <div class="form-row">
+<div>
+  <div class="box2">
+<div>
+  {{ art.1 }}
+</div>
+<div>
+  <div class="box_in_in">
+    <div>
+      {{ queryset_comps.0.comp.price_computers }}
+    </div>
+    <div>
+      {{ art.0.1.price_computers }}
+    </div>
+    <div>
+      <font color="red">{{ count_our_video.0 }}</font>
+    </div>
+    <div>
+      {{ count_our_video.1 }}
+    </div>
+    <div>
+      {{ art.0.2 }}
+    </div>
+  </div>
+</div>
+<br>
+<br>
+  </div>
+</div>
+
+<div class="form-row">
+{% for row in art.0.0 %}
+<div>
+  <div class="box">
+<div>
+<form class="form" method="post" action="{% url 'catch_to_admin_forms' row.3 art.0.1.pk %}">
+{% csrf_token %}
+{{ row.0 }}
+<button type="submit" class="btn">Ok</button>
+</form></div>
+<div>{{ row.4 }}</div>
+
+<div>
+  <div class="box_in">
+<div></div>
+<div><strong>{{ row.1 }}</strong></div>
+  </div>
+</div>
+
+  </div>
+</div>
+{% endfor %}
+</div>
+<br>
+<br>
+
+{% endfor %}
+{% endblock %}
