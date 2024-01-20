@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<style>
+details > summary {
+  padding: 2px;
+  width: 200px;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  color: #447e9b;
+  font-weight: bold;
+}
+
+details > p {
+  background-color: white;
+  padding: 4px;
+  margin: 0;
+}
+</style>
+
+
+
+<h3>{% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}</h3>
+<ul>
+<details>
+  <summary>Все</summary>
+{% for choice in choices %}
+    <li{% if choice.selected %} class="selected" {% endif %}>
+    <a href="{{ choice.query_string|iriencode }}" title="{{ choice.display }}">{{ choice.display }}</a></li>
+{% endfor %}
+</details>
+</ul>

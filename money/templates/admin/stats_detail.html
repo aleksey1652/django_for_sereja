@@ -1,0 +1,25 @@
+{% extends "admin/change_list.html" %}
+{% block content_title %}
+    <h1> Раздел статистики: детальная инфа по расходам, доходам, планамт </h1>
+{% endblock %}
+{% block result_list %}
+<br>
+<br>
+<br>
+<div class="results">
+{% for dict_ in list_result %}
+  {% for k, v in dict_.items %}
+  <tr class="{% cycle 'row1' 'row2'%}">
+          <td>
+      <strong>
+      {{ k }}
+      </strong>
+    </td>
+    <td>{{ v }}</td>
+  </tr>
+  {% endfor %}
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}
