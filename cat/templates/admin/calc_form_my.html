@@ -1,0 +1,133 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% block content_title %}
+    {% if extra_data.3 %}
+    <h1><a href="{% url 'start_to_calc' 0 %}"> Назад</a></h1>
+    <h1><strong>{{ extra_data.3.name_computers }}</strong>, Цена:{{ extra_data.3.price_computers }},
+    <a href="{% url 'admin_margin_exch' extra_data.3.pk %}">Наценка:{{ extra_data.3.class_computers }} ,Курс:{{ extra_data.3.warranty_computers }}, Итого:{{ extra_data.4}}</a></h1>
+    {% for row in extra_data.3.promotion_set.all %}---{{ row.prom }}{% endfor %}
+    {% if  not extra_data.5 %}
+{% for row in extra_data.3.promotion_set.all %}
+<a href="">{{ row.prom }} -- удалить ярлык,</a>
+{% endfor %}
+{% endif %}
+{% else %}
+    <h1><strong>Создавайте компы в компьютерных сборках</strong></h1>
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<style>
+.box div { width:400px; display:inline-block; }
+.box2 div { width:600px; display:inline-block; }
+.box_in div { width:100px; display:inline-block; }
+.box_in_in div { width:100px; display:inline-block; }
+.myfield {width:300px;}
+</style>
+
+<div>
+  <div class="box">
+<div>
+  <h1>Детали
+</div>
+
+<div>
+  <div class="box_in">
+<div><h1>Цена</div>
+
+</div>
+</div>
+
+<div>
+  <div class="box_in">
+<div><h1>Другие детали $</div>
+
+</div>
+</div>
+
+<div>
+  <div class="box_in">
+<div><h1>Кол</div>
+
+</div>
+</div>
+
+  </div>
+</div>
+
+<div class="form-row">
+{% for row in extra_data.0 %}
+<div>
+  <div class="box">
+<div>
+<form class="form" method="post" action="{% url 'catch_to_admin_forms' row.3 extra_data.1 %}">
+{% csrf_token %}
+{{ row.0 }}
+<button type="submit" class="btn">Ok</button>
+</form></div>
+{% if extra_data.5 %}<div>{{ row.4 }}</div>{% else %}<div>{{ row.1 }}</div>{% endif %}
+<div>
+<form class="form-inline" method="post" action="{% url 'catch_to_calc_forms' row.3 extra_data.1 %}">
+{% csrf_token %}
+{{ row.2 }}
+<button type="submit" class="btn">Ok</button>
+</form></div>
+{% if  not extra_data.5 %}
+<div>
+  <div class="box_in">
+
+{% if row.4 %}
+<div>
+<form class="form" method="post" action="{% url 'catch_to_admin_forms_num' row.3 extra_data.1 %}">
+{% csrf_token %}
+{{ row.4 }}
+<button type="submit" class="btn">Ok</button>
+</form></div>
+{% else %}
+<div>x1</div>
+{% endif %}
+  </div>
+</div>
+{% else %}
+<div>
+  <div class="box_in">
+<div>{{ row.1 }}</div>
+</div>
+</div>
+{% endif %}
+
+  </div>
+</div>
+{% endfor %}
+</div>
+<br>
+<br>
+
+<h1><strong> Данные для клиента: </strong></h1>
+
+{% for k, v in extra_data.2.0.items %}
+<div class="box">
+  <div><h1>{{ k }}</div>  <div>{{ v }} </h1></div>
+</div>
+
+{% endfor %}
+<br>
+<br>
+<h1><strong> Данные для CRM: </strong></h1>
+
+{% for k, v in extra_data.2.1.items %}
+<div class="box">
+  <div><h1>{{ k }}</div>  <div>{{ v }} </h1></div>
+</div>
+
+{% endfor %}
+
+  </div>
+</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "money/base_generic.html" %}
+
+{% block title %}<title>Bids detail</title>{% endblock %}
+
+{% block content0 %}
+    <li><a href="{% url 'family' %}">Back</a>
+    </li>
+
+{% endblock %}
+
+{% block content2 %}
+<br>
+<br>
+{% if form_b %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_b.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Search</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block content5 %}
+<ul class="sidebar-nav">
+  {% if user.is_authenticated %}
+       <li><a href="{% url 'logout'%}?next={{request.path}}">Logout **** User: {{ user.get_username }}</a></li>
+     {% else %}
+       <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+     {% endif %}
+    </ul>
+{% endblock %}
+{% block content6 %}
+<ul class="sidebar-nav">
+          <li><strong>ID:</strong>{{ bids.ID }}</li>
+          <li><strong>Site:</strong> {{ bids.site }}</li>
+          <li><strong>Status:</strong> {{ bids.status }}</li>
+          <li><strong>SposobOplaty:</strong> {{ bids.sposobOplaty }}</li>
+          <li><strong>Date_ch:</strong>{{ bids.date_ch }}</li>
+          <li><strong>Nds:</strong> {{ bids.nds }}</li>
+          <li><strong>Nalog_na_pribil:</strong> {{ bids.nalog_na_pribil }}</li>
+          <li><strong>Few_sborsik:</strong> {{ bids.few_sborsik }}</li>
+
+
+          <div style="margin-left:20px;margin-top:20px">
+            <h4>Goods</h4>
+
+            {% for g in bids.goods_set.all %}
+            <hr>
+            <p><strong>Discription pars:</strong> {{g.discr}}</p>
+            <p><strong>Kind:</strong> {{g.kind}}</p>
+            <p><strong>Amount:</strong> {{g.amount}}</p>
+            <p class="text-muted"><strong>Summa:</strong> {{g.summa}} UA</p>
+            {% endfor %}
+          </div>
+          {% for message in messages %}
+              <li class="{{ message.tags }}">
+                  {{ message|safe }}
+                  <a href="#" class="close"></a>
+              </li>
+          {% endfor %}
+      </ul>
+{% endblock %}
