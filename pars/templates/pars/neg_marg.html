@@ -1,0 +1,235 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-danger mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1280px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>></h6><h5>negative_margine</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px
+">
+{% if pos_neg == 'name_parts' %}
+<a class="navbar-text text-dar ml-2"><h5>Negative price or search parts</h5></a>
+{% else %}
+<a class="navbar-text text-dar ml-2"><h5>Positive price or search parts</h5></a>
+{% endif %}
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Advanced</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'get_negative_margin' %}">Negative_Margin</a>
+        <a class="dropdown-item" href="{% url 'get_positive_margin' %}">Positive_Margin</a>
+        <a class="dropdown-item" href="{% url 'send_sheet' 'itblok' %}">Send_Itblok</a>
+        <a class="dropdown-item" href="{% url 'send_sheet' 'versum' %}">Send_Versum</a>
+        <a class="dropdown-item" href="{% url 'articlecreate' %}">Article add</a>
+        <a class="dropdown-item" href="{% url 'forversum' '-' 0 %}">for_Versum_site</a>
+      </div>
+    <li>
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">{{ pos_neg }}</button>
+    </form>
+    </span>
+    </li>
+  </ul>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px
+">
+<div class="container">
+  <div class="row row-cols-5">
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">IntProc</a>
+        </li>
+        {% for d in short.iproc%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">AmdProc</a>
+        </li>
+        {% for d in short.aproc%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Mem</a>
+        </li>
+        {% for d in short.mem%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">IntMb</a>
+        </li>
+        {% for d in short.imb%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">AmdMb</a>
+        </li>
+        {% for d in short.amb%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Video</a>
+        </li>
+        {% for d in short.video%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Hdd</a>
+        </li>
+        {% for d in short.hdd%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Ssd</a>
+        </li>
+        {% for d in short.ssd%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Cooler</a>
+        </li>
+        {% for d in short.cool%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Ps</a>
+        </li>
+        {% for d in short.ps%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Case</a>
+        </li>
+        {% for d in short.case%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.0.name_parts|truncatechars:30}}  by providers: {{d.0.min_price|truncatechars:30}} on comp: {{d.0.x_code|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for dd in d.1%}
+              <a class="dropdown-item" href="{% url 'assembly' dd.pk %}">{{ dd.name_computers }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+</nav>
+{% endblock %}
