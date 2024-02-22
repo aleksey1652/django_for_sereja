@@ -23,7 +23,7 @@ import re
 import math
 from money.salary import *
 from money.onec_transforms_advance import StatsRules
-#promotions_admin_edit x_code catch_to_admin_forms admin_test catch_to_calc_forms webhook Офис ПК витрина 2% ПК_витрина catch_to_admin_forms admin_margin_exch
+#promotions_admin_edit x_code catch_to_admin_forms admin_test catch_to_calc_forms webhook Офис ПК витрина 2% ПК_витрина catch_to_admin_forms admin_margin_exch admin_special_price
 #Gross_profit Expense admin_test promotions_admin_edit change_assembly cash_rate_already
 
 
@@ -268,7 +268,8 @@ def admin_special_price(request, test_pk):
                                             reverse('admin:cat_computers_changelist')
                                             )
 
-            sp_to_bd = round(special_price * margin * exch)
+            #sp_to_bd = round(special_price * margin * exch)
+            sp_to_bd = round(special_price) # поменяли алгоритм
 
             comp = Computers.objects.filter(pk__in=comps_pk)
             comp.update(warranty_computers=sp_to_bd)
