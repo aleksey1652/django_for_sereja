@@ -32,6 +32,7 @@ def special_price(request, pc_pk):
         form = ComputersSpecialPrice(request.POST)
         if form.is_valid():
             margin = form.cleaned_data['class_computers']
+            margin = round(margin, 1)
             special_price = form.cleaned_data['warranty_computers']
             exch = form.cleaned_data['exch']
             try:
@@ -44,11 +45,14 @@ def special_price(request, pc_pk):
                                             args=(comp.pk,))
                                             )
 
-            sp_to_bd = round(special_price * margin * exch)
+            #sp_to_bd = round(special_price * margin * exch)
+            sp_to_bd = round(special_price) # поменяли алгоритм
 
-            comp.warranty_computers=sp_to_bd
+            comp.warranty_computers = sp_to_bd
+            comp.class_computers = margin
             comp.save()
-            messages.success(request,f'В {comp.name_computers} спеццена теперь: {sp_to_bd}')
+            messages.success(
+            request,f'В {comp.name_computers} спеццена теперь: {sp_to_bd}, наценка:{margin}')
 
             return  HttpResponseRedirect(
                                         reverse(f'admin:cat_computers_change',
