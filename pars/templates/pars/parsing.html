@@ -1,0 +1,148 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>></h6><h5>admin2</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<div class="navbar-brand-lg mt-3 mb-1 mr-5 ">
+<h2>Uploader</h2>
+</div>
+</nav>
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-success mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1290px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+
+<nav class="navbar navbar-expand navbar-light mr-5 ml-5 p-0" style="background-color: #F5DEB3;width: 1290px">
+<div class="d-flex bd-highlight" id="navbarsExample05">
+  <ul class="navbar-nav ">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">From where</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'uploader' 'update' %}">Price update</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'tech' %}">Tech update</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'itblok' %}">Itblok</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'hotline' %}">Hotline</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'artline' %}">Artline</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'telemart' %}">Telemart</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'compx' %}">Compx</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'result_last' %}">Results parsing</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'mail' %}">Mail settings</a>
+      </div>
+    </div>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Compare sites</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'compare_sites' 'it_art' %}">Itblok-Artline</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'it_fury' %}">Itblok-Digitalfury</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'ver_art' %}">Versum-Artline</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'ver_fury' %}">Versum-Digitalfury</a>
+      </div>
+    </div>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Advanced</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'get_negative_margin' %}">Negative_Margin</a>
+        <a class="dropdown-item" href="{% url 'get_positive_margin' %}">Positive_Margin</a>
+        <a class="dropdown-item" href="{% url 'articlecreate' %}">Article add</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'cpu' 0 %}">for_Versum_site</a>
+        <a class="dropdown-item" href="{% url 'forversum_other' 'cpu' 0 %}">for_Versum_single_parts</a>
+        <a class="dropdown-item" href="{% url 'promotion' 'versum' 0 %}">Promotion</a>
+      </div>
+    </div>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add files</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'uploader' 'onec'%}">Upload 1C</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'itlink' %}">Upload from itlink</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'erc' %}">Upload from erc</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'be' %}">Upload from Be_quiet</a>
+        <a class="dropdown-item" href="{% url 'uploader' 'DiWeave' %}">Upload from DiWeave</a>
+      </div>
+    </div>
+    </li>
+    {% if onec %}
+    <li class="p-2  bg-warning">
+        <a class="nav-item text-dark ml-2">For load 1C file >>></a>
+    </li>
+    <li class="p-2 bd-highlight">
+      <form method="post" enctype="multipart/form-data" action="{% url 'uploader' '-' %}">
+    {% csrf_token %}
+    <input type="file" name="myfile">
+    <button type="submit">Upload 1C</button>
+  </form>
+  </li>
+  {% endif %}
+  {% if itlink %}
+  <li class="p-2  bg-warning">
+      <a class="nav-item text-dark ml-2">For load itlink file(xls) >>></a>
+  </li>
+  <li class="p-2 bd-highlight">
+    <form method="post" enctype="multipart/form-data" action="{% url 'uploader' '-' %}">
+  {% csrf_token %}
+  <input type="file" name="itlink">
+  <button type="submit">Upload from itlink</button>
+</form>
+  </li>
+  {% endif %}
+  {% if erc %}
+  <li class="p-2  bg-warning">
+      <a class="nav-item text-dark ml-2">For load erc file(xlsx) >>></a>
+  </li>
+  <li class="p-2 bd-highlight">
+    <form method="post" enctype="multipart/form-data" action="{% url 'uploader' '-' %}">
+  {% csrf_token %}
+  <input type="file" name="erc">
+  <button type="submit">Upload from erc</button>
+</form>
+  </li>
+  {% endif %}
+  {% if be %}
+  <li class="p-2  bg-warning">
+      <a class="nav-item text-dark ml-2">For load be file(xlsx) >>></a>
+  </li>
+  <li class="p-2 bd-highlight">
+    <form method="post" enctype="multipart/form-data" action="{% url 'uploader' '-' %}">
+  {% csrf_token %}
+  <input type="file" name="be">
+  <button type="submit">Upload from be</button>
+</form>
+  </li>
+  {% endif %}
+  {% if DiWeave %}
+  <li class="p-2  bg-warning">
+      <a class="nav-item text-dark ml-2">For load DiWeave file(xlsx) >>></a>
+  </li>
+  <li class="p-2 bd-highlight">
+    <form method="post" enctype="multipart/form-data" action="{% url 'uploader' '-' %}">
+  {% csrf_token %}
+  <input type="file" name="DiWeave">
+  <button type="submit">Upload from DiWeave</button>
+</form>
+  </li>
+  {% endif %}
+  </ul>
+</div>
+{% endblock %}

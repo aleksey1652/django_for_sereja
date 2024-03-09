@@ -1,0 +1,250 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>></h6><h5>article_add</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="{% url 'articlecreate' %}">Update page</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="{% url 'uploader' '-' %}">Admin2</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="">Partnumber_from_google_sheet</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="">Load_versum_parts_description</a>
+    </li>
+  </ul>
+</nav>
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-warning mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1280px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #808080;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+    <a class="navbar-text">For new article or parts used kind: cool, imb, case, ssd, hdd, aproc, iproc, amb, video, ps, mem, vent,mon,wifi,km</a>
+</div>
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+    <a class="navbar-text">Partnumber add</a>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+    </form>
+    </span>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+    <a class="navbar-text">Computers parts add</a>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ form2.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+    </form>
+    </span>
+</div>
+</nav>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+    <a class="navbar-text">Computers parts search, delete, rename</a>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ formd.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+    </form>
+    </span>
+</div>
+</nav>
+{% if if_search %}
+{% for f in if_search %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #DEB887;border: 4px double black;width: 1212px">
+  <ul class="navbar-nav">
+    <span class="border-right border-dark">
+    <li class="navbar-text" style="width: 300px;">
+<a class="navbar-text text-dark ml-2" style="width: 300px;">{{f.name_parts|truncatechars:40}}:{{f.kind}}</a>
+</li>
+</span>
+<span class="border-right border-dark" style="width: 300px;">
+<li class="navbar-text ml-2" style="width: 300px;">
+  <form class="form-inline" method="post" action="{% url 'articlecreate' %}">
+    {% csrf_token %}
+    <div class="form-check">
+  <input class="form-check-input"  type="checkbox" value="{{f.pk}}" name="del">
+  <label class="form-check-label" for="flexCheckDefault">
+  Delete
+  </label>
+  <button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Delete</button>
+  </form>
+</li>
+</span>
+<span class="border-right border-dark" style="width: 300px;">
+<li class="navbar-text ml-2" style="width: 300px;">
+  <form class="form-inline " method="post" id='2' action="{% url 'articlecreate' %}">
+    {% csrf_token %}
+    New name after 'space'<input class="form-control ml-2" value="{{f.pk}}" name="rename" type="text" style="width: 190px; height:30px">
+  </form>
+</li>
+</span>
+{% if f.parts_full.first %}
+<span class="border-right border-dark" style="width: 300px;">
+  <li class="navbar-text ml-2" style="width: 300px;">
+    <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-dark" style="background-color: #F5DEB3;" href="{% url  'pc_assembly_page_advanced' f.pk 'versum,itblok' 0 %}">Stick with: {{f.parts_full.first.name_parts}}</a>
+  </li>
+</span>
+{% endif %}
+</ul>
+</nav>
+{% endfor %}
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+    <a class="navbar-text">Price parts search and add-remove in hot list</a>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+      <span>
+        <form class="form-inline" method="get" action="{% url 'articlecreate' %}">
+          <input class="form-control" name="hots" type="text" style="width: 300px;">
+          <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+        </form>
+    </span>
+</div>
+</nav>
+{% if if_hot %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #DEB887;border: 4px double black;width: 412px">
+  <ul class="navbar-nav">
+    <span class="border-right border-dark">
+<span class="border-right border-dark">
+<li class="navbar-text ml-2" style="width: 300px;">
+  <form class="form" method="post" action="{% url 'articlecreate' %}">
+  {% csrf_token %}
+  {% for f in if_hot %}
+  <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="{{ f.pk }}" name="{{ f.pk }}">
+  <label class="form-check-label" for="flexCheckDefault">
+  <a class="btn btn-outline-secondary text-dark" style="background-color: #F5DEB3;">
+  {{f.name_parts|truncatechars:40}}:{% if not f.is_hot %}<mark>Hot</mark>{% endif %}</mark>
+  </a>
+  </label>
+  {% endfor %}
+  <button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Change</button>
+  </form>
+</li>
+</span>
+</ul>
+</nav>
+{% endif %}
+{% if par %}
+{% for d in par %}
+  <nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #DEB887;border: 4px double black;width: 2890px">
+  <span class="border-right border-dark">
+  <a class="navbar-text text-dark ml-2" style="width: 200px;">{{d.first.partnumber_parts|truncatechars:40}}</a>
+  </span>
+  <div class="collapse navbar-collapse" id="navbarsExample05">
+    <ul class="navbar-nav">
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 380px;">
+        {% if d.first.url_parts %}
+          <a class="btn nav-item ml-2" href="{{d.first.url_parts}}">{{d.first.name_parts|truncatechars:40}}</a>
+        {% else %}
+          <a class="btn nav-item ml-2" href="{{d.1.url_parts}}">{{d.first.name_parts|truncatechars:40}}</a>
+        {% endif %}
+      </li>
+      </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 100px;">
+        <a class="nav-item text-dark ml-2">{{d.first.providerprice_parts}}</a>
+      </li>
+      </span>
+    </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text ml-2 text-dark" style="width: 50px;">
+        <a class="nav-item">{{d.first.providers.name_provider}}</a>
+      </li>
+      </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 100px;">
+        <a class="nav-item text-dark ml-2">{{d.first.availability_parts}}</a>
+      </li>
+      </span>
+      {% for p in d %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-dark ml-2"><mark>{{p.providers.name_provider}}</mark>; price: {{p.providerprice_parts}}$; status: {{p.availability_parts}}</a>
+      </li>
+      </span>
+      {% endfor %}
+      {% if d.first.remainder %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-info ml-2">{{d.first.remainder}}</a>
+      </li>
+      </span>
+      {% endif %}
+      {% if d.first.date_chg %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-danger ml-2">{{d.first.date_chg}}</a>
+      </li>
+      </span>
+      {% endif %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 110px;">
+        <form class="form-inline" method="post" action="{% url 'articlecreate' %}">
+          {% csrf_token %}
+          <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="{{d.first.pk}};{{short}}" name="stick">
+    <label class="form-check-label" for="flexCheckDefault">
+    </label>
+    <button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Stick</button>
+  </form>
+      </li>
+      </span>
+    </ul>
+  </div>
+  </nav>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
