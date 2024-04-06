@@ -1223,40 +1223,6 @@ docker system prune #clear
 python3 manage.py runserver 0.0.0.0:8000
 python3 manage.py dumpdata --exclude auth.permission --exclude contenttypes > db_.json
   git:
-    #git clone https://github.com/aleksey1652/django_for_sereja
-
-    # if need
-    git init
-
-    git add -A
-      #git add [file]
-      #git commit -m "Commit message"
-      #git push origin [master]
-    git commit -m "124 version of application moved into github"
-      #git remote
-      #git remote remove django_for_sereja
-    git remote add django_for_sereja https://github.com/aleksey1652/django_for_sereja
-    git checkout -b master124 #create branch (ветка)
-    #git push django_for_sereja master2
-    git push --set-upstream https://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@github.com/aleksey1652/django_for_sereja.git master124
-
-    #git fetch django_for_sereja
-
-    #info
-    git branch -r
-
-    git branch -vv
-  server:
-    mc
-    look up !!!!! few_sborsik !!!! db_index=False
-    #git clone -b master --single-branch https://github.com/aleksey1652/django_for_sereja
-    git clone -b master124 --single-branch https://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@github.com/aleksey1652/django_for_sereja.git
-    cd /work/django_for_sereja
-    docker-compose -f docker-compose.prod.yml down -v
-    #in settings add 'versum.site' to allowed host,more: env file!!!
-    docker-compose -f docker-compose.prod.yml up -d --build
-
-    docker cp 39d0eb6811c3:/usr/src/sereja/media temp ---копируем из контейнера
 
 колонки для один деталей: цена поставщ, цена в грн,
 цена с нац(если вкл руч, тянет с рпрайс, это 1 колонка), нац,
@@ -1284,42 +1250,6 @@ docker cp /home/aleksey1652/sereja/1c.xlsx f42cc87524d6:/usr/src/sereja/media
 docker-compose -f docker-compose.prod.yml up --build
 docker-compose -f docker-compose.prod.yml down -v
 docker-compose -f docker-compose.prod.yml up -d --build
-
-emma korti
-*01021979a*
-nC83xlpuHRjl
-
-
-12EbWWQj6e6ZiJNU2AeoubGFQxamDvxUkA
-12EbWWQj6e6ZiJNU2AeoubGFQxamDvxUkA
-
-0x57502Aa62bF96c367d2C2455aAFE7222eca061B6 usdt
-
-bc1qm2svnxjaxdh3n245gkyy5u3qnt8cxmj52xhcg3
-bc1qsf28dnxx2ar2keh9vyv8vl4yelvvy33aemqg25
-
-bc1qe6yw5f59y7tvk539gy6gmk90586h8pnlnh8fl8
-bc1q5aup2kv3w3d4zhsr529e733rhhuvm5gfa8s0ju
-bc1q6wqugtzzehpu6r27l5vvk5fr94vhfdwj47qnq4
-bc1q4c2cc6z0cg507pz73jggp0rfnlcmxthprw3zwj
-bc1qdtwdpa7w32x0kvzy2q70n9kem9katdcwk8kx5k юра втс
-bc1qdtwdpa7w32x0kvzy2q70n9kem9katdcwk8kx5k
-bc1qdtwdpa7w32x0kvzy2q70n9kem9katdcwk8kx5k
-
-  import requests
-  response = requests.post(
-    'https://www.cutout.pro/api/v1/matting?mattingType=6',
-    files={'file': open('/path/to/file.jpg', 'rb')},
-    headers={'APIKEY': 'INSERT_YOUR_API_KEY_HERE'},
-  )
-  with open('out.png', 'wb') as out:
-    out.write(response.content)
-
-from django.db.models import F
-from django.db.models.functions import Round
-#Cooler.objects.filter(id=your_cooler_id).update(price=Round(F('price')))
-
-versum_margin = 1.25, versum_usd = 37.6 (Versum Api Parts)
 
 
 parts_simple (любая комп деталь в поле которой special_price=0 т.е без скидки)

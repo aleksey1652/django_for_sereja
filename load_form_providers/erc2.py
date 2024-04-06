@@ -267,14 +267,14 @@ def get_erc(usd_ex):
     try:
         #p1 = pd.read_excel(MEDIA_ROOT+'/1c.xlsx', usecols=cols,header=None)
         erc = pd.read_excel(MEDIA_ROOT+'/прайс_erc.xls',
-        usecols=[2, 3, 4, 6, 8, 9, 12],header=None)
+        usecols=[2, 3, 4, 6, 9, 10, 13],header=None)
     except Exception as e:
         print(e.__class__)
         return 0, 0, 0
 
     erc_=erc.rename(columns={2:'subcategory', 3:'name_parts',
-            4:'partnumber_parts', 6: 'rrp', 8:'providerprice_parts',
-            9: 'usd', 12:'availability_parts'})
+            4:'partnumber_parts', 6: 'rrp', 9:'providerprice_parts',
+            10: 'usd', 13:'availability_parts'})
 
     for x in erc_.iloc:
         if isinstance(x['subcategory'],str) and x['subcategory'] in dict1:

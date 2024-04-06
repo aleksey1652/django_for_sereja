@@ -299,7 +299,7 @@ class Parts_shortAdmin(admin.ModelAdmin):
         css = {
             'all': ('admin/css/admin_custom.css',),
         }
-        #js = ('admin/js/auto_save.js',)
+        js = ('admin/js/auto_save.js',)
 
     def relate_to_parts_full(self, request, queryset):
         # admin_test from money.views.py
