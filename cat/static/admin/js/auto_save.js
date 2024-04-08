@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var saveButton = document.querySelector('.default');
     var inputs = document.querySelectorAll('td.field-x_code input[type="number"]');
     var inputsMin = document.querySelectorAll('td.field-min_price input[type="number"]');
+    var incomps = document.querySelectorAll('td.field-in_comps input[type="checkbox"]');
+    var inauto = document.querySelectorAll('td.field-auto input[type="checkbox"]');
 
     function handleInputBlur() {
     // Нажимаем кнопку сохранения
@@ -25,6 +27,17 @@ document.addEventListener("DOMContentLoaded", function() {
     input.addEventListener('blur', handleInputBlur);
     });
     }
+    if (incomps) {
+    incomps.forEach(function(input) {
+    input.addEventListener('blur', handleInputBlur);
+    });
+    }
+    if (inauto) {
+    inauto.forEach(function(input) {
+    input.addEventListener('blur', handleInputBlur);
+    });
+    }
+
     if (saveButton) {
         saveButton.addEventListener('click', function() {
             // Логика сохранения данных
