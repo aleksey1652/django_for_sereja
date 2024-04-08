@@ -6,7 +6,7 @@ from django.http import HttpResponse
 #from sereja.tasks_for_models import send_mail_task
 #from django.db.models.functions import Length
 #from django.db.models import CharField
-#CharField.register_lookup(Length) 
+#CharField.register_lookup(Length)
 
 
 CHOISE_RU = (
@@ -130,10 +130,12 @@ class Cooler_OTHER(models.Model):
 
     get_sum_part_number.short_description = 'связь-партнамберов'
 
-    def get_r_price_rrp_price(self):
-        rrp = self.rrp_price if self.rrp_price else 0
-        return f"{self.r_price}/ {rrp}"
-    get_r_price_rrp_price.short_description = 'r_price/ rrp'
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -233,6 +235,12 @@ class CPU_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -367,6 +375,13 @@ class MB_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -469,6 +484,13 @@ class RAM_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -562,6 +584,13 @@ class HDD_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -650,6 +679,13 @@ class PSU_OTHER(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -763,6 +799,13 @@ class GPU_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -869,6 +912,13 @@ class FAN_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -972,6 +1022,13 @@ class CASE_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1066,6 +1123,13 @@ class SSD_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1156,6 +1220,13 @@ class WiFi_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1245,6 +1316,13 @@ class Cables_OTHER(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1333,6 +1411,13 @@ class Soft_OTHER(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')

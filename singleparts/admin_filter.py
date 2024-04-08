@@ -21,6 +21,55 @@ class TechFilter(admin.SimpleListFilter):
             groups__isnull=True
                                 )
 
+class LabelFilter(admin.SimpleListFilter):
+
+    title = 'Label'
+    parameter_name = 'label'
+    template = "admin/filter_admin.html"
+
+    def lookups(self, request, model_admin):
+        #case = set(Cooler_OTHER.objects.filter(label__isnull=False).
+        #values_list('label', flat=True))
+        #labs =  [(vendor, vendor) for vendor in case]
+        #main = [('пусто', 'пусто'), ('заполнено', 'заполнено'),]
+        #return tuple(main + labs)
+        return (
+            ('пусто', 'пусто'),
+            ('заполнено', 'заполнено'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() and self.value() == 'пусто':
+            return queryset.filter(
+                label__isnull=True
+                                    )
+        elif self.value() and self.value() == 'заполнено':
+            return queryset.filter(
+                label__isnull=False
+                                    )
+        #elif self.value() and self.value() not in ('пусто', 'пусто'):
+        #    return queryset.filter(label=self.value())
+        return queryset
+
+class FullFilter(admin.SimpleListFilter):
+
+    title = 'Заполнен'
+    parameter_name = 'full'
+    template = "admin/filter_admin.html"
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Да', 'Да'),
+            ('Нет', 'Нет'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() and self.value() == 'Да':
+            return queryset.filter(full=True)
+        elif self.value() and self.value() == 'Нет':
+            return queryset.filter(full=False)
+        return queryset
+
 class ProvFilter(admin.SimpleListFilter):
 
     title = 'provider'
