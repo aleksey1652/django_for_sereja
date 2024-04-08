@@ -212,12 +212,26 @@ def get_new_comp(amd_intel, comp_pk, name_new):
 
     comp = Computers.objects.get(pk=comp_pk)
 
+    try:
+        kind_proc = Parts_short.objects.get(
+        name_parts=comp.proc_computers).kind
+    except:
+        kind_proc = None
+
     if amd_intel == 'AMD':
-        proc = Parts_short.objects.filter(kind2=False, kind='aproc').last()
-        mb = Parts_short.objects.filter(kind2=False, kind='amb').last()
+        if kind_proc == 'aproc':
+            proc = comp.proc_computers
+            mb = comp.mb_computers
+        else:
+            proc = Parts_short.objects.filter(kind2=False, kind='aproc').last()
+            mb = Parts_short.objects.filter(kind2=False, kind='amb').last()
     else:
-        proc = Parts_short.objects.filter(kind2=False, kind='iproc').last()
-        mb = Parts_short.objects.filter(kind2=False, kind='imb').last()
+        if kind_proc == 'iproc':
+            proc = comp.proc_computers
+            mb = comp.mb_computers
+        else:
+            proc = Parts_short.objects.filter(kind2=False, kind='iproc').last()
+            mb = Parts_short.objects.filter(kind2=False, kind='imb').last()
 
     comp_copy = comp
     comp_copy.name_computers = name_new
@@ -434,10 +448,11 @@ def calc_comp_context(pk_):
     form_full = FullForm()
 
     comp_parts = comp.values(
-    'proc_computers', 'mb_computers', 'mem_computers', 'video_computers', 'hdd_computers',
-    'ps_computers', 'case_computers', 'cool_computers', 'vent_computers',
-    'vent_computers', 'mon_computers', 'wifi_computers', 'km_computers',
-    'cables_computers', 'soft_computers')[0]
+    'proc_computers', 'cool_computers', 'mb_computers',
+    'mem_computers', 'video_computers', 'hdd_computers',
+    'ps_computers', 'case_computers', 'vent_computers',
+    'vent_computers', 'mon_computers', 'wifi_computers',
+    'km_computers', 'cables_computers', 'soft_computers')[0]
     try:
         comp_parts['hdd2_computers'] = comp_parts['hdd_computers'].split(';')[1]
     except:

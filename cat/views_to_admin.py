@@ -13,7 +13,7 @@ from random import choice
 from load_form_providers.load_element import get_min_short, to_article2_1
 from cat.views_to_admin_try import *
 from django.db.models import Q
-#providerprice_parts x_code
+#providerprice_parts x_code  get_comp_context
 
 def count_video_price_per_our_price(art_comp_price, parts_price):
     margin = Gross_profit.objects.filter(site='Versum').last()
@@ -27,10 +27,11 @@ def get_comp_context(object_id):
     comp = Computers.objects.filter(pk=object_id)
 
     comp_parts = comp.values(
-    'proc_computers', 'mb_computers', 'mem_computers', 'video_computers', 'hdd_computers',
-    'ps_computers', 'case_computers', 'cool_computers', 'vent_computers',
-    'vent_computers', 'mon_computers', 'wifi_computers', 'km_computers',
-    'cables_computers', 'soft_computers')[0]
+    'proc_computers', 'cool_computers', 'mb_computers',
+    'mem_computers', 'video_computers', 'hdd_computers',
+    'ps_computers', 'case_computers', 'vent_computers',
+    'vent_computers', 'mon_computers', 'wifi_computers',
+    'km_computers', 'cables_computers', 'soft_computers')[0]
     try:
         comp_parts['hdd2_computers'] = comp_parts['hdd_computers'].split(';')[1]
     except:
