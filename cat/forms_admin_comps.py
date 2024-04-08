@@ -2,7 +2,7 @@ from django.forms import ModelForm, Textarea, CharField, ChoiceField
 from .models import *
 from django.core.exceptions import ValidationError
 from django import forms
-#providerprice_parts price
+#providerprice_parts price Form_text_input
 
 dict_kind_to_short = {
 'iproc': 'proc_computers',
@@ -390,6 +390,7 @@ class Short_kind_Form(ModelForm):
 
 class Form_text_input(forms.Form):
     new = forms.CharField(
-        label='Ручной ввод детали',
-        widget=forms.TextInput(attrs={'style': 'width: 400px;'}),
+        label='',
+        initial='Ручной ввод детали',
+        widget=forms.TextInput(attrs={'style': 'width: 486px;'}),
     )
