@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import *
 from .admin_filter import *
-from singleparts.admin_filter import ProvFilter
+from singleparts.admin_filter import ProvFilter, FullFilter, LabelFilter
 
 
 class Monitors_Inline(admin.StackedInline):
@@ -16,15 +16,16 @@ class Monitors_Inline(admin.StackedInline):
 @admin.register(Monitors)
 class MonitorsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorMonitors, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorMonitors, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     exclude = ('sc_o', )
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -33,6 +34,12 @@ class MonitorsAdmin(admin.ModelAdmin):
     inlines = [
         Monitors_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -84,14 +91,15 @@ class KM_Inline(admin.StackedInline):
 @admin.register(KM)
 class KMAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorKM, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorKM, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -100,6 +108,12 @@ class KMAdmin(admin.ModelAdmin):
     inlines = [
         KM_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -151,14 +165,15 @@ class Keyboards_Inline(admin.StackedInline):
 @admin.register(Keyboards)
 class KeyboardsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorKeyboards, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorKeyboards, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -167,6 +182,12 @@ class KeyboardsAdmin(admin.ModelAdmin):
     inlines = [
         Keyboards_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -218,14 +239,15 @@ class Mouses_Inline(admin.StackedInline):
 @admin.register(Mouses)
 class MousesAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorMouses, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorMouses, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -234,6 +256,12 @@ class MousesAdmin(admin.ModelAdmin):
     inlines = [
         Mouses_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -285,14 +313,15 @@ class Pads_Inline(admin.StackedInline):
 @admin.register(Pads)
 class PadsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorPads, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorPads, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -301,6 +330,12 @@ class PadsAdmin(admin.ModelAdmin):
     inlines = [
         Pads_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -352,14 +387,15 @@ class Headsets_Inline(admin.StackedInline):
 @admin.register(Headsets)
 class HeadsetsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorHeadsets, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorHeadsets, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -368,6 +404,12 @@ class HeadsetsAdmin(admin.ModelAdmin):
     inlines = [
         Headsets_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -419,14 +461,15 @@ class Webcams_Inline(admin.StackedInline):
 @admin.register(Webcams)
 class WebcamsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorWebcams, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorWebcams, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -435,6 +478,12 @@ class WebcamsAdmin(admin.ModelAdmin):
     inlines = [
         Webcams_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -486,14 +535,15 @@ class WiFis_Inline(admin.StackedInline):
 @admin.register(WiFis)
 class WiFisAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorWiFis, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorWiFis, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -502,6 +552,12 @@ class WiFisAdmin(admin.ModelAdmin):
     inlines = [
         WiFis_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -553,14 +609,15 @@ class Acoustics_Inline(admin.StackedInline):
 @admin.register(Acoustics)
 class AcousticsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorAcoustics, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorAcoustics, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -569,6 +626,12 @@ class AcousticsAdmin(admin.ModelAdmin):
     inlines = [
         Acoustics_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -620,14 +683,15 @@ class Tables_Inline(admin.StackedInline):
 @admin.register(Tables)
 class TablesAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorTables, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorTables, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -636,6 +700,12 @@ class TablesAdmin(admin.ModelAdmin):
     inlines = [
         Tables_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -687,14 +757,15 @@ class Chairs_Inline(admin.StackedInline):
 @admin.register(Chairs)
 class ChairsAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorChairs, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorChairs, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -703,6 +774,12 @@ class ChairsAdmin(admin.ModelAdmin):
     inlines = [
         Chairs_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -754,14 +831,15 @@ class Accessories_Inline(admin.StackedInline):
 @admin.register(Accessories)
 class AccessoriesAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = ('vendor', ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = ('vendor', ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -770,6 +848,12 @@ class AccessoriesAdmin(admin.ModelAdmin):
     inlines = [
         Accessories_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -821,15 +905,16 @@ class Cabelsplus_Inline(admin.StackedInline):
 @admin.register(Cabelsplus)
 class CabelsplusAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorCabelsplus, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorCabelsplus, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     exclude = ('cab_col_ua', 'cab_col_ru', 'cab_col_u', 'cab_col_r')
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -838,6 +923,12 @@ class CabelsplusAdmin(admin.ModelAdmin):
     inlines = [
         Cabelsplus_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -889,14 +980,15 @@ class Filters_Inline(admin.StackedInline):
 @admin.register(Filters)
 class FiltersAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = (VendorFilters, ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = (VendorFilters, ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -905,6 +997,12 @@ class FiltersAdmin(admin.ModelAdmin):
     inlines = [
         Filters_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'
@@ -956,14 +1054,15 @@ class Others_Inline(admin.StackedInline):
 @admin.register(Others)
 class OthersAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
-    list_filter = ('vendor', ProvFilter, 'is_active', 'full',
-    TechFilter, 'auto', 'hotline', 'creditoff')
+    list_filter = ('vendor', ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
     search_fields = ['part_number', 'name']
     list_display = (
-    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'rentability',
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent_price_ua',
     'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
     'hotline', 'delivery', 'creditoff',
     )
+    list_editable = ('r_price', 'price_rent', 'auto')
     actions = ['change_rentability', 'change_pack_few', 'change_auto']
     autocomplete_fields = ['groups',]
     save_as = True
@@ -972,6 +1071,12 @@ class OthersAdmin(admin.ModelAdmin):
     inlines = [
         Others_Inline,
     ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
 
     def get_rentability(self, object):
         return f'{str(object.price_rent)}({str(object.rentability)})'

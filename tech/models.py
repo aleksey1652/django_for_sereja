@@ -161,6 +161,13 @@ class Monitors(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -283,6 +290,13 @@ class KM(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -412,6 +426,13 @@ class Keyboards(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -517,6 +538,13 @@ class Mouses(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -605,6 +633,13 @@ class Pads(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -749,6 +784,13 @@ class Headsets(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -848,6 +890,13 @@ class Webcams(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -938,6 +987,13 @@ class WiFis(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1058,6 +1114,13 @@ class Acoustics(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1180,6 +1243,13 @@ class Tables(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1301,6 +1371,13 @@ class Chairs(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1390,6 +1467,13 @@ class Accessories(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1502,6 +1586,13 @@ class Cabelsplus(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1602,6 +1693,13 @@ class Filters(models.Model):
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
 
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1686,6 +1784,13 @@ class Others(models.Model):
         rrp = self.rrp_price if self.rrp_price else 0
         return f"{self.r_price}/ {rrp}"
     get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '$'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
