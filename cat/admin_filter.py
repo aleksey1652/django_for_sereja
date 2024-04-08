@@ -132,6 +132,31 @@ class ShortsKind2Filter(admin.SimpleListFilter):
                                     )
         return queryset
 
+class SpecialPriceFilter(admin.SimpleListFilter):
+
+    title = 'Скидка'
+    parameter_name = 'special_price'
+    template = "admin/filter_admin.html"
+
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Нет', 'Нет'),
+            ('Да', 'Да'),
+        )
+
+    def queryset(self, request, queryset):
+
+        if self.value() and self.value() == 'Да':
+            return queryset.filter(
+                special_price__gt=0
+                                    )
+        elif self.value() and self.value() == 'Нет':
+            return queryset.filter(
+                special_price=0
+                                    )
+        return queryset
+
 class ShortsIn_compsFilter(admin.SimpleListFilter):
 
     title = 'В_сборке'

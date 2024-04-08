@@ -283,8 +283,9 @@ class Parts_shortAdmin(admin.ModelAdmin):
     'kind', 'itblok_versum_view', 'parts_full_view', 'get_providers',
     'description_view', 'special_price', 'config',
     )
-    list_editable = ('x_code', 'min_price')
-    list_filter = ('kind', ShortsKind2Filter, 'auto', ShortsIn_compsFilter,)
+    list_editable = ('x_code', 'min_price', 'in_comps','auto')
+    list_filter = (PriceKindFilter, ShortsKind2Filter, 'auto',
+    ShortsIn_compsFilter, SpecialPriceFilter)
     #'hand',Parts_short_x_code_ListFilter
     search_fields = ['name_parts', 'x_code', 'partnumber_list']
     #autocomplete_fields = ['computer_shorts']
