@@ -1,0 +1,37 @@
+{% extends 'cat/m.html' %}
+{% block main_section %}
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-warning mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1290px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 2890px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-' %}">Admin2</a>
+    </li>
+    <li class="navbar-text">
+    <form method="post" action="{% url 'uploader' 'mail' %}">
+      {% csrf_token %}
+      {{ form.as_ul }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+    </form>
+    </li>
+  </ul>
+</div>
+</nav>
+
+{% endblock %}
