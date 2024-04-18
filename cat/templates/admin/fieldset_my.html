@@ -1,0 +1,219 @@
+{% extends "admin/delete_confirmation.html" %}
+
+
+{% block content_title %}
+<style>
+  h1 div.contain_my {
+    display: inline-block;
+    margin-right: 10px;
+  }
+</style>
+    {% if extra_data.3 %}
+    <h1>
+      <div class='contain_my'>
+      <strong><a href="{% url 'change_comp_name' extra_data.3.pk %}">
+      {{ extra_data.3.name_computers }}</a></strong>
+      </div>
+      <div class='contain_my'>Цена:{{ extra_data.4 }}</div>
+      <div class='contain_my'>
+      <a href="{% url 'special_price' extra_data.3.pk %}">
+        Спеццена:{{ extra_data.3.warranty_computers }}</a>
+      </div>
+      <div class='contain_my'>Наценка:{{ extra_data.3.class_computers }}</div>
+      <div class='contain_my'>
+      <a href="{% url 'change_assembly' extra_data.3.pk %}">
+        Сборка:{{ extra_data.3.pc_assembly }}</a>
+      </div>
+      </h1>
+    {% for row in extra_data.3.promotion_set.all %}---{{ row.prom }}{% endfor %}
+    {% if  not extra_data.6 %}
+{% for row in extra_data.3.promotion_set.all %}
+<a href="{% url 'promotions_admin_edit' extra_data.3.pk row.pk %}">{{ row.prom }} -- удалить ярлык,</a>
+{% endfor %}
+<h1><a href="{% url 'promotions_admin_edit' extra_data.3.pk 0 %}">Добавить ярлык</a></h1>
+  {% if extra_data.3.is_active %}
+  <h1><a href="{% url 'activate_change_comp' extra_data.3.pk %}">Активен -- Изменить</a></h1>
+  {% else %}
+  <h1><a href="{% url 'activate_change_comp' extra_data.3.pk %}">В резерве -- Изменить</a></h1>
+  {% endif %}
+  <h1><a href="{% url 'start_to_calc' extra_data.3.pk %}">Создать новый комп</a></h1>
+{% endif %}
+{% else %}
+    <h1><strong>Создавайте компы в компьютерных сборках</strong></h1>
+    {% endif %}
+  <div style="margin: 5px 0 5px 0;">
+  <form class="form" method="post" action="{% url 'catch_to_admin_shorts' extra_data.3.pk %}">
+    {% csrf_token %}
+    {{ extra_data.5 }}
+    <button type="submit" class="btn">Ok</button>
+  </form>
+  </div>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<style>
+.box div { width:400px; display:inline-block; }
+.box2 div { width:600px; display:inline-block; }
+.box_in div { width:100px; display:inline-block; }
+.box_in_in div { width:100px; display:inline-block; }
+.myfield {width:300px;}
+#id_proc, #id_mb, #id_mem, #id_video, #id_hdd_ssd, #id_hdd_ssd2,
+#id_ps, #id_case,#id_cool, #id_vent,
+#id_wifi, #id_soft, #id_mon, #id_cables, #id_km {width: 500px;}
+</style>
+
+
+<div class="box">
+  <div>
+    <h1>Компьютерные детали
+  </div>
+</div>
+
+
+{% for row in extra_data.0 %}
+<div>
+<div class="box2">
+
+<div>
+  <form class="form" method="post" action="{% url 'catch_to_admin_forms' row.3 extra_data.1 %}">
+{% csrf_token %}
+{{ row.0 }}
+<button type="submit" class="btn">Ok</button>
+</form>
+</div>
+
+<div>
+  <div class="box_in_in">
+    <div>
+      {{ row.1 }}
+    </div>
+    <div>
+      <a href="{% url 'admin_test' row.2 %}">Связать</a>
+    </div>
+    <div>
+{% if row.4 %}
+<div>
+<form class="form" method="post" action="{% url 'catch_to_admin_forms_num' row.3 extra_data.1 %}">
+{% csrf_token %}
+{{ row.4 }}
+<button type="submit" class="btn">Ok</button>
+</form></div>
+{% else %}
+<div>x1</div>
+{% endif %}
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+{% endfor %}
+
+
+<br>
+<br>
+
+{% if  not extra_data.6 %}
+<button id="toggleFormsButton" width='500px'>Показать данные для РЕСТ АПИ</button>
+<div id="formContainer" style="display: none;">
+  <div class="form-row">
+
+<div>
+  <div class="box2">
+<div>
+  <b>Деталь</b>
+</div>
+<div>
+  <div class="box_in_in">
+    <div>
+      <b>Привязка</b>
+    </div>
+    <div>
+      <b>Описание</b>
+    </div>
+    <div>
+      <b>Цена</b>
+    </div>
+    <div>
+      <b>Название</b>
+    </div>
+    <div>
+      <b>Партнмбр</b>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+
+  </div>
+</div>
+</div>
+
+
+{% for k, v in extra_data.2.items %}
+<div>
+  <div class="box2">
+<div>
+  {{ k }}
+</div>
+<div>
+  <div class="box_in_in">
+    <div>
+      {{ v.stick }}
+    </div>
+    <div>
+      {{ v.discr }}
+    </div>
+    <div>
+      {{ v.discr_price }}
+    </div>
+    <div>
+      {{ v.name }}
+    </div>
+    <div>
+      {{ v.part_number }}
+    </div>
+  </div>
+</div>
+<br>
+<br>
+  </div>
+</div>
+
+{% endfor %}
+</div>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var formContainer = document.getElementById('formContainer');
+  var toggleFormsButton = document.getElementById('toggleFormsButton');
+
+  toggleFormsButton.addEventListener('click', function() {
+    if (formContainer.style.display === 'none') {
+      formContainer.style.display = 'block';
+      toggleFormsButton.textContent = 'Скрыть';
+    } else {
+      formContainer.style.display = 'none';
+      toggleFormsButton.textContent = 'Показать Данные для РЕСТ АПИ';
+    }
+  });
+});
+// Находим поле input по его id
+    var inputField = document.getElementById("id_new");
+
+    // Добавляем обработчик события фокуса
+    inputField.addEventListener("focus", function(event) {
+        // Очищаем значение по умолчанию, если оно равно "Ручной ввод детали"
+        if (inputField.value === "Ручной ввод детали") {
+            inputField.value = "";
+            inputField.style.color = 'black';
+        }
+    });
+</script>
+
+
+{% endblock %}
