@@ -1,0 +1,44 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% block content_title %}
+    <h1> Kind chg </h1>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+{% if form %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Применить</button>
+</form>
+{% endif %}
+<br>
+<br>
+{% if form_hand %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_hand.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Применить</button>
+</form>
+{% endif %}
+
+{% if form_plan %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_plan.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Применить</button>
+</form>
+{% endif %}
+
+{% if form_profit %}
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_profit.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Применить</button>
+</form>
+{% endif %}
+
+{% endblock %}

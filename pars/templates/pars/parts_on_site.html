@@ -1,0 +1,157 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>></h6><h5>Parts_on_sites</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #E1E7EA;width: 1280px
+">
+<div class="container">
+  <div class="row row-cols-5">
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Itblok</a>
+        </li>
+        {% for d in comps.itblok%}
+          <div class="dropdown">
+            <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Versum</a>
+        </li>
+        {% for d in comps.versum%}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Artline</a>
+        </li>
+        {% for d in comps.art%}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Uastore</a>
+        </li>
+        {% for d in comps.ua%}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Digitalfury</a>
+        </li>
+        {% for d in comps.fury%}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+      <li class="navbar-text">
+          <a class="btn btn-outline-secondary text-info" style="width: 280px;background-color: #F5DEB3;" href="">Other</a>
+        </li>
+        {% for d in comps.other%}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary " style="width: 200px;background-color: #F5DEB3" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h10>{{d.name_computers|truncatechars:30}}</h1></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="">{{ d.proc_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mb_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.mem_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.video_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.hdd_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.case_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.ps_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.cool_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.price_computers }}</a>
+              <a class="dropdown-item" href="">{{ d.url_computers }}</a>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+</nav>
+{% endblock %}

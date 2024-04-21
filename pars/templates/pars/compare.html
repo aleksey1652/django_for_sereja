@@ -1,0 +1,116 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-success mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1290px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>></h6><h5>Compare_site</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px
+">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Compare sites</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'compare_sites' 'it_art' %}">Itblok-Artline</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'it_fury' %}">Itblok-Digitalfury</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'ver_art' %}">Versum-Artline</a>
+        <a class="dropdown-item" href="{% url 'compare_sites' 'ver_fury' %}">Versum-Digitalfury</a>
+      </div>
+    </li>
+  </ul>
+</div>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+    <a class="btn btn-outline-dark text-dark" style="width: 320px;background-color: #808080" href="">{{ site_1.pc_assembly.sites.name_sites }}</a>
+    </li>
+    <li class="navbar-text">
+    <a class="btn btn-outline-dark text-dark" style="width: 320px;background-color: #808080" href="">{{ site_2.pc_assembly.sites.name_sites }}</a>
+    </li>
+    <li class="navbar-text">
+    <a class="btn btn-outline-dark text-dark" style="width: 640px;background-color: #808080" href="">Params</a>
+    </li>
+  </ul>
+</div>
+</nav>
+{% for d in comps %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <span class="border-right border-dark">
+    {% if d.0 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 320px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.0.name_computers|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'proc' %}">{{ d.0.proc_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'mb' %}">{{ d.0.mb_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'mem' %}">{{ d.0.mem_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'video' %}">{{ d.0.video_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_hdd_on_site' d.0.pk  %}">{{ d.0.hdd_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'case' %}">{{ d.0.case_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'ps' %}">{{ d.0.ps_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_parts_on_site' d.0.pk 'cool' %}">{{ d.0.cool_computers }}</a>
+        <a class="dropdown-item" href="{% url 'get_price_on_site' d.0.pk d.1.pk %}">{{ d.0.price_computers }}</a>
+        <a class="dropdown-item" href="{{ d.0.url_computers }}">{{ d.0.url_computers }}</a>
+      </div>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.1 %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 320px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.1.name_computers|truncatechars:30}}</h5></a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'proc' %}">{{ d.1.proc_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'mb' %}">{{ d.1.mb_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'mem' %}">{{ d.1.mem_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'video' %}">{{ d.1.video_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_hdd_on_site' d.1.pk  %}">{{ d.1.hdd_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'case' %}">{{ d.1.case_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'ps' %}">{{ d.1.ps_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_parts_on_site' d.1.pk 'cool' %}">{{ d.1.cool_computers }}</a>
+      <a class="dropdown-item" href="{% url 'get_price_on_site' d.0.pk d.1.pk %}">{{ d.1.price_computers }}</a>
+      <a class="dropdown-item" href="{{ d.1.url_computers }}">{{ d.1.url_computers }}</a>
+    </div>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.2 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 640px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{ d.0.proc_computers|truncatechars:15 }}{{ d.0.mem_computers|truncatechars:15 }}{{ d.1.video_computers|truncatechars:25 }}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        {% for p in d.2 %}
+        <a class="dropdown-item" href="">{{ p }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    {% endif %}
+    </span>
+  </ul>
+</div>
+</nav>
+{% endfor %}
+{% endblock %}
