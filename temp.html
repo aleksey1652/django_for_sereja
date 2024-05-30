@@ -1,0 +1,350 @@
+{% extends "money/base_generic.html" %}
+
+<style>
+
+</style>
+
+{% block title %}<title>Money</title>{% endblock %}
+
+{% block content0 %}
+<li><a href="{% url 'family' %}">Back</a>
+</li>
+{% endblock %}
+{% block content1 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Time period
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for s_ in st_period %}
+    <li><a class="dropdown-item" href="{% url 'family' s_ %}">{{ s_ }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content2 %}
+<br>
+<br>
+{% if form_b %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_b.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Search</button>
+</form>
+{% endif %}
+{% if form_sb %}
+<h3>Добавление сборки с учетом сложности:</h3>
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_sb.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Готово</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content3 %}
+<br>
+<br>
+{% if form_s %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_s.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Choose site</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content4 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Bids
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for b in bids_per_period %}
+    <li><a class="dropdown-item" href="{% url 'bids-detail' b.pk %}">{{ b.ID }};{{ b.status }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content5 %}
+<ul class="sidebar-nav">
+  {% if user.is_authenticated %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'logout'%}?next={{request.path}}">Logout **** User: {{ user.get_username }}</a></li>
+     {% else %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+     {% endif %}
+</ul>
+<ul class="sidebar-nav">
+  <li>
+    <a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'admin:index' %}">Admin</a>
+  </li>
+</ul>
+{% endblock %}
+{% block content6 %}
+<ul class="sidebar-nav">
+          <li><a href="">{{ bids_site }}</a></li>
+          <li>
+            --- Системные блоки <div class="col-md-4" style="background-color: #ffebcd;width: {{ w2 }}">My</div>
+            <div class="col-md-4" style="background-color: #FFD700;width: {{ w1 }}">Team</div>
+            <div class="col-md-4" style="background-color: #FF0000;width: {{ w3 }}">1st bonus line</div>
+        </li><br>
+        <table border=1, cellpadding='10'>
+          <tr>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 1 %}">1</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 2 %}">2</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 3 %}">3</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 4 %}">4</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 5 %}">5</a>
+            </td>
+          </tr>
+          <tr>
+        </table>
+        <br>
+        {% if formK %}
+        <form class="form-inline" method="post" action="{% url 'kurier_periods' manager_stats_per_period.дата ss_pk %}">
+          {% csrf_token %}
+          <input class="form-control" name="description" type="text" style="width: 90px; height:30px">
+        </form>
+        {% endif %}
+        <br>
+        <table class='my' border=1, cellpadding='10'>
+          <tr>
+            <td>Дата</td><td>Заявка</td><td>Получил</td><td>Бонус</td><td>+-</td>
+          </tr>
+          <tr>
+        </table>
+        <br>
+
+        <table class="my_table" border="1" cellpadding="10">
+  <tr>
+    <form class="form" method="post" action="">
+      {% csrf_token %}
+      <td>{{ form_st.date_field }}</td>
+      <td>{{ form_st.bids }}</td>
+      <td>{{ form_st.summa }}</td>
+      <td>0</td>
+      <td><button type="submit" class="btn-outline-dark text-dark">Добавить</button></td>
+    </form>
+  </tr>
+  {% if manager_stats_per_period.заявки %}
+    {% for kbid in manager_stats_per_period.заявки %}
+      <tr>
+        <td>{{ kbid.date }}</td>
+        <td>{{ kbid.bidskurier__ID }}</td>
+        <td>{{ kbid.bidskurier__kurier_summa }}</td>
+        <td>{{ kbid.bonus }}</td>
+        <td>Удалить</td>
+      </tr>
+    {% endfor %}
+  {% endif %}
+</table>
+
+          <br>
+          <br>
+          {% for message in messages %}
+              <li class="{{ message.tags }}">
+                  {{ message|safe }}
+                  <a href="#" class="close"></a>
+              </li>
+          {% endfor %}
+      </ul>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+let tr = document.querySelectorAll('.my_table tr')[3];
+let mass = []
+for(let val of tr.cells) {
+    mass.push( getComputedStyle(val).width );
+    };
+
+let tr_main = document.querySelector('.my tr');
+for(let i=0; i < mass.length; ++i) {
+  if( parseInt(getComputedStyle(tr_main.cells[i]).width) <= parseInt( mass[i]) )
+    tr_main.cells[i].style.width = mass[i];
+  else
+    {tr.cells[i].style.width = getComputedStyle(tr_main.cells[i]).width;
+    console.log(tr_main.cells[i].innerHTML);}
+};
+
+});
+
+</script>
+{% endblock %}
+
+
+
+
+{% extends "money/base_generic.html" %}
+
+<style>
+
+</style>
+
+{% block title %}<title>Money</title>{% endblock %}
+
+{% block content0 %}
+<li><a href="{% url 'family' %}">Back</a>
+</li>
+{% endblock %}
+{% block content1 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Time period
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for s_ in st_period %}
+    <li><a class="dropdown-item" href="{% url 'family' s_ %}">{{ s_ }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content2 %}
+<br>
+<br>
+{% if form_b %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_b.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Search</button>
+</form>
+{% endif %}
+{% if form_sb %}
+<h3>Добавление сборки с учетом сложности:</h3>
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_sb.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Готово</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content3 %}
+<br>
+<br>
+{% if form_s %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_s.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Choose site</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content4 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Bids
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for b in bids_per_period %}
+    <li><a class="dropdown-item" href="{% url 'bids-detail' b.pk %}">{{ b.ID }};{{ b.status }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content5 %}
+<ul class="sidebar-nav">
+  {% if user.is_authenticated %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'logout'%}?next={{request.path}}">Logout **** User: {{ user.get_username }}</a></li>
+     {% else %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+     {% endif %}
+</ul>
+<ul class="sidebar-nav">
+  <li>
+    <a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'admin:index' %}">Admin</a>
+  </li>
+</ul>
+{% endblock %}
+{% block content6 %}
+<ul class="sidebar-nav">
+          <li><a href="">{{ bids_site }}</a></li>
+          <li>
+            --- Системные блоки <div class="col-md-4" style="background-color: #ffebcd;width: {{ w2 }}">My</div>
+            <div class="col-md-4" style="background-color: #FFD700;width: {{ w1 }}">Team</div>
+            <div class="col-md-4" style="background-color: #FF0000;width: {{ w3 }}">1st bonus line</div>
+        </li><br>
+        <table border=1, cellpadding='10'>
+          <tr>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 1 %}">1</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 2 %}">2</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 3 %}">3</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 4 %}">4</a>
+            </td>
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 5 %}">5</a>
+            </td>
+          </tr>
+          <tr>
+        </table>
+        <br>
+        {% if formK %}
+        <form class="form-inline" method="post" action="{% url 'kurier_periods' manager_stats_per_period.дата ss_pk %}">
+          {% csrf_token %}
+          <input class="form-control" name="description" type="text" style="width: 90px; height:30px">
+        </form>
+        {% endif %}
+        <br>
+        <table class='my' border=1, cellpadding='10'>
+          <tr>
+            <td>Дата</td><td>Заявка</td><td>Получил</td><td>Бонус</td>
+          </tr>
+          <tr>
+        </table>
+        <br>
+        <br>
+        <table class='my_table' border=1, cellpadding='10'>
+          <tr>
+
+          </tr>
+          <tr>
+            <td>Солнце</td><td>Звезда</td><td>129f</td><td>12900</td>
+          </tr>
+          <tr>
+            <td>Земля</td><td>Планета</td><td>333</td><td>44444</td>
+          </tr>
+          <tr>
+            <td>МарсFFFFFFFFFFF</td><td>Планета</td><td>443</td><td>0</td>
+          </tr>
+          <tr>
+            <td>Плутон</td><td>Планета</td><td>233</td><td>4430</td>
+          </tr>
+        </table>
+          <br>
+          <br>
+          {% for message in messages %}
+              <li class="{{ message.tags }}">
+                  {{ message|safe }}
+                  <a href="#" class="close"></a>
+              </li>
+          {% endfor %}
+      </ul>
+<script>
+
+let tr = document.querySelectorAll('.my_table tr')[3];
+let mass = []
+for(let val of tr.cells) {
+    mass.push( getComputedStyle(val).width );
+    };
+
+let tr_main = document.querySelector('.my tr');
+for(let i=0; i < mass.length; ++i) {
+  if( parseInt(getComputedStyle(tr_main.cells[i]).width) <= parseInt( mass[i]) )
+    tr_main.cells[i].style.width = mass[i];
+  else
+    {tr.cells[i].style.width = getComputedStyle(tr_main.cells[i]).width;
+    console.log(tr_main.cells[i].innerHTML);}
+};
+
+</script>
+{% endblock %}
