@@ -1,0 +1,316 @@
+{% extends "admin/change_list.html" %}
+{% block content_title %}
+    <h1> Продажи, Сборка, Ремонт </h1>
+{% endblock %}
+{% block result_list %}
+<div class="results">
+    <table>
+      <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a href="#">Менеджеры</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Системные блоки</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">ПО</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Комплектующие</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Офис</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>ЗП</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Получил</strong>
+            </a>
+          </div>
+        </th>
+      </tr>
+    </thead>
+      <tbody>
+    {% if summary.main %}
+    {% for row in summary.main %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+            <td>
+        <strong>
+        {{ row.name }}
+        </strong>
+      </td>
+      <td> {{ row.Системный_блок }} </td>
+      <td> {{ row.ПО }} </td>
+      <td> {{ row.Комплектующие }} </td>
+      <td> {{ row.ПК_витрина }} </td>
+      <td> {{ row.ЗП }} </td>
+      <td> {{ row.Получил }} </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+<br>
+<div class="results">
+    <table>
+      <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a href="#">Персонал</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">ЗП</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Получил</strong>
+            </a>
+          </div>
+        </th>
+      </tr>
+    </thead>
+      <tbody>
+    {% if summary.personal %}
+    {% for row in summary.personal %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+            <td>
+        <strong>
+        {{ row.name }}
+        </strong>
+      </td>
+      <td> {{ row.ЗП }} </td>
+      <td> {{ row.получил }} </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+<br>
+<div class="results">
+    <table>
+      <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a href="#">Сборщики</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Простая офис</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Простая</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Обычная</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Сложная</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Ультра</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>ЗП</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Получил</strong>
+            </a>
+          </div>
+        </th>
+      </tr>
+    </thead>
+      <tbody>
+    {% if summary.sborsik %}
+    {% for row in summary.sborsik %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+            <td>
+        <strong>
+        {{ row.name }}
+        </strong>
+      </td>
+      <td> {{ row.простой_офисный }} </td>
+      <td> {{ row.простой }} </td>
+      <td> {{ row.обычный }} </td>
+      <td> {{ row.сложный }} </td>
+      <td> {{ row.ультра }} </td>
+      <td> {{ row.ЗП }} </td>
+      <td> {{ row.получил }} </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+<br>
+<div class="results">
+    <table>
+      <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a href="#">Ремонтники</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Простой ремонт--сервис</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">Обычный ремонт--сервис</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Сложный ремонт--сервис</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Ультра ремонт--сервис</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>ЗП</strong>
+            </a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">
+              <strong>Получил</strong>
+            </a>
+          </div>
+        </th>
+      </tr>
+    </thead>
+      <tbody>
+    {% if summary.remontnik %}
+    {% for row in summary.remontnik %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+            <td>
+        <strong>
+        {{ row.name }}
+        </strong>
+      </td>
+      <td> {{ row.простой }} </td>
+      <td> {{ row.обычный }} </td>
+      <td> {{ row.сложный }} </td>
+      <td> {{ row.ультра }} </td>
+      <td> {{ row.ЗП }} </td>
+      <td> {{ row.получил }} </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+<br>
+<div class="results">
+    <table>
+      <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a href="#"></a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">versum</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a href="#">itblok</a>
+          </div>
+        </th>
+       </tr>
+    </thead>
+      <tbody>
+    {% if summary.advanced %}
+    {% for r in summary.advanced %}
+    <tr class="{% cycle 'row1' 'row2' 'row3' %}">
+            <td>
+        <strong>
+        {{ r.tittle }}
+        </strong>
+      </td>
+      {% if r.dates %}
+      <td><a href="{% url 'stats_rules' 'versum' r.mark r.dates.0 r.dates.1 %}">{{ r.versum }}</a></td>
+      <td><a href="{% url 'stats_rules' 'itblok' r.mark r.dates.0 r.dates.1 %}">{{ r.itblok }}</a></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

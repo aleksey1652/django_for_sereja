@@ -1,0 +1,137 @@
+{% extends "money/base_generic.html" %}
+
+{% block title %}<title>Money</title>{% endblock %}
+
+{% block content0 %}
+<li><a href="{% url 'family' %}">Back</a>
+</li>
+{% endblock %}
+{% block content1 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Time period
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for s_ in st_period %}
+    <li><a class="dropdown-item" href="{% url 'family' s_ %}">{{ s_ }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content2 %}
+<style>
+  .bordered-form {
+    border: 2px solid #000; /* Черная рамка толщиной 2 пикселя */
+    padding: 20px;          /* Внутренний отступ */
+    border-radius: 5px;     /* Скругленные углы рамки */
+}
+</style>
+<br>
+<br>
+{% if form_b %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_b.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Search</button>
+</form>
+{% endif %}
+{% if form_st %}
+<h3>Добавление сервисных работ,отчетов:</h3>
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_st.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Готово</button>
+</form>
+{% endif %}
+{% if form_sb %}
+<h3>Добавление сборки с учетом сложности:</h3>
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_sb.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Готово</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content3 %}
+<br>
+<br>
+{% if form_s %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_s.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Choose site</button>
+</form>
+{% endif %}
+{% if form_bonus %}
+<form class="bordered-form" method="post" action="">
+{% csrf_token %}
+{{ form_bonus.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Bonus</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content4 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Bids
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for b in bids_per_period %}
+    <li><a class="dropdown-item" href="{% url 'bids-detail' b.pk %}">{{ b.ID }};{{ b.status }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content5 %}
+<ul class="sidebar-nav">
+  {% if user.is_authenticated %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 300px" href="{% url 'logout'%}?next={{request.path}}">Logout **** User: {{ user.get_username }}</a></li>
+     {% else %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 300px" href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+     {% endif %}
+</ul>
+<ul class="sidebar-nav">
+  <li>
+    <a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'admin:index' %}">Admin</a>
+  </li>
+</ul>
+{% endblock %}
+{% block content6 %}
+<ul class="sidebar-nav">
+          <li><a href="">{{ bids_site }}</a></li>
+          <li>
+            --- Системные блоки <div class="col-md-4" style="background-color: #ffebcd;width: {{ w2 }}">My</div>
+            <div class="col-md-4" style="background-color: #FFD700;width: {{ w1 }}">Team</div>
+            <div class="col-md-4" style="background-color: #FF0000;width: {{ w3 }}">1st bonus line</div>
+        </li><br>
+          {% if manager_stats_per_period %}
+          {% for per,value in manager_stats_per_period.items %}
+          {% if per == 'Заявки офис' %}
+            <li>Заявки офис:{{ value }}</li>
+          {% else %}
+            {% if value.st_pk %}
+            <li>{{ per }}: {{ value.st }}<a href="{% url 'del_servise' value.st_pk %}">Удалить</a></li>
+            {% else %}
+            {% if value.st %}
+            <li>{{ per }}: {{ value.st }}</li>
+            {% else %}
+            <li>{{ per }}: {{ value }}</li>
+            {% endif %}
+            {% endif %}
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          <br>
+          <br>
+          {% for message in messages %}
+              <li class="{{ message.tags }}">
+                  {{ message|safe }}
+                  <a href="#" class="close"></a>
+              </li>
+          {% endfor %}
+      </ul>
+{% endblock %}
