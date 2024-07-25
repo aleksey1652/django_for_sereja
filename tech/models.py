@@ -7,6 +7,7 @@ from django.http import HttpResponse
 #from django.db.models.functions import Length
 #from django.db.models import CharField
 #CharField.register_lookup(Length)
+import re
 
 
 CHOISE_RU = (
@@ -168,6 +169,10 @@ class Monitors(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.sc_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -297,6 +302,10 @@ class KM(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.km_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -433,6 +442,10 @@ class Keyboards(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.kb_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -545,6 +558,10 @@ class Mouses(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.mouse_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -640,6 +657,10 @@ class Pads(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.pad_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -791,6 +812,10 @@ class Headsets(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.hs_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -897,6 +922,10 @@ class Webcams(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.web_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -994,6 +1023,10 @@ class WiFis(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.net_wifi_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1121,6 +1154,10 @@ class Acoustics(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.a_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1250,6 +1287,10 @@ class Tables(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.tb_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1378,6 +1419,10 @@ class Chairs(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.ch_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1474,6 +1519,10 @@ class Accessories(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.acc_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -1593,6 +1642,10 @@ class Cabelsplus(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.cab_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1700,6 +1753,10 @@ class Filters(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.fi_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1791,6 +1848,10 @@ class Others(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.oth_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
