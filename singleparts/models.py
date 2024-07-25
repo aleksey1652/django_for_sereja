@@ -7,6 +7,7 @@ from django.http import HttpResponse
 #from django.db.models.functions import Length
 #from django.db.models import CharField
 #CharField.register_lookup(Length)
+import re
 
 
 CHOISE_RU = (
@@ -137,6 +138,10 @@ class Cooler_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.cool_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -241,6 +246,10 @@ class CPU_OTHER(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.cpu_warr_ua)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -382,6 +391,10 @@ class MB_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.part_mb_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -491,6 +504,10 @@ class RAM_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.ram_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -591,6 +608,10 @@ class HDD_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.hdd_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -686,6 +707,10 @@ class PSU_OTHER(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.psu_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
@@ -806,6 +831,10 @@ class GPU_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.gpu_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -919,6 +948,10 @@ class FAN_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.fan_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1029,6 +1062,10 @@ class CASE_OTHER(models.Model):
             return 0
     get_price_rent_price_ua.short_description = '%'
 
+    def warranty(self):
+        return re.sub('\D+', '', self.case_warr_ru)
+    warranty.short_description = 'waranty'
+
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
@@ -1129,6 +1166,10 @@ class SSD_OTHER(models.Model):
         except:
             return 0
     get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.ssd_warr_ru)
+    warranty.short_description = 'waranty'
 
     class Meta:
         unique_together = ('part_number', 'is_active')
