@@ -144,6 +144,9 @@ def from_file_get_part(filename, periphery=False):
 def min_price_another(obj_full):
     #принимает партс_фулл_обж, выдет имя поставщика с мин ценой и саму цену + rrp
     # (рекомендов-ю цену)
+
+    # новое: фун в provider добавляет цену со склада если есть
+
     try:
         rrp = round(obj_full.rrprice_parts) # округляем только rrprice_parts
     except:
@@ -155,11 +158,19 @@ def min_price_another(obj_full):
 
     try:
         #выделяем цену из "price:1649.08; 2"
-        stock_price = float(re.findall(r':(.+);', obj_full.remainder)[0])
+        stock_price = round(
+        float(re.findall(r':(.+);', obj_full.remainder)[0])
+        )
     except:
         stock_price = 1000000
-    if stock_price < obj_full.providerprice_parts:
-        return ('склад', stock_price, 0)
+
+
+    if stock_price <= obj_full.providerprice_parts:
+        return (f'{stock_price}; склад', stock_price, 0)
+
+    if stock_price != 1000000 and stock_price > obj_full.providerprice_parts:
+        return (f'{stock_price}; {obj_full.name_parts_main}', stock_price, 0)
+
     return (obj_full.name_parts_main, obj_full.providerprice_parts,
             rrp)
 
@@ -225,6 +236,7 @@ def objects_edit(obj, usd_cuurency):
 
 def objects_edit_multi(obj, usd_cuurency):
     # отличается от objects_edit работой с мульти партнамберами (obj.tags ниже)
+
     if obj.tags.exists():
         for q in obj.tags.all():
             objects_edit(q, usd_cuurency)
@@ -349,20 +361,25 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
         providerprice_parts__gt=0, remainder__isnull=False).first()
         try:
             #выделяем цену из "price:1649.08; 2"
-            stock_price = float(re.findall(r':(.+);', full.remainder)[0])
+            stock_price = round(
+            float(re.findall(r':(.+);', full.remainder)[0])
+            )
         except:
             stock_price = 0
 
     if obj.part_number in dc_dict:
         try:
-            prov = dc_dict[obj.part_number]['provider']
+            if stock_price != 0:
+                prov = f"{stock_price}; {dc_dict[obj.part_number]['provider']}"
+            else:
+                prov = dc_dict[obj.part_number]['provider']
             provider_, temp_price = (prov, float(dc_dict[obj.part_number]['PriceUSD']))
         except:
             #print(f"error{obj.part_number}---{dc_dict[obj.part_number]['provider']}")
-            provider_, temp_price = (prov, 0)
+            provider_, temp_price = ('error', 0)
 
-        if stock_price and stock_price < temp_price:
-            provider_, temp_price, rrp =  ('склад', stock_price, 0)
+        if stock_price and stock_price <= temp_price:
+            provider_, temp_price, rrp =  (f'{stock_price}; склад', stock_price, 0)
 
         try:
             temp_rentability = 1 + (obj.rentability / 100)
@@ -409,7 +426,7 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
                 # если ручная цена: price_rent не трогаем, остальное меняем согласно прайсу
                 obj.price_ua = round(stock_price * usd_cuurency)
                 obj.price_usd = round(stock_price)
-                obj.provider = 'склад'
+                obj.provider = f'{stock_price}; склад'
                 obj.rrp_price = 0
                 obj.is_active = True if active else False
                 obj.save()
@@ -418,7 +435,7 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
                 obj.price_ua = round(stock_price * usd_cuurency)
                 obj.price_usd = round(stock_price)
                 obj.price_rent = round(stock_price * usd_cuurency * temp_rentability)
-                obj.provider = 'склад'
+                obj.provider = f'{stock_price}; склад'
                 obj.rrp_price = 0
                 obj.save()
         else:
@@ -462,20 +479,16 @@ def to_model_price_from_dc():
         objects_edit_multi(obj, usd_cuurency)
     for obj in SSD_OTHER.objects.all():
         objects_edit_multi(obj, usd_cuurency)
-    for obj in WiFi_OTHER.objects.all():
-        objects_edit_multi(obj, usd_cuurency)
-    for obj in Cables_OTHER.objects.all():
-        objects_edit_multi(obj, usd_cuurency)
-    for obj in Soft_OTHER.objects.all():
-        objects_edit_multi(obj, usd_cuurency)
+    #for obj in WiFi_OTHER.objects.all():
+    #    objects_edit_multi(obj, usd_cuurency)
+    #for obj in Cables_OTHER.objects.all():
+    #    objects_edit_multi(obj, usd_cuurency)
+    #for obj in Soft_OTHER.objects.all():
+    #    objects_edit_multi(obj, usd_cuurency)
 
-def to_tech_price_from_dc(for_brain=None):
-    # из счанного файла ДС создаем словарь {'CategoryID': {'part_number': {data}, ...}, ...}
-    # в objects_tech_edit кроме прочего передаем {'part_number': {data}, ...}
-    usd = USD.objects.last()
-    usd_cuurency = usd.usd if usd else 37
+def test_tech():
+    # только для теста, временная ф
     count_dc = 0
-
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
     '45', '54', '648', '125', '968', '1376', '25',
@@ -507,6 +520,57 @@ def to_tech_price_from_dc(for_brain=None):
                     dc_dict[d['CategoryID']] = {d['Article']: d}
                 else:
                     dc_dict[d['CategoryID']][d['Article']] = d
+        except Exception as e:
+            print(e)
+            break
+    return dc_dict
+
+def to_tech_price_from_dc(for_brain=None):
+    # из счанного файла ДС создаем словарь {'CategoryID': {'part_number': {data}, ...}, ...}
+    # в objects_tech_edit кроме прочего передаем {'part_number': {data}, ...}
+    usd = USD.objects.last()
+    usd_cuurency = usd.usd if usd else 37
+    count_dc = 0
+
+    category_periphery = (
+    '11', '24', '33', '56', '125', '1410', '125', '5', '255',
+    '45', '54', '648', '125', '968', '1376', '25',
+    )
+    status_ = {'*****':'yes','****':'yes','***':'yes','**':'yes','*':'yes'}
+
+    with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
+        xml = fobj.read()
+    try:
+        root = etree.fromstring(xml)
+    except:
+        print('Wrong  data')
+        if not Results.objects.filter(who='tech').exists():
+            r = Results(who='tech',
+            who_desc='dc file error')
+            r.save()
+        else:
+            r = Results.objects.get(who='tech')
+            r.who_desc = 'dc file error'
+            r.save()
+        return []
+
+    l=root.getchildren()
+    dc_dict = dict()
+    for x in l:
+        d={}
+        try:
+            for y in x.getchildren():
+                if not y.text:
+                    d[y.tag] = 'None'
+                else:
+                    d[y.tag] = y.text
+            d['provider'] = 'dc'
+            if d['CategoryID'] in category_periphery and d['Availability'] in status_:
+                count_dc += 1
+                if not d['CategoryID'] in dc_dict:
+                    dc_dict[d['CategoryID']] = {d['Article']: d}
+                else:
+                    dc_dict[d['CategoryID']][d['Article']] = d
         except:
             print('error but next')
 
@@ -514,7 +578,7 @@ def to_tech_price_from_dc(for_brain=None):
     partnums_tech += list(KM.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Keyboards.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Mouses.objects.all().values_list('part_number',flat=True))
-    partnums_tech = list(Pads.objects.all().values_list('part_number',flat=True))
+    partnums_tech += list(Pads.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Headsets.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Webcams.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(WiFis.objects.all().values_list('part_number',flat=True))
@@ -537,6 +601,10 @@ def to_tech_price_from_dc(for_brain=None):
     print(elko)
     mti = f.from_mti('load_form_providers/mti_price.xml')
     print(mti)
+    brain = f.from_brain('load_form_providers/brain-price.json')
+    print(brain)
+    edg = f.from_edg('load_form_providers/edg-price.xml')
+    print(edg)
     eletek = f.from_eletek('https://www.eletek.ua/ru/pricelist-distry-versum.xml')
     print(eletek)
 
