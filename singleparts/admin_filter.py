@@ -97,11 +97,13 @@ class ProvFilter(admin.SimpleListFilter):
             ('edg', 'edg'),
             ('erc', 'erc'),
             ('eletek', 'eletek'),
+            ('pccooler', 'pccooler'),
         )
 
     def queryset(self, request, queryset):
+        #
         if self.value():
-            return queryset.filter(provider=self.value())
+            return queryset.filter(provider__icontains=self.value())
 
 class VendorCase(admin.SimpleListFilter):
 
