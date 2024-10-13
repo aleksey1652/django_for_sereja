@@ -29,7 +29,7 @@ def clear_status_if_not_exists():
     tuple_kind = ('cool', 'imb', 'amb', 'case', 'ssd', 'hdd', 'aproc','iproc',
     'video', 'ps', 'mem', 'vent', 'cables')
     list_providers = ['dc','asbis','elko','mti','brain','edg',
-    'itlink','erc', 'be', 'dw']
+    'itlink','erc', 'be', 'dw', 'pccooler']
 
     full_update_status_no = Parts_full.objects.filter(kind__in = tuple_kind,
     providers__name_provider='-', availability_parts='yes', remainder__isnull=True)
@@ -369,7 +369,7 @@ def get_xls():
     list_article = []
     if not Providers.objects.all().exists():
         list_prov = ['dc', 'asbis', 'elko', 'mti', 'itlink',
-        'brain', 'edg', 'erc','-', 'dw', 'be']
+        'brain', 'edg', 'erc','-', 'dw', 'be', 'pccooler']
         for l in list_prov:
             Providers.objects.create(name_provider=l)
     for x in p1.iloc:
@@ -642,15 +642,17 @@ def get_itlink():
     set_itlink = set()
     count_no, count_on = 0, 0
     dict1={'SSD':'ssd', 'Корпуса для ПК':'case',
-    'Адаптеры, переходники':None, 'Повербанки': None,
-    'Электроинструменты': None, 'Мыши':None, 'Кулеры':'cool',
+    'Адаптери, перехідники':None, 'Аудіо- та відеопристрої': None,
+    'Повербанки': None, 'Зарядні пристрої': None, 'Кишені и Rack пристрої': None,
+    'Электроинструменты': None, 'Мыши': None, 'Кулери': 'cool',
     'Контроллеры, интерфейсные платы PCI, PCIE':None, 'Ноутбуки': None,
-    'Клавиатуры':None, 'Хабы USB и кард-ридеры':None, 'Материнские платы':0,
-    'Электросамокаты': None, 'Карманы и Rack устройства':None,
-    'Вентиляторы':'vent', 'Подставки для ноутбуков':None,
-    'Сетевые фильтры':None, 'Жесткие диски':'hdd',
-    'Видеокарты':'video', 'Модули памяти':'mem',
-    'Процессоры':1, 'Источники питания':'ps', 'Манипуляторы': None}
+    'Клавиатуры':None, 'Хаби USB и кард-рідери':None, 'Материнські плати': 0,
+    'Электросамокаты': None, 'Карманы и Rack устройства': None,
+    'Вентилятори': 'vent', 'Подставки для ноутбуков': None,
+    'Інше': None, 'Жорсткі диски': 'hdd', 'Портативні зарядні станції': None,
+    'Відеокарти':'video', "Модулі пам'яті": 'mem', 'Ноутбуки': None,
+    'Майнинг - райзери, адаптери': None, 'Маніпулятори': None,
+    'Процесори': 1, 'Джерело живлення': 'ps', 'Манипуляторы': None}
 
     #itlink = pd.read_excel('/home/aleksey1652/Загрузки/прайс.xls', usecols=[0,2,3,6,7],header=None) erc
     try:
@@ -1019,7 +1021,7 @@ def Parsing_from_providers():
             if pp.availability_parts != 'hand':
                 p_prov = Parts_full.objects.filter(partnumber_parts=a.article,
                 providers__name_provider__in=('dc','asbis','elko',
-                'mti','brain','edg', 'erc', 'itlink', 'be', 'dw')).values()
+                'mti','brain','edg', 'erc', 'itlink', 'be', 'dw', 'pccooler')).values()
                 """p_prov_min =  min(p_prov, key=get_min) if p_prov else {'providerprice_parts':0,'availability_parts':'no'}
                 price = p_prov_min['providerprice_parts'] if p_prov_min['availability_parts'] not in ('q','no','') else 0
                 name_parts_main = Parts_full.objects.get(pk=p_prov_min['id']).providers.name_provider if p_prov_min['availability_parts'] not in ('q','no','') else None
@@ -1055,7 +1057,7 @@ def Parsing_from_providers():
         else:
             p_prov = Parts_full.objects.filter(partnumber_parts=a.article,
             providers__name_provider__in=('dc','asbis','elko',
-            'mti','brain','edg','itlink','erc', 'be', 'dw')).values()
+            'mti','brain','edg','itlink','erc', 'be', 'dw', 'pccooler')).values()
             """p_prov_min =  min(p_prov, key=get_min) if p_prov else {'providerprice_parts':0,'availability_parts':'no'}
             price = p_prov_min['providerprice_parts'] if p_prov_min['availability_parts'] not in ('q','no','') else 0
             name_parts_main = Parts_full.objects.get(pk=p_prov_min['id']).providers.name_provider if p_prov_min['availability_parts'] not in ('q','no','') else None
@@ -1198,7 +1200,7 @@ def Parsing_from_providers():
         r = Results.objects.get(who='prov')
         r.who_desc = f'Providers loads result: count_provider: {count_provider} *** {prov_message} ***, update: {count_on} obj, add: {count_no} obj, time :{str(t1-t2)[2:4]} min'
         r.save()
-    r_oher = Results.objects.filter(who__in=('erc','itlink', 'be', 'dw'))
+    r_oher = Results.objects.filter(who__in=('erc','itlink', 'be', 'dw', 'pccooler'))
     r_oher.update(who_desc='')
     #with open("load_form_providers/loads/log.json", "w") as write_file:
     #    json.dump(dict_log,write_file)
@@ -1213,5 +1215,4 @@ def Parsing_from_providers():
 #celery -A sereja beat -l INFO
 
 """
-
 """
