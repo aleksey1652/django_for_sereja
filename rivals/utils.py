@@ -21,6 +21,11 @@ class RivalsData:
         # и возвращает либо данные либо False
         return get_html(self.url)
 
+    def __get_data_other(self, url):
+        #скачивает сыры данные(страница одного компа) от url
+        # и возвращает либо данные либо False
+        return get_html(url)
+
     def versum_portal_data(self, name_comp):
         # берем цену из портала
         # выдает tuple: (флоат-цену, комент), комент: ок или назв ошибки
@@ -45,9 +50,9 @@ class RivalsData:
         price_ua = round(price * currency * rentability_)
         return (price_ua, 'ok')
 
-    def versum_data(self, label1='product-new-price', label2='span'):
+    def versum_data(self, ver_url, label1='product-new-price', label2='span'):
         # выдает tuple: (флоат-цену, комент), комент: ок или назв ошибки
-        data = self.__get_data_rivals()
+        data = self.__get_data_other(ver_url)
         if data:
             soup = BeautifulSoup(data, "html.parser")
             try:
@@ -105,13 +110,13 @@ class RivalsData:
                 return (0, label1)
             try:
                 # берем предпоследнюю цену (код товара последний, 1-может есть может нет)
-                price = float(re.findall(r'\d+', soup_label1.get_text())[-2])
+                price = float(re.findall(r'\d+', soup_label1.get_text())[-1])
             except (ValueError, IndexError):
                 return (0, 'float')
             return (price, 'ok')
         return (0, 'status_code')
 
-    def art_data(self, label1='product__price', label2='span'):
+    def art_data(self, label1='product__price', label2='product__price-normal'):
         # выдает tuple: (флоат-цену, комент), комент: ок или назв ошибки
         data = self.__get_data_rivals()
         if data:
@@ -121,7 +126,7 @@ class RivalsData:
             except IndexError:
                 return (0, label1)
             try:
-                soup_label2 = soup_label1.find(label2).get_text()
+                soup_label2 = soup_label1.find(class_=label2).get_text()
             except AttributeError:
                 return (0, label2)
             try:

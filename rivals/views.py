@@ -74,7 +74,8 @@ def rivals_to_models(rivals_):
             data, mes = riv.hotline_data()
             if mes != 'ok':
                 set_mes.add(asml.hotline)
-            versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            #versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            versum_data, versum_mes = riv.versum_data(asml.versum)
             asml.hot_price = data
             asml.ver_price = versum_data
             asml.ver_hot = versum_data - data if data else 0
@@ -88,7 +89,8 @@ def rivals_to_models(rivals_):
             data, mes = riv.itblok_data()
             if mes != 'ok':
                 set_mes.add(asml.itblok)
-            versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            #versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            versum_data, versum_mes = riv.versum_data(asml.versum)
             asml.it_price = data
             asml.ver_price = versum_data
             asml.ver_it = versum_data - data if data else 0
@@ -102,7 +104,8 @@ def rivals_to_models(rivals_):
             data, mes = riv.art_data()
             if mes != 'ok':
                 set_mes.add(asml.artline)
-            versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            #versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            versum_data, versum_mes = riv.versum_data(asml.versum)
             asml.art_price = data
             asml.ver_price = versum_data
             asml.ver_art = versum_data - data if data else 0
@@ -116,7 +119,8 @@ def rivals_to_models(rivals_):
             data, mes = riv.telemart_data()
             if mes != 'ok':
                 set_mes.add(asml.telemart)
-            versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            #versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            versum_data, versum_mes = riv.versum_data(asml.versum)
             asml.tel_price = data
             asml.ver_price = versum_data
             asml.ver_tel = versum_data - data if data else 0
@@ -130,7 +134,8 @@ def rivals_to_models(rivals_):
             data, mes = riv.compx_data()
             if mes != 'ok':
                 set_mes.add(asml.compx)
-            versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            #versum_data, versum_mes = riv.versum_portal_data(asml.name)
+            versum_data, versum_mes = riv.versum_data(asml.versum)
             asml.com_price = data
             asml.ver_price = versum_data
             asml.ver_com = versum_data - data if data else 0
