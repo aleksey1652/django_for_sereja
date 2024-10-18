@@ -193,6 +193,7 @@ def change_few_things_obj(request, obj_pack, obj_model):
             hotline = form.cleaned_data['hotline']
             delivery = form.cleaned_data['delivery']
             label_ = form.cleaned_data['label_']
+            creditoff = form.cleaned_data['creditoff']
             only_thing = form.cleaned_data['only_thing']
 
             if only_thing == 'hotline':
@@ -205,6 +206,11 @@ def change_few_things_obj(request, obj_pack, obj_model):
                 delivery=delivery
                 )
                 thing = delivery
+            elif only_thing == 'creditoff':
+                count_objs = objs.update(
+                creditoff=creditoff
+                )
+                thing = creditoff
             else:
                 label_ = label_ if label_ else None
                 count_objs = objs.update(
@@ -407,7 +413,8 @@ class versum_single_parts(APIView):
         Dict_full['soft'] = []
         return Response({"parts": Dict_full})
 
-def dop_foto(foto_url, part_number_, apikey='989508c456bf4e018c6322dffe0385d3', obj_cover = 1):
+def dop_foto(foto_url, part_number_, apikey='989508c456bf4e018c6322dffe0385d3',
+obj_cover = 1):
     # вынужденная ручная гет-фото по урл-фото с инета
 
     result = False

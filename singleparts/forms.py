@@ -26,10 +26,12 @@ class SinglePackFewForm(forms.Form):
         ('hotline', 'hotline'),
         ('delivery', 'delivery'),
         ('label', 'label'),
+        ('creditoff', 'creditoff'),
     )
     hotline = forms.BooleanField(required=False, label='hotline')
     delivery = forms.BooleanField(required=False, label='доставка')
     label_ = forms.CharField(required=False, label='label')
+    creditoff = forms.BooleanField(required=False, label='creditoff')
     only_thing = forms.ChoiceField(
                                 choices=CHOICES,
                                 widget=forms.RadioSelect,
