@@ -42,6 +42,31 @@ def get_kind_DW(str_):
     except:
         return None
 
+
+def get_kind_pccooler(str_):
+    # для pccooler возвращаем 'vent' или 'cool'
+
+    if not isinstance(str_, str):
+        return 'cool'
+
+    if str_.lower().find('вентилятор') != -1:
+        return 'vent'
+    return 'cool'
+
+def get_status_pccooler(str_):
+    # для pccooler возвращаем 'yes' or 'no'
+    if isinstance(str_, str):
+        str_ = str_.strip()
+    else:
+        return 'no'
+    dict_status = {
+                '+': 'yes',
+                '-': 'no'
+                    }
+    if str_ in dict_status:
+        return dict_status[str_]
+    return 'no'
+
 def short_procent_diff(pr1, pr2):
     #for Short_per_x_code_single
     #pr1 = min_price,pr2 = short.parts_full.first().providerprice_parts
@@ -252,10 +277,12 @@ def get_erc(usd_ex):
     dict1={'Накопичувачі SSD':'ssd',
            'Корпуси ПК':'case',
             'Материнські плати':0,
+            'Процесори': 1,
             "Накопичувачі HDD внутрішні комп'ютерів":'hdd',
             'Відеокарти':'video',
             'Кулери та радіатори ПК': 'cool',
             "Пам'ять оперативна DDR ПК":'mem',
+            'Пам&#39;ять оперативна DDR ПК':'mem',
             'Блоки живлення ПК':'ps',
             'Накопичувачі SSD':'ssd',
             }
@@ -289,9 +316,15 @@ def get_erc(usd_ex):
                 rrp = 0
             price = price if x['usd'] == '0' else price / usd_ex
             price = round(price, 1)
-            x['subcategory']=temp if temp != 0 else to_article2_1(x["name_parts"],pr=temp)
+            if temp == 'cool':
+                temp = get_kind_pccooler(x["name_parts"])
+            x['subcategory']=temp if temp not in (0, 1) else to_article2_1(
+            x["name_parts"],pr=temp)
+
             if x['subcategory'] in (
-            'ssd','hdd','video','cool','ps','case','iproc','aproc','imb','amb','mem'):
+            'ssd','hdd','video','cool',
+            'vent','ps','case','iproc',
+            'aproc','imb','amb','mem'):
                 kind = x['subcategory']
                 try:
                     pa = re.sub('\*$','',x["partnumber_parts"])[:49].strip()
@@ -636,5 +669,165 @@ def get_DiWeave(usd_ex):
         r.save()
 
     Short_per_x_code()
+
+    return count_no, count_on, pp
+
+def single_clear(set_be):
+    # выключает обьекты single(кулеры и вентиляторы) если
+    # их нет в set_be   is_active
+
+    from singleparts.models import FAN_OTHER, Cooler_OTHER
+
+    pp = FAN_OTHER.objects.exclude(part_number__in=set_be).filter(
+    provider='pccooler')
+    pp.update(is_active=False, provider='нет', price_ua=0, price_usd=0, rrp_price=0)
+
+    pp = Cooler_OTHER.objects.exclude(part_number__in=set_be).filter(
+    provider='pccooler')
+    pp.update(is_active=False, provider='нет', price_ua=0, price_usd=0, rrp_price=0)
+
+def pccooler_to_single(partnum, kind, usd_ex):
+    # по партнамберу обновим вентилятор или кулер в singleparts
+
+    from singleparts.models import FAN_OTHER, Cooler_OTHER
+    from load_form_providers.dc_descr_catalog import objects_edit
+
+    if kind == 'vent':
+        if FAN_OTHER.objects.filter(part_number=partnum).exists():
+            fan = FAN_OTHER.objects.filter(part_number=partnum).first()
+            objects_edit(fan, usd_ex)
+
+    if kind == 'cool':
+        if Cooler_OTHER.objects.filter(part_number=partnum).exists():
+            cool = Cooler_OTHER.objects.filter(part_number=partnum).first()
+            objects_edit(cool, usd_ex)
+
+def get_pccooler(usd_ex):
+    usd_ex = usd_ex if usd_ex > 0 else 1
+    set_be = set()
+    count_no, count_on = 0, 0
+
+    try:
+        MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    except:
+        print('error in MEDIA_ROOT')
+    try:
+        #p1 = pd.read_excel(MEDIA_ROOT+'/1c.xlsx', usecols=cols,header=None)
+        pccooler = pd.read_excel(MEDIA_ROOT+'/прайс_pccooler.xlsx',
+        usecols=[1, 2, 3, 4, 6],header=None)
+    except Exception as e:
+        print(e.__class__)
+        return 0, 0, 0
+
+    pccooler_=pccooler.rename(columns={1:'partnumber_parts', 2:'name_parts',
+            3:'providerprice_parts', 4: 'rrp', 6:'availability_parts'})
+
+    for index, x in pccooler_.iloc[1:].iterrows():
+        try:
+            price = float(x['providerprice_parts'])
+        except:
+            price = 0
+        try:
+            rrp = float(x['rrp'])
+        except:
+            rrp = 0
+        price = price / usd_ex
+        price = round(price, 1)
+        kind_ = get_kind_pccooler(x['name_parts'])
+        if kind_:
+            kind = kind_
+            try:
+                pa = x["partnumber_parts"].strip()
+                av = get_status_pccooler(x["availability_parts"])
+            except:
+                continue
+            #dict_erc[key]=(x["name_parts"],x["providerprice_parts"],status_erc(x["availability_parts"]))
+            if pa:
+                set_be.add(pa)
+                try:
+                    n,pr = x['name_parts'][:99].strip(), price
+                except:
+                    continue
+                prov,_ = Providers.objects.get_or_create(name_provider='pccooler')
+                prov1 = Providers.objects.get(name_provider='-')
+                p1 = Parts_full.objects.filter(partnumber_parts=pa,providers=prov)
+                try:
+                    a1,_ = Articles.objects.get_or_create(article=pa,item_name=n,item_price=kind)
+                except:
+                    a1 = Articles.objects.get(article=pa)
+                if not p1:
+                    p_itl = Parts_full.objects.create(name_parts=n,
+                    partnumber_parts=pa,providers=prov,
+                    providerprice_parts=pr,date_chg=timezone.now(),
+                    availability_parts=av,kind=kind, rrprice_parts=rrp)
+                    a1.parts_full.add(p_itl)
+                    count_no += 1
+                elif p1.count() > 0:
+                    temp2 = p1.first()
+                    temp2.availability_parts = av
+                    temp2.providerprice_parts = pr
+                    temp2.rrprice_parts = rrp
+                    temp2.date_chg = timezone.now()
+                    temp2.kind = kind
+                    temp2.save()
+                    count_on += 1
+                    if p1.count() > 1:
+                        print(f'count:{p1.count()} ')
+                        for x in p1[1:]:
+                            x.delete()
+                if Parts_full.objects.filter(partnumber_parts=pa,providers=prov1).exists():
+                    if av == 'yes':
+                        pl = Parts_full.objects.filter(partnumber_parts=pa,providers=prov1)[0]
+                        try:
+                            if float(pl.providerprice_parts) != 0 and float(pl.providerprice_parts) >= float(pr):
+                                pl.providerprice_parts = pr
+                                pl.rrprice_parts = rrp
+                                pl.name_parts_main = 'pccooler'
+                                pl.availability_parts = av
+                                pl.date_chg=timezone.now()
+                                pl.save()
+                                get_distrib2(pl.kind, pl.partnumber_parts)
+                            elif float(pl.providerprice_parts) == 0 and float(pr):
+                                pl.providerprice_parts = pr
+                                pl.rrprice_parts = rrp
+                                pl.name_parts_main = 'pccooler'
+                                pl.availability_parts = av
+                                pl.date_chg=timezone.now()
+                                pl.save()
+                                get_distrib2(pl.kind, pl.partnumber_parts)
+                        except:
+                            print(f'error in pccooler element:{pa}')
+                else:
+                    pr = pr if av == 'yes' else 0
+                    name_parts_main = 'pccooler' if av == 'yes' else None
+                    p_main = Parts_full.objects.create(name_parts=n,
+                    partnumber_parts=pa,providers=prov1,
+                    providerprice_parts=pr,date_chg=timezone.now(),
+                    availability_parts=av,kind=kind,name_parts_main=name_parts_main,
+                    rrprice_parts=rrp)
+                    a1.parts_full.add(p_main)
+                    get_distrib2(kind,pa)
+
+                pccooler_to_single(pa, kind, usd_ex)
+
+            else:
+                continue
+
+    pp = Parts_full.objects.exclude(partnumber_parts__in=set_be).filter(
+    providers__name_provider='pccooler')
+    pp.update(availability_parts='no',providerprice_parts=0,date_chg = timezone.now())
+    single_clear(set_be) # выключает обьекты single(кулеры и вентиляторы) если
+    # их нет в set_be
+    if not Results.objects.filter(who='pccooler').exists():
+        r = Results(who='pccooler',
+        who_desc=f'count_no: {count_no}, count_on: {count_on}')
+        r.save()
+    else:
+        r = Results.objects.get(who='pccooler')
+        r.who_desc = f'pccooler add: {count_no} obj, update: {count_on} obj'
+        r.save()
+
+    Short_per_x_code()
+
 
     return count_no, count_on, pp
