@@ -1,9 +1,14 @@
 from django.contrib import admin
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from .models import *
 from django.db.models import Sum, Count
 from django.contrib import messages
 import re
 from money.onec_transforms import get_dict_to_bids_advanced
+from .views import add_manager
 
 #first_sborsik few_sborsik
 class Goods_Inline(admin.StackedInline):
@@ -76,7 +81,7 @@ class Bids_advancedAdmin(admin.ModelAdmin):
         response.context_data['summary'] = summary
 
         return response
-
+#
 @admin.register(Average_check)
 class Average_checkAdmin(admin.ModelAdmin):
     list_filter = ('date', 'site')
@@ -85,8 +90,20 @@ class Average_checkAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('kind', 'sloznostPK', 'summa', 'cash_rate',)
+    list_display = ('kind', 'sloznostPK', 'summa', 'cash_rate', 'display_managers')
     exclude = ('managers',)
+    actions = ['addManager',]
+
+    def addManager(self, request, queryset):
+        #admin_change from money.views.py
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('add_manager',
+                                    kwargs={'serv_pk': ','.join(str(pk) for pk in selected)}
+                                    )
+                                    )
+    addManager.short_description = 'Менеджера в сервис'
 
 @admin.register(Statistics_service)
 class Statistics_serviceAdmin(admin.ModelAdmin):

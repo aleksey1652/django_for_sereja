@@ -26,7 +26,59 @@ from money.salary import *
 from money.onec_transforms_advance import StatsRules
 #promotions_admin_edit x_code catch_to_admin_forms admin_test catch_to_calc_forms webhook Офис ПК витрина 2% ПК_витрина catch_to_admin_forms admin_margin_exch admin_special_price
 #Gross_profit Expense admin_test promotions_admin_edit change_assembly cash_rate_already
-# require_POST
+# require_POST admin_special_price crm admin_margin_exch
+
+def add_manager(request, serv_pk):
+    # добавляет/отключает менджера(только активных) к Service
+    """
+    Bids.objects.filter(date_ch__year=2024,
+    site__in=('versum', 'komputeritblok'), status='Успішно виконаний',
+    goods__kind=kind_).exclude(managers__family__groups__name='only_bonus').distinct(
+    ).select_related('goods').annotate(
+    num=F('goods__amount'),
+    suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+    """
+    form = ServiceForm()
+    context = {
+                'form': form,
+                'serv_pk': serv_pk,
+              }
+
+    if request.method == 'POST':
+
+        form = ServiceForm(request.POST)
+        man_name = 'noname'
+        active_or_no = True
+        if form.is_valid():
+            man_name = form.cleaned_data['service_manager']
+            active_or_no = form.cleaned_data['active']
+        pk_ = serv_pk.split(',')
+
+        try:
+            man = Managers.objects.get(name=man_name)
+            servs = Service.objects.filter(pk__in=pk_)
+            if active_or_no:
+                for s in servs:
+                    s.managers.add(man)
+                    s.save()
+            else:
+                for s in servs:
+                    s.managers.remove(man)
+        except Exception as e:
+            messages.error(request,f"Ошибка :{man_name}, pk: {pk_}, e: {e}")
+            return  HttpResponseRedirect(
+                                        reverse(f'admin:money_service_changelist')
+                                        )
+        chk = type(active_or_no)
+        if active_or_no:
+            messages.success(request,f"Для выбранных сервисов добавлен:{man_name}, {chk}")
+        else:
+            messages.success(request,f"Для выбранных сервисов отключен:{man_name}, {active_or_no}")
+        return  HttpResponseRedirect(
+                                    reverse(f'admin:money_service_changelist')
+                                    )
+
+    return render(request, 'money/admin_test.html', context)
 
 def catch_to_admin_shorts(request, comp_pk):
     # в окне ред компа: ручное добавление детали
@@ -352,7 +404,7 @@ def admin_delete_relate(request, test_pk):
         short = forms.ChoiceField(
             choices=CHOISE,
             label='Parts_full'
-        )"""
+        ) super"""
 
     class ShortSearchForm(ModelForm):
         class Meta:
@@ -828,9 +880,14 @@ def service_stats_per_period(m, service_set, month, year):
 def manager_stats_per_period(m, bids_set, month, year, s=('versum', 'komputeritblok')):
     #site_ = 'versum' if m.site == 'versum' else 'komputeritblok'
     sal = Salary(month, year)
+
+    #bids_bonus = sal.get_hand_bonus(month, year, m)
+
     dict_context = dict()
-    if m.super: # m.category_man !!!
+    if m.master: # руководитель
         dict_salary = sal.salary_super(plan_stavka_=True, no_stavka=False)
+    elif m.family.groups.filter(name='category_group').exists():
+        dict_salary = sal.salary_category(plan_stavka_=True, no_stavka=False)
     else:
         dict_salary = sal.salary_manager(m)
     bids_status = (
@@ -853,11 +910,6 @@ def manager_stats_per_period(m, bids_set, month, year, s=('versum', 'komputeritb
         else:
             dict_context[status_] = bids_set.filter(status=status_).distinct().count()
 
-    """for kind_ in bids_kind:
-        dict_context[kind_] = bids_set.filter(status='Выкуплен',
-        goods__kind=kind_).distinct().select_related('goods').annotate(num=F('goods__amount'),
-        suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']"""
-
     #warning: for all kind
     from_office = bids_set.filter(status='Успішно виконаний',
     istocnikZakaza='ПК вітрина 2%').distinct()
@@ -868,22 +920,54 @@ def manager_stats_per_period(m, bids_set, month, year, s=('versum', 'komputeritb
     dict_context['ПК_витрина'] = from_office_sum
     dict_context['Заявки ПК_витрина'] = offise_list
 
+    price_7DRIVE = bids_set.filter(status='Успішно виконаний',
+    istocnikZakaza='7DRIVE 0.5 %').distinct()
+    DRIVE_list = list(price_7DRIVE.values_list('ID', flat=True))
+    DRIVE_sum = price_7DRIVE.select_related('goods').annotate(num=F('goods__amount'),
+    suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+    DRIVE_sum = DRIVE_sum if DRIVE_sum else 0
+    dict_context['7DRIVE'] = DRIVE_sum
+    dict_context['Заявки 7DRIVE'] = DRIVE_list
+
+    price_rozetka_allo = bids_set.filter(status='Успішно виконаний',
+    istocnikZakaza__in=('Rozetka', 'Алло')).distinct()
+    roz_list = list(price_rozetka_allo.values_list('ID', flat=True))
+    roz_sum = price_rozetka_allo.select_related('goods').annotate(num=F('goods__amount'),
+    suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+    roz_sum = roz_sum if roz_sum else 0
+    dict_context['Rozetka_Алло'] = roz_sum
+    dict_context['Заявки Rozetka_Алло'] = roz_list
+
     dicr_res = {**dict_context, **dict_salary}
-    if not m.super:
+    if not m.super and not m.master and not m.family.groups.filter(
+    name='category_group').exists():
         dicr_res['ЗП'] += f", Итого: {dict_salary['sum']}"
 
     return dicr_res
 
     for kind_ in bids_kind:
         if m.site == 'both':
-            dict_context['team ' + kind_] = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
+            count_sum = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
             site__in=('versum', 'komputeritblok'), status='Успішно виконаний',
-            goods__kind=kind_).distinct().select_related('goods').annotate(num=F('goods__amount'),
+            goods__kind=kind_).exclude(
+            managers__family__groups__name='only_bonus'
+            ).distinct().select_related('goods').annotate(num=F(
+            'goods__amount'),
             suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
         else:
-            dict_context['team ' + kind_] = bids_set.filter(managers__site=m.site, status='Успішно виконаний',
-            goods__kind=kind_).distinct().select_related('goods').annotate(num=F('goods__amount'),
+            #dict_context['team ' + kind_] = bids_set.filter(managers__site=m.site,
+            #status='Успішно виконаний',
+            #goods__kind=kind_).distinct().select_related('goods').annotate(num=F(
+            #'goods__amount'),
+            #suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+            count_sum = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
+            site=m.site, status='Успішно виконаний',
+            goods__kind=kind_).exclude(
+            managers__family__groups__name='only_bonus'
+            ).distinct().select_related('goods').annotate(num=F(
+            'goods__amount'),
             suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+        dict_context['team ' + kind_] = count_sum if count_sum else 0
 
         """Goods.objects.filter(bids__managers__family__groups__name='test_group',
         kind=kind_,bids__site=site_,bids__date_ch__month=month,
@@ -919,48 +1003,94 @@ def manager_stats_per_period(m, bids_set, month, year, s=('versum', 'komputeritb
         dict_context['Ставка'] = 0
         cash_rate = 0
     dict_context['План'] = plan_now
-    if not m.super:
-        cash_sum = round(comp * (0.01 + yes) + parts * 0.01 + from_office_sum * 0.01 + cash_rate)
-        dict_context['ЗП'] = f'Сис блоки: {comp} * (0.01 + {yes}), Компл: {parts} * 0.01, ПК_витрина: {from_office_sum} * 0.01, Ставка: {cash_rate}, Всего: {cash_sum}'
+    """if not m.super:
+        cash_sum = round(
+        comp * (0.01 + yes) + parts * 0.01 + from_office_sum * 0.01 + cash_rate +\
+        bids_bonus)
+        dict_context['ЗП'] = f'Сис блоки: {comp} * (0.01 + {yes}),\
+        Компл: {parts} * 0.01, ПК_витрина: {from_office_sum} * 0.01,\
+        Ставка: {cash_rate}, bonus: {bids_bonus} Всего: {cash_sum}'
     else:
         cash_sum = round(super_pk + super_parts + cash_rate)
-        dict_context['ЗП'] = f'Сис блоки {super_pk}: , Компл: {super_parts}, Ставка: {cash_rate}, Всего: {cash_sum}'
+        dict_context['ЗП'] = f'Сис блоки {super_pk}: , Компл: {super_parts},\
+        Ставка: {cash_rate}, Всего: {cash_sum}'
+        """
 
     #dict_context['Уже получил'] = m.cash_rate_already
     man_cash_rate_already = sal.st_cash_rate_already(m)
     dict_context['Уже получил'] = man_cash_rate_already
 
-    dict_context['px'] = salary(team=dict_context['team Системный блок'],my=dict_context['Системный блок'])
+    dict_context['px'] = salary(
+    team=dict_context['team Системный блок'],my=dict_context['Системный блок']
+    )
 
 
     return dict_context
 
-def personal_sklad(request, now, context):
+def personal_sklad(request, now, context, st_pk):
     person = request.user
-    dict_temp = dict()
     M = Managers.objects.get(family__pk=person.pk)
+    form_bonus = BonusForm()
+    context['form_bonus'] = form_bonus
     month, year = now.strftime("%m"), now.strftime("%Y")
 
-    sal = Salary(month, year)
-    context['manager_stats_per_period'] = sal.salary_sklad(plan_stavka_=True, no_stavka=False)
-    return context
-
-    #dict_temp['Уже получил/а'] = M.cash_rate_already
-    man_cash_rate_already = sal.st_cash_rate_already(M)
-    dict_temp['Уже получил/а'] = man_cash_rate_already
-    try:
-        count_comp = Gross_profit.objects.get(date__month=month,date__year=year, site='both').quantity
-    except:
-        count_comp = 0
-    service,_ = Service.objects.get_or_create(kind='Зав склада')
-    tarif = service.summa
-    stavka = service.cash_rate
-    dict_temp['Ставка'] = M.cash_rate
-    if count_comp * tarif  > stavka:
-        dict_temp['ЗП'] = f'Ставка: {stavka} < Кол компов: {count_comp} * {tarif}, Итого: {count_comp * tarif}'
+    if st_pk != 0:
+        messages.warning(request,f'Период:{st_pk}')
+        m_y = re.split(':',st_pk)
+        try:
+            month, year = m_y[0].strip(), m_y[1].strip()
+        except:
+            month, year = now.strftime("%m"), now.strftime("%Y")
     else:
-        dict_temp['ЗП'] = f'Ставка: {stavka} > Кол компов: {count_comp} * {tarif}, Итого: {stavka}'
-    context['manager_stats_per_period'] = dict_temp
+        month, year = now.strftime("%m"), now.strftime("%Y")
+        messages.warning(request,f'Период:{month}: {year}')
+
+    sal = Salary(month, year)
+
+    #
+    st_period = set()
+    st_period.add(now.strftime("%m: %Y"))
+    month_ = int(now.strftime("%m")) - 1
+    year = now.strftime("%Y")
+    if month_ > 0:
+        month_, year_ = str(month_), year
+    else:
+        month_, year_ = '12', str(int(year) - 1)
+    st_period.add(f'{month_}: {year_}')
+    context['st_period'] = st_period if st_pk else now.strftime("%m: %Y")
+
+    if request.method == 'POST':
+        form_bonus = BonusForm(request.POST)
+        if form_bonus.is_valid():
+            bonus = form_bonus.cleaned_data['bonus']
+            name = form_bonus.cleaned_data['name']
+            date_field = form_bonus.cleaned_data['date_field']
+
+            serv, _ = Service.objects.get_or_create(kind='Зав склада',
+            sloznostPK='простой')
+            st = Statistics_service.objects.filter(managers=M,
+            service=serv, description=name,
+            week_count=1, date__month=month, date__year=year)
+
+            if st.exists():
+                ss = st.first()
+            else:
+                ss = Statistics_service.objects.create(managers=M,
+                service=serv, description=name, site=M.site,
+                week_count=1, date=date_field)
+
+            bidskur = BidsKurier.objects.create(ID=month, kurier_summa=bonus,
+            date_ch=date_field, kurier_period=ss)
+
+            bids_bonus = sal.get_hand_bonus(month, year, M)
+
+            messages.warning(
+            request,
+            f'Добавлен бонус: {name}, сумма: {bonus}, дата: {date_field}\
+            id_bids_cur: {bidskur.pk}, сумма бонусов({month}мес): {bids_bonus}')
+
+    context['manager_stats_per_period'] = sal.salary_sklad(plan_stavka_=True,
+    no_stavka=False)
 
     return context
 
@@ -1017,67 +1147,147 @@ def personal_one_c(request, now, context, st_pk):
             messages.warning(request,f'Период:{now.strftime("%m: %Y")}, {zayavka_count} добавлено, тариф: {service.summa}')
 
     sal = Salary(month, year)
-    context['manager_stats_per_period'] = sal.salary_one_c(plan_stavka_=True, no_stavka=False)
+    context['manager_stats_per_period'] = sal.salary_one_c(plan_stavka_=True,
+    no_stavka=False)
     return context
 
-    try:
-        count_comp = Gross_profit.objects.get(date__month=month,date__year=year, site='both').quantity
-    except:
-        count_comp = 0
-    service,_ = Service.objects.get_or_create(sloznostPK='простой',kind='Оператор 1С')
-    stavka = service.cash_rate
-    tarif = service.summa
-    all_serve = Service.objects.filter(kind='Оператор 1С').values('sloznostPK', 'summa')
 
-    stavka_ = sal.plan_stavka()
-    dict_temp = stavka_
-    dict_temp['Тарифы'] = [{k['sloznostPK']: k['summa']} for k in list(all_serve)]
-    stavka_service = round(stavka * stavka_['Процент_ставка'], 1)
-    dict_temp['Ставка'] = stavka_service
-    #dict_temp['Уже получил'] = M.cash_rate_already
-    man_cash_rate_already = sal.st_cash_rate_already(M)
-    dict_temp['Уже получил'] = man_cash_rate_already
+def personal_tovar(request, now, context, st_pk):
+    person = request.user
+    #dict_temp = dict()
+    M = Managers.objects.get(family__pk=person.pk)
+    serv, _ = Service.objects.get_or_create(kind='Заказ товара')
 
-    service_set = Statistics_service.objects.filter(managers=M, date__month=month, date__year=year)
+    form_bonus = BonusForm()
+    context['form_bonus'] = form_bonus
+    month, year = now.strftime("%m"), now.strftime("%Y")
 
-    for stat in service_set.values(
-    'service__sloznostPK', 'sborka_count', 'date', 'service__summa', 'pk'):
-        dict_temp[f"Добавлены/а заявки/а {stat['service__sloznostPK']}, {stat['date'].strftime('%m:%Y--%H:%M')} кол/тариф"] = {'st':(stat['sborka_count'], stat['service__summa']), 'st_pk': f"{stat['pk']}-st"}
-        count += stat['sborka_count'] * stat['service__summa']
+    if st_pk != 0:
+        messages.warning(request,f'Период:{st_pk}')
+        m_y = re.split(':',st_pk)
+        try:
+            month, year = m_y[0].strip(), m_y[1].strip()
+        except:
+            month, year = now.strftime("%m"), now.strftime("%Y")
+    else:
+        month, year = now.strftime("%m"), now.strftime("%Y")
+        messages.warning(request,f'Период:{month}: {year}')
 
-    dict_temp['Дополнительно добавленные'] = count
-    summa = stavka_service + (count_comp * tarif) + count
-    dict_temp['ЗП'] = f'Ставка: {stavka_service} + Кол компов: {count_comp} * {tarif} + {count}, Итого: {summa}'
-    context['manager_stats_per_period'] = dict_temp
+    sal = Salary(month, year)
+
+    #st_period = set([
+    #x.date_ch.strftime("%m: %Y") for x in \
+    #Bids.objects.filter(date_ch__month=month,date_ch__year=year,
+    #status='Успішно виконаний')
+    #])
+    st_period = set()
+    st_period.add(now.strftime("%m: %Y"))
+    month_ = int(now.strftime("%m")) - 1
+    year = now.strftime("%Y")
+    if month_ > 0:
+        month_, year_ = str(month_), year
+    else:
+        month_, year_ = '12', str(int(year) - 1)
+    st_period.add(f'{month_}: {year_}')
+    context['st_period'] = st_period if st_pk else now.strftime("%m: %Y")
+
+    if request.method == 'POST':
+        form_bonus = BonusForm(request.POST)
+        if form_bonus.is_valid():
+            bonus = form_bonus.cleaned_data['bonus']
+            name = form_bonus.cleaned_data['name']
+            date_field = form_bonus.cleaned_data['date_field']
+
+            st = Statistics_service.objects.filter(managers=M,
+            service=serv, description=name,
+            week_count=1, date__month=month, date__year=year)
+
+            if st.exists():
+                ss = st.first()
+            else:
+                ss = Statistics_service.objects.create(managers=M,
+                service=serv, description=name, site=M.site,
+                week_count=1, date=date_field)
+
+            bidskur = BidsKurier.objects.create(ID=month, kurier_summa=bonus,
+            date_ch=date_field, kurier_period=ss)
+
+            bids_bonus = sal.get_hand_bonus(month, year, M)
+
+            messages.warning(
+            request,
+            f'Добавлен бонус: {name}, сумма: {bonus}, дата: {date_field}\
+            id_bids_cur: {bidskur.pk}, сумма бонусов({month}мес): {bids_bonus}')
+
+    context['manager_stats_per_period'] = sal.salary_tovar(plan_stavka_=True,
+    no_stavka=False)
 
     return context
 
-def personal_tovar(request, now, context):
+def personal_office(request, now, context, st_pk):
     person = request.user
     dict_temp = dict()
     M = Managers.objects.get(family__pk=person.pk)
+    serv, _ = Service.objects.get_or_create(kind='Офисный менеджер')
+
+    form_bonus = BonusForm()
+    context['form_bonus'] = form_bonus
     month, year = now.strftime("%m"), now.strftime("%Y")
 
-    sal = Salary(month, year)
-    context['manager_stats_per_period'] = sal.salary_tovar(plan_stavka_=True, no_stavka=False)
-    return context
-
-    dict_temp['Ставка'] = M.cash_rate
-    #dict_temp['Уже получил/а'] = M.cash_rate_already
-    man_cash_rate_already = sal.st_cash_rate_already(M)
-    dict_temp['Уже получил/а'] = man_cash_rate_already
-    try:
-        count_comp = Gross_profit.objects.get(date__month=month,date__year=year, site='both').quantity
-    except:
-        count_comp = 0
-    service,_ = Service.objects.get_or_create(kind='Заказ товара')
-    tarif = service.summa
-    stavka = service.cash_rate
-    if count_comp * tarif  > stavka:
-        dict_temp['ЗП'] = f'Ставка: {stavka} < Кол компов: {count_comp} * {tarif}, Итого: {count_comp * tarif}'
+    if st_pk != 0:
+        messages.warning(request,f'Период:{st_pk}')
+        m_y = re.split(':',st_pk)
+        try:
+            month, year = m_y[0].strip(), m_y[1].strip()
+        except:
+            month, year = now.strftime("%m"), now.strftime("%Y")
     else:
-        dict_temp['ЗП'] = f'Ставка: {stavka} > Кол компов: {count_comp} * {tarif}, Итого: {stavka}'
-    context['manager_stats_per_period'] = dict_temp
+        month, year = now.strftime("%m"), now.strftime("%Y")
+        messages.warning(request,f'Период:{month}: {year}')
+
+    sal = Salary(month, year)
+
+    st_period = set()
+    st_period.add(now.strftime("%m: %Y"))
+    month_ = int(now.strftime("%m")) - 1
+    year = now.strftime("%Y")
+    if month_ > 0:
+        month_, year_ = str(month_), year
+    else:
+        month_, year_ = '12', str(int(year) - 1)
+    st_period.add(f'{month_}: {year_}')
+    context['st_period'] = st_period if st_pk else now.strftime("%m: %Y")
+
+    if request.method == 'POST':
+        form_bonus = BonusForm(request.POST)
+        if form_bonus.is_valid():
+            bonus = form_bonus.cleaned_data['bonus']
+            name = form_bonus.cleaned_data['name']
+            date_field = form_bonus.cleaned_data['date_field']
+
+            st = Statistics_service.objects.filter(managers=M,
+            service=serv, description=name,
+            week_count=1, date__month=month, date__year=year)
+
+            if st.exists():
+                ss = st.first()
+            else:
+                ss = Statistics_service.objects.create(managers=M,
+                service=serv, description=name, site=M.site,
+                week_count=1, date=date_field)
+
+            bidskur = BidsKurier.objects.create(ID=month, kurier_summa=bonus,
+            date_ch=date_field, kurier_period=ss)
+
+            bids_bonus = sal.get_hand_bonus(month, year, M)
+
+            messages.warning(
+            request,
+            f'Добавлен бонус: {name}, сумма: {bonus}, дата: {date_field}\
+            id_bids_cur: {bidskur.pk}, сумма бонусов({month}мес): {bids_bonus}')
+
+    context['manager_stats_per_period'] = sal.office_man(plan_stavka_=True,
+    no_stavka=False)
 
     return context
 
@@ -1267,7 +1477,15 @@ def personal_kurier(request, now, context, st_pk):
     sal = Salary(month, year) # класс ЗП в том числе и курьера в salary.py
     context['manager_stats_per_period'] = sal.salary_kurier(plan_stavka_=True,
     no_stavka=False, week=week_count)
-
+    try:
+        for_mess_stavka = context['manager_stats_per_period']['ставка']
+        for_mess_zp = context['manager_stats_per_period']['ЗП']
+        for_mess_already = context['manager_stats_per_period']['получил']
+    except Exception as es:
+        messages.success(request,f'Error: {es}')
+    messages.success(request,f'Ставка: {for_mess_stavka}')
+    messages.success(request,f'ЗП: {for_mess_zp}')
+    messages.success(request,f'Получил: {for_mess_already}')
 
     context['st_pk'] = [] #must be clear!
     context['bids_per_period'] = [] #must be clear!
@@ -1405,7 +1623,7 @@ def Family(request,st_pk=0):
         return render(request, 'money/family_kurier.html', context)
 
     if u.groups.filter(name='sklad_group').exists():
-        context = personal_sklad(request, now, context)
+        context = personal_sklad(request, now, context, st_pk)
 
         return render(request, 'money/family.html', context)
 
@@ -1414,8 +1632,13 @@ def Family(request,st_pk=0):
 
         return render(request, 'money/family.html', context)
 
+    if u.groups.filter(name='office_group').exists():
+        context = personal_office(request, now, context, st_pk)
+
+        return render(request, 'money/family.html', context)
+
     if u.groups.filter(name='tovar_group').exists():
-        context = personal_tovar(request, now, context)
+        context = personal_tovar(request, now, context, st_pk)
 
         return render(request, 'money/family.html', context)
 
@@ -1524,11 +1747,20 @@ def Family(request,st_pk=0):
                     ss = st.first()
                 else:
                     ss = Statistics_service.objects.create(managers=M,
-                    service=serv, description=name,
+                    service=serv, description=name, site=M.site,
                     week_count=1, date=date_field)
+
+                bidskur = BidsKurier.objects.create(ID=month, kurier_summa=bonus,
+                date_ch=date_field, kurier_period=ss)
+                bids_bonus = BidsKurier.objects.filter(date_ch=date_field,
+                kurier_period__managers__pk=M.pk).aggregate(
+                Total=Sum('kurier_summa'))['Total'] # сумма бонусов
+                bids_bonus = bids_bonus if bids_bonus else 0
+
                 messages.warning(
                 request,
-                f'Добавлен бонус: {name}, сумма: {bonus}, дата: {date_field}')
+                f'Добавлен бонус: {name}, сумма: {bonus}, дата: {date_field}\
+                id_bids_cur: {bidskur.pk}, сумма бонусов({month}мес): {bids_bonus}')
 
         if request.method == 'GET':
             form_b = BidsSearchForm(request.GET)
@@ -1551,8 +1783,29 @@ def Family(request,st_pk=0):
         M = Managers.objects.get(family__pk=u.pk)
         #st = Statistics_service.objects.filter(managers=M)
         #context['st'] = st
-        st_period = set([x.date_ch.strftime("%m: %Y") for x in Bids.objects.filter(managers=M)])
-        context['st_period'] = st_period
+        #st_period = set([x.date_ch.strftime("%m: %Y") for x in\
+        #Bids.objects.filter(managers=M)])
+        #context['st_period'] = st_period
+
+        month, year = now.strftime("%m"), now.strftime("%Y")
+        month_before = int(month) - 1
+        year_before = year
+        if int(month) - 1 == 0:
+            month_before, year_before = 12, int(year) - 1
+        if month_before < 10:
+            month_before = f'0{month_before}'
+        st_period = set([x.date_ch.strftime("%m: %Y") for x in\
+        Bids.objects.filter(managers=M)])
+        st_period.add(f"{month}: {year}")
+        st_period.add(f"{month_before}: {year_before}")
+        date_tuples = [
+        (int(date.split(': ')[0]), int(date.split(': ')[1])) for date in st_period
+                        ]
+        sorted_dates = sorted(date_tuples, key=lambda x: (x[1], x[0]))
+        sorted_dates_str = [f'{x}:{y}' for x, y in sorted_dates]
+
+        context['st_period'] = sorted_dates_str # набор отсорт-ых мес периодов
+
         if st_pk != 0:
             messages.warning(request,f'Period:{st_pk}')
             m_y = re.split(':',st_pk)
@@ -1601,7 +1854,7 @@ def save_create_data(data, only_sborka=False, only_remont=False):
 
         return (None, 'only_remont')
 
-    if only_sborka == Tch_statusrue and data['status'] in st:
+    if only_sborka == True and data['status'] in st:
         for prod in data['products']:
             if prod[2][0] and data['sborsik']:
                 sloznostPK, num_PK = prod[2]
@@ -1702,7 +1955,8 @@ def save_create_data(data, only_sborka=False, only_remont=False):
         if data['istocnikZakaza'] in ('Алло', 'Rozetka'):
             try:
                 count = round(count * 0.1)
-                expense_marketplace(data['ID'], count, data['account'], data['istocnikZakaza'])
+                expense_marketplace(data['ID'], count, data['account'],
+                data['istocnikZakaza'])
             except:
                 pass
 
@@ -1717,9 +1971,16 @@ def webhook(request):
     '''who_time = timezone.now().strftime("%d %B %Y, %H:%M")
     r, _ = Results.objects.get_or_create(who='crm')
     r.json_data = data
-    r.who_desc = who_time
+    r.who_desc = timezone.now().strftime("%d %B %Y, %H:%M")
     r.save()'''
-    dict_data = bid(data)
+    dict_data = bid(data) #bid from money/service.py
+    """try:
+        who_time = str(data['meta']['fields'])
+        r.who_desc = str(who_time)
+    except Exception as e:
+        r.who_desc = e
+
+    """
 
     if dict_data['manager'] in [m.name for m in Managers.objects.filter(is_active=True)]:
         res = save_create_data(dict_data)
@@ -1733,8 +1994,8 @@ def webhook(request):
             ist = res[0].istocnikZakaza if res[0] else 'bad_ist'
             st = res[1] if res[1] else 'bad_1'
             print(f'ok: {bids_} {ist} {st}')
-        except:
-            print(f"bad in zayvka: {dict_data['ID']}")
+        except Exception as e:
+            print(f"bad in zayvka: {dict_data['ID']} {e}")
     else:
         #messages.success(request,f'{dict_data.keys()}')
         print(f'bad: {dict_data.keys()}')

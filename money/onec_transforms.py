@@ -8,8 +8,8 @@ from load_form_providers.load_element import to_article2_1
 from money.service import trans_remainder_category_dict
 from money.salary import Salary
 from money.onec_expense import ExpenseRules
-#providerprice_parts transformations Expense get_dict_to_bids_advanced Офис ПК витрина 2% Bids
-#Gross_profit Expense cash_rate_already Выкуплен витрина
+#providerprice_parts transformations Expense get_dict_to_bids_advanced Офис ПК витрина 2% Bids crm
+#Gross_profit Expense cash_rate_already Выкуплен витрина bid
 
 for_Customer = {'IT-Blok': 'itblok', 'Versum': 'versum', 'both': 'both', 'tenders': 'tenders'}
 
@@ -135,6 +135,35 @@ def yes_div_per_man(man, m, plan, bids_):
     except:
         return 0
 
+def bonus_man_per_date(dateqs, man):
+    # вычисляет ручн вводимый бонус в кабинете для работника man за период dateqs
+
+    month, year = dateqs.strftime("%m"), dateqs.strftime("%Y")
+
+    bids_bonus = BidsKurier.objects.filter(
+    date_ch__month=month, date_ch__year=year,
+    kurier_period__managers__pk=man.pk).aggregate(
+    Total=Sum('kurier_summa'))['Total'] # сумма ручных бонусов
+    bids_bonus = bids_bonus if bids_bonus else 0
+
+    return bids_bonus
+
+def tender_man_per_date(dateqs):
+    # вычисляет сумму от тендеров за период dateqs
+
+    month, year = dateqs.strftime("%m"), dateqs.strftime("%Y")
+
+    bids_tender = Bids.objects.filter(
+    date_ch__month=month, date_ch__year=year,
+    status='Успішно виконаний',
+    managers__family__groups__name='only_bonus'
+    ).distinct().select_related('goods').annotate(
+    num=F('goods__amount'), suma=F('goods__summa')
+    ).aggregate(Total=Sum(F('num')*F('suma')))['Total'] # сумма тендерных бонусов
+    bids_tender = bids_tender if bids_tender else 0
+
+    return bids_tender
+
 
 def salary_admin_managers(dateqs, kw, bids_, man):
     sal = Salary(dateqs.strftime("%m"), dateqs.strftime("%Y"))
@@ -142,7 +171,9 @@ def salary_admin_managers(dateqs, kw, bids_, man):
     salary_dict = {'versum': 0, 'itblok': 0}
     goods__kind = 0
     salary_editions = kw[:]
-    plan_ = Plan.objects.filter(date__month=dateqs.strftime("%m"),date__year=dateqs.strftime("%Y"))
+    plan_ = Plan.objects.filter(
+    date__month=dateqs.strftime("%m"),date__year=dateqs.strftime("%Y")
+    )
     #plan_now = plan_.last().plan if plan_.exists() else 10000000
     #yes = 0.01 if salary_editions[-1]['Системный_блок'] >= plan_now else 0
     soft_bonus = Goods.objects.first().software_bonus
@@ -151,20 +182,34 @@ def salary_admin_managers(dateqs, kw, bids_, man):
             m = Managers.objects.get(name=k['name'])
         except:
             continue
+        bonus = bonus_man_per_date(dateqs, m)
         #already = m.cash_rate_already
         already = sal.st_cash_rate_already(m)
         k['Получил'] = already
         if 'ПК_витрина' not in k:
             k['ПК_витрина'] = 0
+        if '7DRIVE' not in k:
+            k['7DRIVE'] = 0
+        if 'Rozetka_Алло' not in k:
+            k['Rozetka_Алло'] = 0
         if m.cash_rate:
             rate_serve = sal.plan_stavka()
-            rate = round(m.cash_rate * rate_serve['Процент_ставка'])
+            #rate = round(m.cash_rate * rate_serve['Процент_ставка'])
+            rate = round(m.cash_rate) # сейчас rate_serve['Процент_ставка'] = 1
+            # для игнора плана!!!
         else:
-            rate = m.cash_rate
-        if m.super:
+            rate = 0
+        if m.master: #m.super было раньше
+            #service = sal.get_service('простой', 'Руководитель')
+            #summa_procent = service.summa # % от оборота вер, айти
+            summa_procent = sal.get_pocent_service('Руководитель%')
+            tender_pr = sal.get_pocent_service('Тендер%')
+            tender = tender_man_per_date(dateqs) * tender_pr
             #k['ЗП'] = round(salary_editions[-1]['Системный_блок'] * 0.005 + k['Комплектующие'] * 0.005 + k['ПО'] * soft_bonus + k['ПК_витрина'] * 0.01)
-            zp = round(salary_editions[-1]['Системный_блок'] * 0.005 + salary_editions[-1]['Комплектующие'] * 0.005 + rate)
-            k['ЗП'] = f"{salary_editions[-1]['Системный_блок']}*0.005 + {salary_editions[-1]['Комплектующие']} * 0.005 + ставка: {rate} = {zp}"
+            zp = round(salary_editions[-1]['Системный_блок'] * summa_procent +\
+            salary_editions[-1]['Комплектующие'] * summa_procent + bonus +\
+            tender + rate)
+            k['ЗП'] = f"{salary_editions[-1]['Системный_блок']} * {summa_procent} + {salary_editions[-1]['Комплектующие']} * {summa_procent} + {bonus} + {tender} + ставка: {rate} = {zp}"
 
             #super_manager_option = k['ЗП']
             super_manager_option = zp
@@ -174,7 +219,36 @@ def salary_admin_managers(dateqs, kw, bids_, man):
                 salary_negative = float(salary_negative * 0.005)
             except:
                 salary_negative = 0'''
+
+        elif m.family.groups.filter(name='category_group').exists():
+            #service = sal.get_service('простой', 'Категорийный менеджер')
+            #summa_procent = service.summa # % от оборота вер, айти
+            summa_procent = sal.get_pocent_service('Категорийный менеджер%')
+            ps_sum = salary_editions[-1]['Системный_блок']
+            parts_sum = salary_editions[-1]['Комплектующие']
+
+            if m.cash_rate:
+                rate_serve = sal.plan_stavka()
+                #rate = round(m.cash_rate * rate_serve['Процент_ставка'])
+                rate = round(m.cash_rate) # сейчас rate_serve['Процент_ставка'] = 1
+                # для игнора плана!!!
+            else:
+                rate = 0
+
+            zp = round(
+            ps_sum * summa_procent + parts_sum * summa_procent + bonus + rate)
+
+            k['ЗП'] = f"{ps_sum} * {summa_procent} + {parts_sum} * {summa_procent} + {bonus} + ставка: {rate} = {zp}"
+
         else:
+
+            # ниже: вместо цифренных коэф-ов изменяемые в админке раздел Service
+            pc_pr = sal.get_pocent_service('ПК%')
+            parts_pr = sal.get_pocent_service('Комплектующие%')
+            of_pr = sal.get_pocent_service('ПК вітрина%')
+            dr_pr = sal.get_pocent_service('7DRIVE%')
+            roz_pr = sal.get_pocent_service('Rozetka-Алло%')
+
             if m.site == 'versum':
                 plan_now = sal.get_plan('versum')
                 yes = sal.yes_div_per_man(m, plan_now)
@@ -192,17 +266,29 @@ def salary_admin_managers(dateqs, kw, bids_, man):
                     plan_now = 10000000
                 yes = yes_div_per_man(man, m, plan_now, bids_)"""
             try:
-                zp = round(k['Системный_блок'] * (0.01 + yes) + k['Комплектующие'] * 0.01 + k['ПК_витрина'] * 0.01 + rate)
-                k['ЗП'] = f"{k['Системный_блок']} * (0.01 + {yes}) + {k['Комплектующие']} * 0.01 + {k['ПК_витрина']}* 0.01 ставка:{rate} = {zp}"
+                zp = round(k['Системный_блок'] * (pc_pr + yes) + k['Комплектующие'] *\
+                parts_pr + k['ПК_витрина'] * of_pr + k['7DRIVE'] * dr_pr +\
+                k['Rozetka_Алло'] * roz_pr + bonus + rate)
+                k['ЗП'] = f"{k['Системный_блок']} * ({pc_pr} + {yes}) +\
+                {k['Комплектующие']} * {parts_pr} + {k['ПК_витрина']}* {of_pr} +\
+                {k['7DRIVE']}* {dr_pr} + {k['Rozetka_Алло']}* {roz_pr} +\
+                {bonus} + ставка:{rate} = {zp}"
                 #k['ЗП'] = round(k['Системный_блок'] * (0.01 + yes) + k['Комплектующие'] * 0.005 + k['ПО'] * soft_bonus + k['ПК_витрина'] * 0.01)
             except:
-                zp = round(k['Системный_блок'] * 0.01 + k['Комплектующие'] * 0.01 + k['ПК_витрина'] * 0.01)
-                k['ЗП'] = f"{k['Системный_блок']} * 0.01 + {k['Комплектующие']} * 0.005 + {k['ПК_витрина']}* 0.01 = {zp}"
+                zp = round(k['Системный_блок'] * pc_pr + k['Комплектующие'] *\
+                parts_pr + k['ПК_витрина'] * of_pr + k['7DRIVE'] * dr_pr +\
+                k['Rozetka_Алло'] * roz_pr + bonus)
+                k['ЗП'] = f"{k['Системный_блок']} * {pc_pr} + {k['Комплектующие']} *\
+                {parts_pr} + {k['ПК_витрина']} * {of_pr} + {k['7DRIVE']} * {dr_pr} +\
+                {k['Rozetka_Алло']}* {roz_pr} + {bonus} = {zp}"
                 #k['ЗП'] = round(k['Системный_блок'] * 0.01 + k['Комплектующие'] * 0.005 + k['ПО'] * soft_bonus + k['ПК_витрина'] * 0.01)
             if m.site == 'versum':
                 salary_dict['versum'] += zp
-            else:
+            if m.site == 'itblok':
                 salary_dict['itblok'] += zp
+            if m.site == 'both':
+                salary_dict['itblok'] += zp / 2
+                salary_dict['versum'] += zp / 2
     """if super_manager_option:
         try:
             temp_zp = float(salary_editions[-1]['ЗП'].split('=')[-1].strip())
@@ -339,13 +425,13 @@ def personal_data(dateqs):
     if kurier_man:
         temp_dict = sal.salary_kurier(plan_stavka_=True, no_stavka=False)
         list_personal.append(temp_dict)
-    """try:
-        one_man = Managers.objects.get(family__groups__name='one_c_group')
+    try:
+        one_man = Managers.objects.get(family__groups__name='office_group')
     except:
         one_man = None
     if one_man:
-        temp_dict = sal.salary_one_c(plan_stavka_=True, no_stavka=False)
-        list_personal.append(temp_dict)"""
+        temp_dict = sal.office_man(plan_stavka_=True, no_stavka=False)
+        list_personal.append(temp_dict)
     try:
         razrab_man = Managers.objects.get(family__groups__name='razrab_group')
     except:
@@ -515,12 +601,14 @@ def reklama_managers(dateqs, type_):
     return f'Расходы по курьерам km: {km_per_period_} * тариф: {tarif}: / кол компов: {profit} = {res}'"""
 
 def get_dict_to_bids_advanced(qs):
-    man = Managers.objects.filter(family__groups__name='test_group')
+    man = Managers.objects.filter(family__groups__name='test_group')# без мен only_bonus
     sborsik = Managers.objects.filter(sborsik=True)
     remontnik = Managers.objects.filter(remontnik=True)
     personal = Managers.objects.filter(family__groups__name='personal_group')
-    bids_ = qs.filter(status='Успішно виконаний')
-    date_temp = qs.filter(status='Успішно виконаний')
+    bids_ = qs.filter(status='Успішно виконаний').exclude(
+    managers__family__groups__name='only_bonus') # без мен only_bonus
+    date_temp = qs.filter(status='Успішно виконаний').exclude(
+    managers__family__groups__name='only_bonus') # без мен only_bonus
     dateqs = date_temp.last().date_ch if date_temp else timezone.now()
     month, year = dateqs.strftime("%m"), dateqs.strftime("%Y")
     sal = Salary(dateqs.strftime("%m"), dateqs.strftime("%Y"))
@@ -528,7 +616,8 @@ def get_dict_to_bids_advanced(qs):
     st = Statistics_service.objects.filter(
     date__month=dateqs.strftime("%m"),date__year=dateqs.strftime("%Y"))
     summary = {'main': [], 'personal': [], 'sborsik': [], 'remontnik': [], 'advanced': []}
-    dict_all_man = {'name': 'Все', 'Системный_блок': 0, 'ПО': 0, 'Комплектующие': 0, 'ПК_витрина': 0}
+    dict_all_man = {'name': 'Все', 'Системный_блок': 0, 'ПО': 0, 'Комплектующие': 0,
+    'ПК_витрина': 0, '7DRIVE': 0,}
 
     summary['personal'] = personal_data(dateqs)
 
@@ -542,6 +631,7 @@ def get_dict_to_bids_advanced(qs):
             dict_temp[re.sub(' ', '_', k)] = temp if temp else 0
             if temp:
                 dict_all_man[re.sub(' ', '_', k)] += temp
+
         temp = bids_.filter(managers=m,
         istocnikZakaza='ПК вітрина 2%').distinct().select_related('goods').annotate(
         num=F('goods__amount'),
@@ -549,7 +639,17 @@ def get_dict_to_bids_advanced(qs):
         dict_temp['ПК_витрина'] = temp if temp else 0
         if temp:
             dict_all_man['ПК_витрина'] += temp
+
+        temp = bids_.filter(managers=m,
+        istocnikZakaza='7DRIVE 0.5 %').distinct().select_related('goods').annotate(
+        num=F('goods__amount'),
+        suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+        dict_temp['7DRIVE'] = temp if temp else 0
+        if temp:
+            dict_all_man['7DRIVE'] += temp
+
         summary['main'].append(dict_temp)
+
     summary['main'].append(dict_all_man)
     summary_temp = summary['main'][:]
     summary['main'] = salary_admin_managers(dateqs, summary_temp, bids_, man)

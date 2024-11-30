@@ -39,9 +39,12 @@ class Bids(models.Model):
         ('Корзина', 'Корзина'), #('КОРЗИНА', 'КОРЗИНА'),
         ('Telegram', 'Telegram'), #('Rozetka', 'Rozetka'),
         ('Чат', 'Чат'), #('Алло', 'Алло'),
+        ('Rozetka', 'Rozetka'),
+        ('Алло', 'Алло'),
         ('Телефон', 'Телефон'), #('Телефон_Чат', 'Телефон_Чат'),
         ('Офіс', 'Офіс'), #('Офис', 'Офис'),
-        ('ПК вітрина 2%', 'ПК вітрина 2%'), #('ПК витрина 2%', 'ПК витрина 2%'),
+        ('ПК вітрина 2%', 'ПК вітрина 2%'), #('ПК вітрина 2%', 'ПК витрина 2%'),
+        ('7DRIVE 0.5 %', '7DRIVE 0.5 %'),
         ('Instagram', 'Instagram'), #('Инстаграм', 'Инстаграм'),
         ('Інше джерело', 'Інше джерело'), #('Другой', 'Другой'),
         ('OLX', 'OLX'),
@@ -167,6 +170,7 @@ class Managers(models.Model):
     remontnik = models.BooleanField(default=False, verbose_name='Ремонтник')
     is_active = models.BooleanField(default=False, verbose_name='Менеджер')
     super = models.BooleanField(default=False, verbose_name='Главный менеджер')
+    master = models.BooleanField(default=False, verbose_name='Руководитель')
     site = models.CharField(max_length=20, db_index=True, verbose_name='сайт',
     choices=CHOISE, default='versum')
     cash_rate = models.PositiveIntegerField(db_index=True, verbose_name='Ставка', default=0)
@@ -249,12 +253,17 @@ class Service(models.Model):
     summa = models.FloatField(db_index=True, verbose_name='Оплата за этот вид работ',
     default=0)
     kind = models.CharField(max_length=50, db_index=True,
-    verbose_name='Вид работ', choices=CHOISE, default='Сборка')
+    verbose_name='Вид работ', default='Сборка')
     sloznostPK = models.CharField(max_length=50, db_index=True,
     verbose_name='Сложность', choices=CHOISE2,
     default='простой')
     cash_rate = models.PositiveIntegerField(db_index=True, verbose_name='Ставка', default=0)
     managers = models.ManyToManyField(Managers)
+
+    def display_managers(self):
+        return ', '.join(str(genre.name) for genre in self.managers.all())
+
+    display_managers.short_description = 'Менеджеры'
 
     def __str__(self):
         return self.kind + ', сложность: ' + self.sloznostPK
@@ -279,6 +288,7 @@ def check_saves_service(sender, instance, created, **kwargs):
         'Курьер': 'kurier_group',
         'Оператор 1С': 'one_c_group',
         'Категорийный менеджер': 'category_group',
+        'Категорийный менеджер%': 'category_group',
                         }
 
     cash_rate_ = instance.cash_rate
@@ -362,7 +372,8 @@ class Statistics_service(models.Model):
 class Statistics_bid(models.Model):
     date = models.DateTimeField(auto_now=True)
     bid_count = models.PositiveIntegerField(default=0, verbose_name='bid_count')
-    idet_dialog_count = models.PositiveIntegerField(default=0, verbose_name='idet_dialog_count')
+    idet_dialog_count = models.PositiveIntegerField(default=0,
+    verbose_name='idet_dialog_count')
     ojidaem_oplatu_count = models.PositiveIntegerField(default=0,
     verbose_name='ojidaem_oplatu_count')
     otkaz_count = models.PositiveIntegerField(default=0, verbose_name='otkaz_count')

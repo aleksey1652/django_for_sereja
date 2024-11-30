@@ -49,6 +49,16 @@ class Salary:
         else:
             return 0
 
+    def get_hand_bonus(self, month, year, man):
+        # для man вычисляем ручные бонусы за период month, year
+
+        bids_bonus = BidsKurier.objects.filter(
+        date_ch__month=month, date_ch__year=year,
+        kurier_period__managers__pk=man.pk).aggregate(
+        Total=Sum('kurier_summa'))['Total'] # сумма ручных бонусов
+        bids_bonus = bids_bonus if bids_bonus else 0
+
+        return bids_bonus
 
     def get_count_comp(self, site_='both'):
         # Колличество компов
@@ -64,6 +74,29 @@ class Salary:
         service,_ = Service.objects.get_or_create(sloznostPK=sloznostPK_,kind=kind_)
 
         return service
+
+    def get_pocent_service(self, kind_):
+        # Возвращает процент от service.kind (вида деятельности)
+
+        dict_kind = {
+        'ПК%': 0.01,
+        'Комплектующие%': 0.01,
+        'ПК вітрина%': 0.02,
+        '7DRIVE%': 0.005,
+        'Rozetka-Алло%': 0.005,
+        'Тендер%': 0.0025,
+        'Руководитель%': 0.005,
+        'Категорийный менеджер%': 0.0035,
+        }
+
+        kind_prcnt = self.get_service('простой', kind_)
+        prcnt_ = kind_prcnt.summa
+        try:
+            prcnt = prcnt_ if prcnt_ else dict_kind[kind_]
+        except:
+            prcnt = prcnt_
+
+        return prcnt
 
     def get_plan(self, site_, past_period=True, view_full=False):
         # План для прошлого периода(True), текущего(False)
@@ -146,7 +179,8 @@ class Salary:
         )
 
         if exp.exists():
-            sum = exp.select_related('expense__amount').aggregate(total=Sum('expense__amount'))['total']
+            sum = exp.select_related('expense__amount'
+            ).aggregate(total=Sum('expense__amount'))['total']
             sum = sum if sum else 0
             return sum
         else:
@@ -185,11 +219,18 @@ class Salary:
             return stavka_man_ + stavka_man_stavka_
 
     def salary_manager(self, man):
-        # ЗП менеджеров включая категорийного category_group
+        # ЗП менеджеров включая главного
         month, year = self.month, self.year
 
         bids_set = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
         status='Успішно виконаний', managers=man)
+
+        # ниже 5строк: вместо цифренных коэф-ов изменяемые в админке раздел Service
+        pc_pr = self.get_pocent_service('ПК%')
+        parts_pr = self.get_pocent_service('Комплектующие%')
+        of_pr = self.get_pocent_service('ПК вітрина%')
+        dr_pr = self.get_pocent_service('7DRIVE%')
+        roz_pr = self.get_pocent_service('Rozetka-Алло%')
 
         price_pc = bids_set.filter(goods__kind='Системный блок'
         ).distinct().select_related('goods').annotate(num=F('goods__amount'),
@@ -206,6 +247,18 @@ class Salary:
         suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
         price_office = price_office if price_office else 0
 
+        price_7DRIVE = bids_set.filter(istocnikZakaza='7DRIVE 0.5 %'
+        ).select_related('goods').annotate(num=F('goods__amount'),
+        suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+        price_7DRIVE = price_7DRIVE if price_7DRIVE else 0
+
+        price_rozetka_allo = bids_set.filter(istocnikZakaza__in=('Rozetka', 'Алло')
+        ).select_related('goods').annotate(num=F('goods__amount'),
+        suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+        price_rozetka_allo = price_rozetka_allo if price_rozetka_allo else 0
+
+        bids_bonus = self.get_hand_bonus(month, year, man)
+
         plan = self.get_plan(man.site)
         yes = self.yes_div_per_man(man, plan)
         if man.cash_rate:
@@ -214,8 +267,14 @@ class Salary:
         else:
             rate = 0
         salary_dict = self.salary_team_manager(man)
-        salary_dict['sum'] = round(price_pc * (0.01 + yes) + price_parts * 0.01 + price_office * 0.01 + rate)
-        salary_dict['ЗП'] = f'Сис блоки: {price_pc} * (0.01 + {yes}), Компл: {price_parts} * 0.01, ПК_витрина: {price_office} * 0.01, Ставка: {rate}'
+        salary_dict['sum'] = round(price_pc * (pc_pr + yes) + price_parts * parts_pr +\
+        price_office * of_pr + price_7DRIVE * dr_pr + price_rozetka_allo * roz_pr +\
+        bids_bonus + rate)
+        salary_dict['Руч бонус'] = bids_bonus
+        salary_dict['ЗП'] = f'Сис блоки: {price_pc} * ({pc_pr} + {yes}),\
+        Компл: {price_parts} * {parts_pr}, ПК_витрина: {price_office} * {of_pr},\
+        7DRIVE: {price_7DRIVE} * {dr_pr}, Rozetka-Алло: {price_rozetka_allo} * {roz_pr},\
+        Руч бонус: {bids_bonus}, Ставка: {rate}'
         salary_dict['Уже получил'] = self.st_cash_rate_already(man)
 
         """salary_dict = {
@@ -233,16 +292,22 @@ class Salary:
 
         for kind_ in bids_kind:
             if man.site == 'both':
-                dict_context['team ' + kind_] = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
+                count_sum = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
                 site__in=('versum', 'komputeritblok'), status='Успішно виконаний',
-                goods__kind=kind_).distinct().select_related('goods').annotate(num=F('goods__amount'),
-                suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
-            else:
-                dict_context['team ' + kind_] = Bids.objects.filter(
-                managers__site=man.site, status='Успішно виконаний',
-                goods__kind=kind_).distinct().select_related('goods').annotate(
+                goods__kind=kind_).exclude(
+                managers__family__groups__name='only_bonus'
+                ).distinct().select_related('goods').annotate(
                 num=F('goods__amount'),
                 suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+            else:
+                count_sum = Bids.objects.filter(date_ch__month=month,date_ch__year=year,
+                site=man.site, status='Успішно виконаний',
+                goods__kind=kind_).exclude(
+                managers__family__groups__name='only_bonus'
+                ).distinct().select_related('goods').annotate(
+                num=F('goods__amount'),
+                suma=F('goods__summa')).aggregate(Total=Sum(F('num')*F('suma')))['Total']
+            dict_context['team ' + kind_] = count_sum if count_sum else 0
 
         return dict_context
 
@@ -549,13 +614,13 @@ class Salary:
         else:
             return {'ЗП': 0}
 
-    def office_man(self, plan_stavka_=None):
+    def office_man(self, plan_stavka_=None, no_stavka=True, site_='both'):
         # зп офис-менеджера (раньше была с курьером)
         month, year = self.month, self.year
 
         service = self.get_service('простой', 'Офисный менеджер')
         if service.cash_rate == 0:
-            service.cash_rate == 15000
+            service.cash_rate == 4000
             service.save()
         try:
             office_man_ = Managers.objects.get(family__groups__name='office_group')
@@ -567,15 +632,29 @@ class Salary:
         else:
             rate_serve = {'Процент_ставка': 1}
 
-        if plan_stavka_ and office_man_:
-            rate_serve['дата'] = f"{month}: {year}"
-            rate_serve['ставка'] = service.cash_rate
-            rate_serve['ЗП'] = service.cash_rate * rate_serve['Процент_ставка']
-            man_cash_rate_already = self.st_cash_rate_already(office_man_)
-            rate_serve['получил'] = man_cash_rate_already
-            #rate_serve['получил'] = office_man_.cash_rate_already
+        if office_man_:
+
+            bids_bonus = self.get_hand_bonus(month, year, office_man_)
+            rate_serve['name'] =  office_man_.name
+            count_comp = self.get_count_comp()
+            stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
+            tarif = service.summa
+
+            zp_sum = count_comp * tarif + stavka + bids_bonus
+            for_admin_stats = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Р_бонусы: {bids_bonus}, Итого: {zp_sum}'
+
+            if plan_stavka_:
+                rate_serve['дата'] = f"{month}: {year}"
+                rate_serve['ставка'] = service.cash_rate
+                rate_serve['компы*тариф'] = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Р_бонусы: {bids_bonus}, Итого: {zp_sum}'
+                rate_serve['ЗП'] = for_admin_stats
+                man_cash_rate_already = self.st_cash_rate_already(office_man_)
+                rate_serve['получил'] = man_cash_rate_already
+                #rate_serve['получил'] = office_man_.cash_rate_already
+            else:
+                rate_serve['ЗП'] = count_comp * tarif + bids_bonus
         else:
-            rate_serve['ЗП'] = service.cash_rate
+            rate_serve['ЗП'] = 0
 
         return rate_serve
 
@@ -591,16 +670,19 @@ class Salary:
         except:
             category_man = None
         if category_man:
+            service = self.get_service('простой', 'Категорийный менеджер%')
             if plan_stavka_:
-                rate_serve = self.plan_stavka()
+                rate_serve = {'Процент_ставка': 1}
+                #rate_serve = self.plan_stavka()
             else:
                 rate_serve = {'Процент_ставка': 1}
             count = 0
             rate_serve['name'] =  category_man.name
-            service = self.get_service('простой', 'Категорийный менеджер')
             stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
+            # category_man.cash_rate = 0 но навсяк оставим
             # ставки нет, но в админке остав возм поставить cash_rate != 0
-            summa_procent = service.summa # % от оборота вер, айти
+            summa_procent = self.get_pocent_service('Категорийный менеджер%')
+            # summa_procent % от оборота вер, айти
             if summa_procent:
                 #
                 salary_rate = self.salary_team_manager(category_man)
@@ -612,33 +694,22 @@ class Salary:
                     parts = salary_rate['team ' + 'Комплектующие'] * summa_procent
                 except:
                     parts = 0
-                summa = stavka + comp + parts
+                bids_bonus = self.get_hand_bonus(month, year, category_man)
+
+                summa = stavka + comp + parts + bids_bonus
+                rate_serve['Ручной бонус'] = f'Ручной бонус: {bids_bonus}'
                 if plan_stavka_:
                     rate_serve['ЗП'] = f'Сис блоки: {comp}: , Компл: {parts},\
-                    Ставка: {stavka}, Всего: {summa}'
-                    rate_serve['ставка'] = category_man.cash_rate
+                    Бонусы: {bids_bonus}, Ставка: {stavka}, Всего: {summa}'
+                    rate_serve['ставка'] = service.cash_rate
                     man_cash_rate_already = self.st_cash_rate_already(category_man)
                     rate_serve['получил'] = man_cash_rate_already
                     #rate_serve['получил'] = category_man.cash_rate_already
                 else:
-                    rate_serve['ЗП'] = summa if not no_stavka else comp + parts
+                    rate_serve['ЗП'] = summa if not no_stavka else comp + parts +\
+                    bids_bonus
 
                 return rate_serve
-
-            """salary_rate = self.salary_manager(category_man)
-            summa = stavka + salary_rate['sum']
-            if plan_stavka_:
-                rate_serve['ставка'] = service.cash_rate
-                rate_serve['ЗП'] = salary_rate['ЗП'] + f", Ставка: {stavka}, Всего: {salary_rate['sum']}"
-                man_cash_rate_already = self.st_cash_rate_already(category_man)
-                rate_serve['получил'] = man_cash_rate_already
-                #rate_serve['получил'] = category_man.cash_rate_already
-            else:
-                # используем rate_serve с пониж коэф чтобы компенсировать
-                # в salary_manager ставку(с пон коэф), поэтому минусуем соотв stavka
-                rate_serve = self.plan_stavka()
-                stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
-                rate_serve['ЗП'] = salary_rate['sum'] if not no_stavka else salary_rate['sum'] - stavka"""
 
             # not summa_procent значит нет процента от оборота, но возможно есть ставка
             if plan_stavka_:
@@ -657,42 +728,65 @@ class Salary:
             return {'ЗП': 0}
 
     def salary_super(self, plan_stavka_=None, no_stavka=True):
-        # зп-главного менеджера,
+        # зп-главного менеджера, теперь руководителя
         # ставка, если ставка > тариф * компы, тариф * компы, если наоборот
         # при no_stavka=True - только процент
         month, year = self.month, self.year
+        bids_bonus = 0 # ручной бонус
+        tender_pr = self.get_pocent_service('Тендер%') # процент тедерного бонуса
+        master_pr = self.get_pocent_service('Руководитель%')
+        service = self.get_service('простой', 'Руководитель%')
+         # master_pr - процент руководителя оборота вер, айти
         try:
-            super_man = Managers.objects.get(super=True)
+            master_man = Managers.objects.get(master=True)
         except:
-            super_man = None
-        if super_man:
+            master_man = None
+
+        if master_man:
+
+            bids_bonus = self.get_hand_bonus(month, year, master_man)
+
+            bids_tender = Bids.objects.filter(
+            date_ch__month=month, date_ch__year=year,
+            status='Успішно виконаний',
+            managers__family__groups__name='only_bonus'
+            ).distinct().select_related('goods').annotate(
+            num=F('goods__amount'), suma=F('goods__summa')
+            ).aggregate(Total=Sum(F('num')*F('suma')))['Total'] # сумма тендерных бонусов
+            bids_tender = bids_tender * tender_pr if bids_tender else 0
+
             if plan_stavka_:
-                rate_serve = self.plan_stavka()
+                #rate_serve = self.plan_stavka()
+                rate_serve = {'Процент_ставка': 1}
             else:
                 rate_serve = {'Процент_ставка': 1}
             count = 0
-            rate_serve['name'] =  super_man.name
-            stavka = round(super_man.cash_rate * rate_serve['Процент_ставка'])
+            rate_serve['name'] =  master_man.name
+            stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
 
-            salary_rate = self.salary_team_manager(super_man)
+            salary_rate = self.salary_team_manager(master_man)
             try:
-                comp = salary_rate['team ' + 'Системный блок'] * 0.005
+                comp = salary_rate['team ' + 'Системный блок'] * master_pr
             except:
                 comp = 0
             try:
-                parts = salary_rate['team ' + 'Комплектующие'] * 0.005
+                parts = salary_rate['team ' + 'Комплектующие'] * master_pr
             except:
                 parts = 0
-            summa = stavka + comp + parts
+            summa = stavka + comp + parts + bids_bonus + bids_tender
             if plan_stavka_:
                 rate_serve['ЗП'] = f'Сис блоки: {comp}: , Компл: {parts},\
+                Бонусы ручные: {bids_bonus}, Бонусы от тендеров: {bids_tender},\
                 Ставка: {stavka}, Всего: {summa}'
-                rate_serve['ставка'] = super_man.cash_rate
-                man_cash_rate_already = self.st_cash_rate_already(super_man)
+                rate_serve['ставка'] = service.cash_rate
+                rate_serve['Ручной бонус'] = f'Ручной бонус: {bids_bonus}'
+                rate_serve['Бонусы_от_тендеров'] = f'Бонусы от тендеров: {bids_tender}'
+                man_cash_rate_already = self.st_cash_rate_already(master_man)
                 rate_serve['получил'] = man_cash_rate_already
-                #rate_serve['получил'] = super_man.cash_rate_already
+                #rate_serve['получил'] = master_man.cash_rate_already
             else:
-                rate_serve['ЗП'] = summa if not no_stavka else comp + parts
+                rate_serve['ЗП'] = summa if not no_stavka else comp + parts +\
+                bids_bonus + bids_tender
 
             return rate_serve
 
@@ -700,7 +794,7 @@ class Salary:
             return {'ЗП': 0}
 
     def salary_sklad(self, plan_stavka_=None, no_stavka=True, site_='both'):
-        # зп-курьер, plan_stavka_=True - полная инфа и пониж коэф, None - краткая и без пониж коэф
+        # зп-завсклада, plan_stavka_=True - полная инфа и пониж коэф, None - краткая и без пониж коэф
         # ставка, если ставка > тариф * компы, тариф * компы, если наоборот
         # при no_stavka=True - summa(алглритм)
         month, year = self.month, self.year
@@ -708,32 +802,32 @@ class Salary:
             sklad_man = Managers.objects.get(family__groups__name='sklad_group')
         except:
             sklad_man = None
+
         if sklad_man:
+
+            bids_bonus = self.get_hand_bonus(month, year, sklad_man)
+
             if plan_stavka_:
                 #rate_serve = self.plan_stavka()
                 rate_serve = {'Процент_ставка': 1}
             else:
                 rate_serve = {'Процент_ставка': 1}
-            count = 0
+
             rate_serve['name'] =  sklad_man.name
             count_comp = self.get_count_comp()
             service = self.get_service('простой', 'Зав склада')
-
             stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
             tarif = service.summa
 
-            stavka_service = count_comp * tarif
-            if stavka_service  > stavka:
-                summa = stavka_service
-            else:
-                summa = stavka
+            zp_sum = count_comp * tarif + stavka + bids_bonus
+
             if plan_stavka_:
-                rate_serve['ЗП'] = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Итого: {summa}'
+                rate_serve['ЗП'] = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Р_бонусы: {bids_bonus}, Итого: {zp_sum}'
                 man_cash_rate_already = self.st_cash_rate_already(sklad_man)
                 rate_serve['получил'] = man_cash_rate_already
                 #rate_serve['получил'] = sklad_man.cash_rate_already
             else:
-                rate_serve['ЗП'] = summa
+                rate_serve['ЗП'] = count_comp * tarif + bids_bonus
 
             return rate_serve
 
@@ -741,7 +835,7 @@ class Salary:
             return {'ЗП': 0}
 
     def salary_tovar(self, plan_stavka_=None, no_stavka=True, site_='both'):
-        # зп-завсклада, plan_stavka_=True - полная инфа и пониж коэф, None - краткая и без пониж коэф
+        # зп-заказ товара, plan_stavka_=True - полная инфа и пониж коэф, None - краткая и без пониж коэф
         # ставка, если ставка > тариф * компы, тариф * компы, если наоборот
         # при no_stavka=True - summa(алглритм)
         month, year = self.month, self.year
@@ -750,12 +844,15 @@ class Salary:
         except:
             tovar_man = None
         if tovar_man:
+
+            bids_bonus = self.get_hand_bonus(month, year, tovar_man)
+
             if plan_stavka_:
                 #rate_serve = self.plan_stavka()
                 rate_serve = {'Процент_ставка': 1}
             else:
                 rate_serve = {'Процент_ставка': 1}
-            count = 0
+
             rate_serve['name'] =  tovar_man.name
             count_comp = self.get_count_comp()
             service = self.get_service('простой', 'Заказ товара')
@@ -763,19 +860,15 @@ class Salary:
             stavka = round(service.cash_rate * rate_serve['Процент_ставка'])
             tarif = service.summa
 
-            stavka_service = count_comp * tarif
-            if stavka_service  > stavka:
-                summa = stavka_service
-            else:
-                summa = stavka
+            zp_sum = count_comp * tarif + stavka + bids_bonus
 
             if plan_stavka_:
-                rate_serve['ЗП'] = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Итого: {summa}'
+                rate_serve['ЗП'] = f'Ставка: {stavka} Кол компов: {count_comp} * {tarif}, Р_бонусы: {bids_bonus}, Итого: {zp_sum}'
                 man_cash_rate_already = self.st_cash_rate_already(tovar_man)
                 rate_serve['получил'] = man_cash_rate_already
                 #rate_serve['получил'] = tovar_man.cash_rate_already
             else:
-                rate_serve['ЗП'] = summa
+                rate_serve['ЗП'] = count_comp * tarif + bids_bonus
 
             return rate_serve
 
