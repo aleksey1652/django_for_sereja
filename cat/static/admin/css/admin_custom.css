@@ -1,0 +1,12 @@
+/* Уменьшение ширины полей list_editable */
+td.field-x_code input[type="number"],
+td.field-min_price input[type="number"] {
+    width: 50px; /* Установите желаемую ширину */
+    -moz-appearance: textfield; /* Убираем стрелки в Firefox */
+    appearance: textfield; /* Убираем стрелки в других браузерах */
+
+}
+
+.field-parts_full_price, .field-sklad_view {
+    padding-top: 15px;
+}

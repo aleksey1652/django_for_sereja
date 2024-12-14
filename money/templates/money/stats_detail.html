@@ -1,0 +1,38 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% block content_title %}
+    <h1> Раздел статистики: детальная инфа по расходам, доходам, планам </h1>
+    <br>
+    <strong><a href="{% url 'admin:money_bids_advanced_changelist' %}">Назад</a></strong>
+    <br>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<div class="results">
+{% for dict_ in list_result %}
+  {% for k, v in dict_.items %}
+  <tr class="{% cycle 'row1' 'row2' %}">
+    <td>
+      <strong>
+      {{ k }}
+      </strong>
+    </td>
+    <td>{{ v }}</td>
+  </tr>
+  <br>
+  {% endfor %}
+  <br>
+  <br>
+{% endfor %}
+{% if plan_detale %}
+  <a href="{% url 'plan_change'  site month year %}">Изменить план: {{ v }}</a>
+{% endif %}
+
+{% if gross_profit_detale %}
+  <a href="{% url 'gross_profit_change'  site month year %}">Измения в Валовая прибыль: {{ v }}</a>
+{% endif %}
+</div>
+{% endblock %}

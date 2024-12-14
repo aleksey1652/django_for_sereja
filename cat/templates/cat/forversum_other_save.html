@@ -1,0 +1,59 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>>for_Versum_single_parts</h6><h5>Load</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'forversum_other' kind_other 0 %}">Back</a>
+    </li>
+
+  </ul>
+</nav>
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-warning mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1280px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+<form class="form" method="post" action="{% url 'forversum_other' kind_other 0 %}">
+  {% csrf_token %}
+  <div class="form-check">
+  <input class="form-check-input" type="checkbox" value={% autoescape on %}{{ part_number }}{% endautoescape %},{{ kind_other }} name='pc_parts'>
+  <label class="form-check-label" for="flexCheckDefault">
+  <a class="nav-item text-dark ml-2">For Versum pc parts</a>
+  </label>
+  </div>
+  <div class="form-check">
+  <input class="form-check-input" type="checkbox" value={% autoescape on %}{{ part_number }}{% endautoescape %},{{ kind_other }} name='other_parts'>
+  <label class="form-check-label" for="flexCheckDefault">
+  <a class="nav-item text-dark ml-2">For Versum single parts</a>
+  </label>
+  </div>
+  <button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Go</button>
+</form>
+
+</div>
+</nav>
+
+{% endblock %}

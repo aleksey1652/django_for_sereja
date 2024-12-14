@@ -1,0 +1,13 @@
+/* Уменьшение ширины полей list_editable */
+td.field-r_price input[type="number"],
+td.field-price_rent input[type="number"] {
+    width: 50px; /* Установите желаемую ширину */
+    -moz-appearance: textfield; /* Убираем стрелки в Firefox */
+    appearance: textfield; /* Убираем стрелки в других браузерах */
+
+}
+
+.field-get_price_rent_price_ua, .field-price_rent_price_ua {
+    /* vertical-align: middle; */
+    padding-top: 15px;
+}

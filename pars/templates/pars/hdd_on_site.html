@@ -1,0 +1,19 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+
+<nav class="navbar navbar-expand-lg navbar-dark  text-dark" style="background-color: #CD853F;width: 1280px
+">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-info" style="width: 320px;background-color: #F5DEB3;" href="{% url 'get_parts_on_site' d.pk '0' %}">{{ hdd.0 }}</a>
+    </li>
+    {% if hdd.1 %}
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1 text-info" style="width: 320px;background-color: #F5DEB3;" href="{% url 'get_parts_on_site' d.pk '1' %}">{{ hdd.1 }}</a>
+    </li>
+    {% endif %}
+  </ul>
+</div>
+
+{% endblock %}

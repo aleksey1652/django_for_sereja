@@ -1,0 +1,4 @@
+{% extends "admin/change_list.html" %}
+hello
+{# added pagination to top as well as bottom #}
+{% block content %}{% pagination cl %}{{ block.super }}{% endblock %}

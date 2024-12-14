@@ -1,0 +1,206 @@
+{% extends 'cat/m.html' %}
+{% block main_section %}
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 2890px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-waring " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Prices</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'kind_price' 'aproc' %}">AMD PROC</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'iproc' %}">INTEL PROC</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'amb' %}">AMD MB</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'imb' %}">INTEL MB</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'cool' %}">COOLER</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'video' %}">VIDEO</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'mem' %}">MEMORY</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'hdd' %}">HDD</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'ssd' %}">SSD</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'ps' %}">POWERSUPPLY</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'case' %}">CASE</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'wifi' %}">WIFI</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'mon' %}">MONITOR</a>
+        <a class="dropdown-item" href="{% url 'kind_price' 'km' %}">KM</a>
+
+      </div>
+    </li>
+    {% for ii in itblok %}
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{ ii.first.kind }}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for i in ii %}
+          <a class="dropdown-item" href="{% url 'for_itblok' i.pk %}">{{ i.name_parts|truncatechars:80 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+</nav>
+{% if short %}
+<li class="navbar-text ml-5" style="width: 210px;">
+  <form class="form-inline" method="get" action="">
+  Nameparts <input class="form-control" name="search" type="text" style="width: 200px;">
+  </form>
+</li>
+<li class="navbar-text ml-5" style="width: 210px;">
+  <form class="form-inline" method="get" action="">
+  Part_number <input class="form-control" name="search2" type="text" style="width: 200px;">
+  </form>
+</li>
+  </ul>
+</div>
+</nav>
+{% endif %}
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-success mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 2890px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="" class="close">✖</a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
+{% if short %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;border: 4px double black;width: 2890px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <span class="border-right border-dark">
+    <li class="navbar-text" style="width: 200px;">
+      <a class="nav-item text-dark ml-2">{{short.name_parts}}</a>
+    </li>
+    </span>
+    </li>
+    <span class="border-right border-dark">
+    <li class="navbar-text" style="width: 100px;">
+      <a class="nav-item text-dark ml-2">{{short.x_code}}</a>
+    </li>
+    </span>
+    <span class="border-right border-dark">
+    <li class="navbar-text ml-2 text-dark" style="width: 280px;">
+      <form class="form-inline " method="post" id='2' action="{% url 'for_itblok' short.pk %}">
+        {% csrf_token %}
+        New Price<input class="form-control ml-2" name="price" type="text" style="width: 190px; height:30px">
+      </form>
+    </li>
+  </span>
+  <span class="border-right border-dark">
+  <li class="navbar-text ml-2 text-dark" style="width: 280px;">
+    <form class="form-inline " method="post" id='2' action="{% url 'for_itblok' short.pk %}">
+      {% csrf_token %}
+      Rename<input class="form-control ml-2" name="rename" type="text" style="width: 190px; height:30px">
+    </form>
+  </li>
+  </span>
+  <span class="border-right border-dark">
+  <li class="navbar-text ml-2 text-dark" style="width: 280px;">
+    <form class="form-inline " method="post" id='2' action="{% url 'for_itblok' short.pk %}">
+      {% csrf_token %}
+      Add foritblk<input class="form-control ml-2" name="add" type="text" style="width: 190px; height:30px">
+    </form>
+  </li>
+  </span>
+  <span class="border-right border-dark">
+  <li class="navbar-text ml-2 mr-2">
+  <form class="form-inline" method="post" action="{% url 'for_itblok' short.pk %}">
+    {% csrf_token %}
+    <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="1" name="del">
+  <label class="form-check-label" for="flexCheckDefault">
+  </label>
+  <button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Delete</button>
+  </form>
+  </li>
+  </span>
+  </ul>
+</div>
+</nav>
+{% endif %}
+
+{% for d in par %}
+  <nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #DEB887;border: 4px double black;width: 2890px">
+  <div class="collapse navbar-collapse" id="navbarsExample05">
+    <ul class="navbar-nav">
+      <span class="border-right border-dark">
+        <li class="navbar-text" style="width: 200px;">
+      <a class="navbar-item text-dark ml-2" >{{d.first.partnumber_parts|truncatechars:40}}</a>
+      </li>
+      </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 390px;">
+        {% if d.first.url_parts %}
+          <a class="btn nav-item ml-2" href="{{d.first.url_parts}}">{{d.first.name_parts|truncatechars:80}}</a>
+        {% else %}
+          <a class="btn nav-item ml-2" href="{{d.1.url_parts}}">{{d.first.name_parts|truncatechars:80}}</a>
+        {% endif %}
+      </li>
+      </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 100px;">
+        <a class="nav-item text-dark ml-2">{{d.first.providerprice_parts}}</a>
+      </li>
+      </span>
+    </span>
+    {% if delete %}
+    <li class="navbar-text ml-2 mr-2">
+    <form class="form-inline" method="post" action="{% url 'test_price' d.first.pk %}">
+      {% csrf_token %}
+      <div class="form-check">
+<input class="form-check-input" type="checkbox" value="1" name="del">
+<label class="form-check-label" for="flexCheckDefault">
+</label>
+<button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Delete</button>
+</form>
+</li>
+{% endif %}
+    <span class="border-right border-dark">
+    <li class="navbar-text" style="width: 110px;">
+      <form class="form-inline" method="post" action="{% url 'test_price' d.first.pk %}">
+        {% csrf_token %}
+        <input class="form-control" name="price" type="text" style="width: 100px;">
+      </form>
+    </li>
+    </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text ml-2 text-dark" style="width: 50px;">
+        <a class="nav-item">{{d.first.providers.name_provider}}</a>
+      </li>
+      </span>
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 100px;">
+        <a class="nav-item text-dark ml-2">{{d.first.availability_parts}}</a>
+      </li>
+      </span>
+      {% for p in d %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-dark ml-2"><mark>{{p.providers.name_provider}}</mark>; price: {{p.providerprice_parts}}$; status: {{p.availability_parts}}</a>
+      </li>
+      </span>
+      {% endfor %}
+      {% if d.first.remainder %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-info ml-2">{{d.first.remainder}}</a>
+      </li>
+      </span>
+      {% endif %}
+      {% if d.first.date_chg %}
+      <span class="border-right border-dark">
+      <li class="navbar-text" style="width: 250px;">
+        <a class="nav-item text-danger ml-2">{{d.first.date_chg}}</a>
+      </li>
+      </span>
+      {% endif %}
+    </ul>
+  </div>
+  </nav>
+{% endfor %}
+
+{% endblock %}

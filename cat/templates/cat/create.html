@@ -1,0 +1,10 @@
+{% extends "layout/basic.html" %}
+{% block title %}Add ads{% endblock %}
+{% block content %}
+<h2>Add ads</h2>
+<form action="{% url 'add_save' %}"method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value 'add'>
+</form>
+{% endblock %}
