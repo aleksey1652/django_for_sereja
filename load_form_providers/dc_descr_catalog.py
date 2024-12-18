@@ -438,8 +438,10 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
         try:
             if stock_price != 0:
                 prov = f"{stock_price}; {dc_dict[obj.part_number]['provider']}"
+                label_auto_edited(obj, True) # добавляем лабел recommend
             else:
                 prov = dc_dict[obj.part_number]['provider']
+                label_auto_edited(obj, False) # удаляем(если есть) лабел recommend
             provider_, temp_price = (prov, float(dc_dict[obj.part_number]['PriceUSD']))
         except:
             #print(f"error{obj.part_number}---{dc_dict[obj.part_number]['provider']}")
@@ -488,6 +490,7 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
             obj.save()
     else:
         if stock_price:
+            label_auto_edited(obj, True) # добавляем лабел recommend
             try:
                 temp_rentability = 1 + (obj.rentability / 100)
             except:
@@ -516,6 +519,7 @@ def objects_tech_edit(obj, usd_cuurency, dc_dict, prov='dc'):
                 get_price_rent_price_ua(obj.price_rent, obj.price_ua) # для нов колонки %
                 obj.save()
         else:
+            label_auto_edited(obj, False) # удаляем(если есть) лабел recommend
             if obj.auto == True:
                 # если ручная цена: price_rent не трогаем, остальное меняем согласно прайсу
                 obj.price_ua = 0
