@@ -1,0 +1,36 @@
+{% extends "admin/delete_confirmation.html" %}catch_to_admin_forms
+
+{% block content_title %}
+  <h1><strong>Создание нового компа в той же группе и серии</strong>
+
+
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+
+{% block content %}
+<style>
+.box div { width:400px; display:inline-block; }
+.box2 div { width:600px; display:inline-block; }
+.box_in div { width:100px; display:inline-block; }
+.box_in_in div { width:100px; display:inline-block; }
+.myfield {width:300px;}
+</style>
+
+<div>
+  <div class="box">
+    <div>
+    <form class="form" method="post" action="">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit" class="btn">Ok</button>
+    </form></div>
+
+
+</div>
+</div>
+
+
+{% endblock %}

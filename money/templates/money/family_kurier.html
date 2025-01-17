@@ -1,0 +1,233 @@
+{% extends "money/base_generic.html" %}
+
+<style>
+
+</style>
+
+{% block title %}<title>Money</title>{% endblock %}
+
+{% block content0 %}
+<li><a href="{% url 'family' %}">Back</a>
+</li>
+{% endblock %}
+{% block content1 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Периоды (мес)
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for s_ in st_period %}
+    <li><a class="dropdown-item" href="{% url 'family' s_ %}">{{ s_ }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content2 %}
+<br>
+<br>
+{% if form_b %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_b.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Search</button>
+</form>
+{% endif %}
+{% if form_sb %}
+<h3>Добавление сборки с учетом сложности:</h3>
+<form class="form" method="post" action="">
+{% csrf_token %}
+{{ form_sb.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Готово</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content3 %}
+<br>
+<br>
+{% if form_s %}
+<form class="form" method="get" action="">
+{% csrf_token %}
+{{ form_s.as_p }}
+<button type="submit" class="btn-outline-dark text-dark">Choose site</button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content4 %}
+<br>
+<br>
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #417690;width: 200px">
+    Заявки
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for b in bids_per_period %}
+    <li><a class="dropdown-item" href="{% url 'bids-detail' b.pk %}">{{ b.ID }};{{ b.status }}</a></li>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block content5 %}
+<ul class="sidebar-nav">
+  {% if user.is_authenticated %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 300px" href="{% url 'logout'%}?next={{request.path}}">Logout **** User: {{ user.get_username }}</a></li>
+     {% else %}
+       <li><a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+     {% endif %}
+</ul>
+<ul class="sidebar-nav">
+  <li>
+    <a class="btn btn-outline-secondary" style="background-color: #79aec8;width: 200px" href="{% url 'admin:index' %}">Admin</a>
+  </li>
+</ul>
+{% endblock %}
+{% block content6 %}
+
+<style>
+
+.tab1 td {
+  padding: 10px;
+      }
+
+</style>
+
+<ul class="sidebar-nav">
+          <li><a href="">{{ bids_site }}</a></li>
+          <li><b>
+            --- Курьер статистика</b>
+        </li><br>
+        <table class="tab1" border=1, cellpadding='10' align="center">
+          <tr>
+            {% if formK %}
+            <td>{{ description }}</td>
+            <td>
+              <form class="form-inline" method="post" action="{% url 'kurier_periods' manager_stats_per_period.дата ss_pk %}">
+                {% csrf_token %}
+                <input class="form-control" name="description" type="text" style="width: 90px; height:30px">
+              </form>
+            </td>
+            {% endif %}
+            {% if week_count.1 %}
+            <td style="background-color: {{ week_count.1 }}"><a href="{% url 'kurier_periods' manager_stats_per_period.дата 1 %}">
+              1 неделя</a></td>
+            {% else %}
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 1 %}">
+              1 неделя</a>
+            </td>
+            {% endif %}
+            {% if week_count.2 %}
+            <td style="background-color: {{ week_count.2 }}"><a href="{% url 'kurier_periods' manager_stats_per_period.дата 2 %}">
+              2 неделя</a>
+            </td>
+            {% else %}
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 2 %}">
+              2 неделя</a>
+            </td>
+            {% endif %}
+            {% if week_count.3 %}
+            <td style="background-color: {{ week_count.3 }}"><a href="{% url 'kurier_periods' manager_stats_per_period.дата 3 %}">
+              3 неделя</a>
+            </td>
+            {% else %}
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 3 %}">
+              3 неделя</a>
+            </td>
+            {% endif %}
+            {% if week_count.4 %}
+            <td style="background-color: {{ week_count.4 }}"><a href="{% url 'kurier_periods' manager_stats_per_period.дата 4 %}">
+              4 неделя</a>
+            </td>
+            {% else %}
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 4 %}">
+              4 неделя</a>
+            </td>
+            {% endif %}
+            {% if week_count.5 %}
+            <td style="background-color: {{ week_count.5 }}"><a href="{% url 'kurier_periods' manager_stats_per_period.дата 5 %}">
+              5 неделя</a>
+            </td>
+            {% else %}
+            <td><a href="{% url 'kurier_periods' manager_stats_per_period.дата 5 %}">
+              5 неделя</a>
+            </td>
+            {% endif %}
+          </tr>
+        </table>
+
+        <br>
+        <table class='my' border=1, cellpadding='10' align="center">
+          <tr>
+            <td>Дата</td><td>Заявка</td><td>Получил</td><td>Бонус</td><td>+-</td>
+          </tr>
+          <tr>
+        </table>
+
+        <table class="my_table" border="1" cellpadding="10" align="center">
+  <tr>
+    <form class="form" method="post" action="">
+      {% csrf_token %}
+      <td>{{ form_st.date_field }}</td>
+      <td>{{ form_st.bids }}</td>
+      <td>{{ form_st.summa }}</td>
+      <td>0</td>
+      <td><button type="submit" class="btn-outline-dark text-dark">Добавить</button></td>
+    </form>
+  </tr>
+  {% if manager_stats_per_period.заявки %}
+    {% for kbid in manager_stats_per_period.заявки %}
+      <tr>
+        <td>{{ kbid.bidskurier__date_ch }}</td>
+        {% if kbid.color %}
+        <td style="background-color: #79aec8"><b>{{ kbid.bidskurier__ID }}</b></td>
+        <td style="background-color: #79aec8"><b>{{ kbid.bidskurier__kurier_summa }}</b></td>
+        <td style="background-color: #79aec8"><b>{{ kbid.bonus }}</b></td>
+        {% else %}
+        <td>{{ kbid.bidskurier__ID }}</td>
+        <td>{{ kbid.bidskurier__kurier_summa }}</td>
+        <td>{{ kbid.bonus }}</td>
+        {% endif %}
+        <td>
+          {% if kbid.bidskurier__pk %}
+          <button class="btn-outline-dark text-dark" onclick="window.location.href='{% url 'kurier_del' kbid.bidskurier__pk %}'">
+            Удалить$
+          </button></td>
+          {% else %}
+          <td></td>
+          {% endif %}
+      </tr>
+    {% endfor %}
+  {% endif %}
+</table>
+
+          <br>
+          <br>
+          {% for message in messages %}
+              <li class="{{ message.tags }}">
+                  {{ message|safe }}
+                  <a href="#" class="close"></a>
+              </li>
+          {% endfor %}
+      </ul>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+let tr = document.querySelectorAll('.my_table tr')[0];
+let mass = []
+for(let val of tr.cells) {
+    mass.push( getComputedStyle(val).width );
+    };
+
+let tr_main = document.querySelector('.my tr');
+for(let i=0; i < mass.length; ++i) {
+  if( parseInt(getComputedStyle(tr_main.cells[i]).width) <= parseInt( mass[i]) )
+    tr_main.cells[i].style.width = mass[i];
+  else
+    {tr.cells[i].style.width = getComputedStyle(tr_main.cells[i]).width;
+    console.log(tr_main.cells[i].innerHTML);}
+};
+
+});
+
+</script>
+{% endblock %}

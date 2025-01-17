@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div id="content-main">
+    {% block pagination_top %}
+    <div class="paginator top">
+        <span class="step-links">
+            {% if cl.has_previous %}
+                <a href="?{{ cl.get_query_string 0 }}{{ cl.previous_page_number_query }}">&laquo; Назад</a>
+            {% endif %}
+            <span class="current">
+                Страница {{ cl.page_num }} из {{ cl.paginator.num_pages }}.
+            </span>
+            {% if cl.has_next %}
+                <a href="?{{ cl.get_query_string cl.next_page_number }}">&raquo; Вперед</a>
+            {% endif %}
+        </span>
+    </div>
+    {% endblock %}
+    {% block object-tools %}
+        {% if has_add_permission %}
+        <ul class="object-tools">
+            <li>
+                <a href="{% url opts|admin_urlname:'add' %}" class="addlink">{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}</a>
+            </li>
+        </ul>
+        {% endif %}
+    {% endblock %}
+
+    <!-- Список объектов администрирования -->
+    <div id="changelist">
+        {% block pagination_bottom %}
+        <div class="paginator bottom">
+            <span class="step-links">
+                {% if cl.has_previous %}
+                    <a href="?{{ cl.get_query_string 0 }}{{ cl.previous_page_number_query }}">&laquo; Назад</a>
+                {% endif %}
+                <span class="current">
+                    Страница {{ cl.page_num }} из {{ cl.paginator.num_pages }}.
+                </span>
+                {% if cl.has_next %}
+                    <a href="?{{ cl.get_query_string cl.next_page_number }}">&raquo; Вперед</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
+

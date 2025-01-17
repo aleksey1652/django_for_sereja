@@ -1,0 +1,47 @@
+class MyAdminSite(AdminSite):
+
+    def get_app_list(self, request):
+        """
+        Return a sorted list of all the installed apps that have been
+        registered in this site.
+        """
+        app_dict = self._build_app_dict(request)
+
+        models_ = ['Процессоры', 'Видеокарты', 'Материнские платы',
+                  'Память', 'SSD_OTHER', 'Жесткие диски',
+                  'БП', 'Кулеры', 'Вентиляторы',
+                  'Корпуса',
+                 ]
+
+        # Sort the apps alphabetically.
+        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+        """app_list = sorted(
+        app_dict.values(), key=lambda x: models_.index(
+        [value['name'] for key, value in app_dict.items() if value['name'] == x['name']][0]
+        )
+        )
+        """
+
+        # Sort the models alphabetically within each app.
+        for app in app_list:
+            #app['models'].sort(key=lambda x: x['name'])
+            my_ = app['models'][:]
+            app['models'] = sorted(my_,
+            key=lambda x: models_.index([value['name'] for value in my_ if value['name'] == x['name']][0])
+            )
+
+        return app_list
+
+admin.site.register(CPU_OTHER)
+admin.site.register(GPU_OTHER)
+admin.site.register(MB_OTHER)
+admin.site.register(RAM_OTHER)
+admin.site.register(SSD_OTHER)
+admin.site.register(HDD_OTHER)
+admin.site.register(PSU_OTHER)
+admin.site.register(Cooler_OTHER)
+admin.site.register(FAN_OTHER)
+admin.site.register(CASE_OTHER)
+
+admin.site.register(Group, GroupAdmin)
+admin.site.register(User, UserAdmin)

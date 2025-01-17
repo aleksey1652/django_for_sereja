@@ -1,0 +1,425 @@
+{% extends 'cat/m.html' %}
+{% block main_section %}
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-danger mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1290px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 2000px
+">
+<h6>Home>></h6><h5>Computer_assembly_page</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 2000px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Computer's_assembly</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'assembly_page' 'itblok' %}">IT_BLOK</a>
+        <a class="dropdown-item" href="{% url 'assembly_page' 'versum' %}">VERSUM</a>
+        <a class="dropdown-item" href="{% url 'rename_group' price 2 %}">Add_series</a>
+        <a class="dropdown-item" href="{% url 'rename_group' price 0 %}">Add_group</a>
+        <a class="dropdown-item" href="{% url 'test_group' 0 %}">Test_descriptions(only for versum)</a>
+        <a class="dropdown-item" href="{% url 'test_group' 1 %}">Test_computer_price(only for versum)</a>
+        <a class="dropdown-item" href="{% url 'price_get_new_models' 'dc' %}">Новые детали (DC)</a>
+        <a class="dropdown-item" href="{% url 'price_get_tech_models' 'dc' %}">Новая периферия (DC)</a>
+
+      </div>
+    </li>
+    <li>
+      <span>
+      <form class="form-inline" method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Srch</button>
+    </form>
+    </span>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Active_list</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in act %}
+          <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 70px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Reserve_list</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in reserve %}
+          <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>AMDcpu</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for a in Acpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>IntelCPU</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for i in Icpu %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' i.pk price 0 %}">{{ i.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>GPU</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Vid %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Imb</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Imb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Amb</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Amb %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Mem</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Mem %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Ps</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Ps %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Case</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in Case %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' v.pk price 0 %}">{{ v.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Ssd</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Ssd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Ssd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+    <li class="nav-item dropdown ml-5" style="width: 50px;">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Hdd</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% if grp %}
+        {% for a in Hdd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' page_id price a.pk %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% else %}
+        {% for a in Hdd %}
+          <a class="dropdown-item" href="{% url 'pc_assembly_page_advanced' a.pk price 0 %}">{{ a.name_parts|truncatechars:40 }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </li>
+  </ul>
+</div>
+</nav>
+{% if set_series %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Series</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for v in set_series %}
+          <a class="dropdown-item" href="{% url 'assembly_page' v %}">{{ v}}</a>
+        {% endfor %}
+      </div>
+    </li>
+  </ul>
+</div>
+</nav>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+      {% for s in set_series %}
+    <li class="navbar-text">
+    <a class="btn btn-outline-dark text-dark" style="width: 200px;background-color: #808080" href="{% url 'get_kind_assembly_desc' s 'ru' %}">{{ s }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+</nav>
+{% for d in par %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #FFEFD5;width: 1290px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <span class="border-right border-dark">
+    {% if d.0 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.0.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.0.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.0.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.0.pk %}">Delete group (if not comps)</a>
+        {% for p in d.0.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.1 %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.1.name_assembly|truncatechars:30}}</h5></a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="{% url 'computercreate' d.1.pk %}">New comp</a>
+      <a class="dropdown-item" href="{% url 'rename_group' 'group' d.1.pk %}">Rename group</a>
+      <a class="dropdown-item" href="{% url 'rename_group' 'del' d.1.pk %}">Delete group (if not comps)</a>
+      {% for p in d.1.computers_set.all %}
+      {% if p.is_active %}
+      <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.2 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.2.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.2.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.2.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.2.pk %}">Delete group (if not comps)</a>
+        {% for p in d.2.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.3 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.3.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.3.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.3.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.3.pk %}">Delete group (if not comps)</a>
+        {% for p in d.3.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.4 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.4.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.4.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.4.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.4.pk %}">Delete group (if not comps)</a>
+        {% for p in d.4.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.5 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.5.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.5.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.5.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.5.pk %}">Delete group (if not comps)</a>
+        {% for p in d.5.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.6 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.6.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.6.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.6.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.6.pk %}">Delete group (if not comps)</a>
+        {% for p in d.6.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.7 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.7.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.7.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.7.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.7.pk %}">Delete group (if not comps)</a>
+        {% for p in d.7.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.8 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.8.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.8.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.8.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.8.pk %}">Delete group (if not comps)</a>
+        {% for p in d.8.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.9 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.9.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.9.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.9.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.9.pk %}">Delete group (if not comps)</a>
+        {% for p in d.9.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% else %}
+    <li class="dropdown">
+    <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5></h5></a>
+    </li>
+    {% endif %}
+    </span>
+    <span class="border-right border-dark">
+    {% if d.10 %}
+    <li class="dropdown">
+      <a class="btn dropdown-toggle text-dark " style="width: 200px;background-color: #F5DEB3;height: 50px" href="#" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>{{d.10.name_assembly|truncatechars:30}}</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url 'computercreate' d.10.pk %}">New comp</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'group' d.10.pk %}">Rename group</a>
+        <a class="dropdown-item" href="{% url 'rename_group' 'del' d.10.pk %}">Delete group (if not comps)</a>
+        {% for p in d.10.computers_set.all %}
+        {% if p.is_active %}
+        <a class="dropdown-item" href="{% url 'assembly' p.pk %}">{{ p.name_computers }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    {% endif %}
+    </span>
+  </ul>
+</div>
+</nav>
+{% endfor %}
+
+{% endblock %}

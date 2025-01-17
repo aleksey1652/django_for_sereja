@@ -1,0 +1,149 @@
+{% extends 'pars/m.html' %}
+{% block main_section %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+<h6>Home>>admin2>></h6><h5>for_versum_site</h5>
+</nav>
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-3 ml-5 p-0 text-dark" style="background-color: #F4A460;width: 1280px
+">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'cat-home' %}">Home</a>
+    </li>
+    <li class="navbar-text">
+      <a class="btn btn-outline-secondary ml-1  mb-1 mr-1" style="background-color: #F5DEB3;" href="{% url 'uploader' '-'%}">Admin2</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Choose rubric or search</h5></a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'forversum' 'cpu' 0 %}">CPU</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'cooler' 0 %}">Cooler</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'mb' 0 %}">MB</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'ram' 0 %}">MEM</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'hdd' 0 %}">HDD</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'psu' 0 %}">PSU</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'gpu' 0 %}">GPU</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'fan' 0 %}">FAN</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'case' 0 %}">CASE</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'ssd' 0 %}">SSD</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'wifi' 0 %}">WIFI</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'cables' 0 %}">CABLES</a>
+        <a class="dropdown-item" href="{% url 'forversum' 'soft' 0 %}">SOFT</a>
+      </div>
+    </li>
+    <li class="nav-item dropdown">
+      {% if i != '-' %}
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Active_list_ {{ i }}</h5></a>
+      {% else %}
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Active_list_ cpu</h5></a>
+      {% endif %}y
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in i2 %}
+        {% if p.is_active %}
+          <a class="dropdown-item" href="{% url 'forversum' i p.pk %}">{{ p.name|truncatechars:40 }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+    <li class="nav-item dropdown">
+      {% if i != '-' %}
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Reserve_list_ {{ i }}</h5></a>
+      {% else %}
+      <a class="nav-link dropdown-toggle text-dark " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><h5>Reserve_list_ cpu</h5></a>
+      {% endif %}
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        {% for p in i2 %}
+        {% if not p.is_active %}
+          <a class="dropdown-item" href="{% url 'forversum' i p.pk %}">{{ p.name|truncatechars:40 }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </li>
+  </ul>
+</nav>
+
+{% if messages %}
+<nav class="navbar navbar-expand-lg navbar-dark  bg-warning mb-2 mr-5 ml-5 p-0 text-dark" style="border: 4px double black;width: 1280px">
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close"></a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% else %}
+<br></br>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark mb-2 mr-5 ml-5 p-0 text-dark" style="background-color: #CD853F;width: 1280px">
+<div class="collapse navbar-collapse" id="navbarsExample05">
+  <ul class="navbar-nav mr-auto">
+    <li class="navbar-text">
+      <span>
+      <form class="form-inline" method="get" action="{% url 'forversum' i 0 %}">
+        {% csrf_token %}
+        name<input class="form-control ml-2 mr-2" name="name" type="text" style="width: 190px; height:30px">
+      <button type="submit" class="btn-outline-dark text-dark ml-2 mr-2">Search</button>
+    </form>
+    </span>
+    </li>
+    <li class="navbar-text">
+      <span>
+      <form class="form-inline" method="get" action="{% url 'forversum' i 0 %}">
+        {% csrf_token %}
+        part_number<input class="form-control ml-2 mr-2" name="part_number" type="text" style="width: 190px; height:30px">
+      <button type="submit" class="btn-outline-dark text-dark ml-2">Search</button>
+    </form>
+    </span>
+    </li>
+    {% if n %}
+    {% if n.is_active %}
+    <li class="navbar-text ml-2">
+    <form class="form-inline" method="post" action="{% url 'forversum' i n.pk %}">
+      {% csrf_token %}
+      <div class="form-check">
+<input class="form-check-input" type="checkbox" value="1" name="reserve">
+<label class="form-check-label" for="flexCheckDefault">
+  Reserved
+</label>
+<div class="form-check">
+<input class="form-check-input" type="checkbox" value="11" name="delete">
+<label class="form-check-label" for="flexCheckDefault">
+Deleted
+</label>
+<button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Go</button>
+</form>
+</li>
+    {% else %}
+    <li class="navbar-text ml-2">
+    <form class="form-inline" method="post" action="{% url 'forversum' i n.pk %}">
+      {% csrf_token %}
+      <div class="form-check">
+<input class="form-check-input" type="checkbox" value="1" name="active">
+<label class="form-check-label" for="flexCheckDefault">
+  Activated
+</label>
+<div class="form-check">
+<input class="form-check-input" type="checkbox" value="11" name="delete">
+<label class="form-check-label" for="flexCheckDefault">
+Deleted
+</label>
+<button type="submit" class="btn-outline-dark text-dark ml-2 mb-2">Go</button>
+</form>
+</li>
+    {% endif %}
+    {% endif %}
+  </ul>
+</div>
+</nav>
+{% if form %}
+<form class="form" method="post" action="{% url 'forversum' i 0 %}">
+  {% csrf_token %}
+  <a class="navbar-text ml-2">{{ form.as_p }}</a>
+  <button type="submit" class="btn-outline-dark text-dark ml-2">Ok</button>
+</form>
+</span>
+{% endif %}
+
+{% endblock %}
