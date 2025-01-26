@@ -58,7 +58,7 @@ class Salary:
         Total=Sum('kurier_summa'))['Total'] # сумма ручных бонусов
         bids_bonus = bids_bonus if bids_bonus else 0
 
-        return bids_bonus
+        return round(bids_bonus)
 
     def get_count_comp(self, site_='both'):
         # Колличество компов
@@ -687,11 +687,11 @@ class Salary:
                 #
                 salary_rate = self.salary_team_manager(category_man)
                 try:
-                    comp = salary_rate['team ' + 'Системный блок'] * summa_procent
+                    comp = round(salary_rate['team ' + 'Системный блок'] * summa_procent)
                 except:
                     comp = 0
                 try:
-                    parts = salary_rate['team ' + 'Комплектующие'] * summa_procent
+                    parts = round(salary_rate['team ' + 'Комплектующие'] * summa_procent)
                 except:
                     parts = 0
                 bids_bonus = self.get_hand_bonus(month, year, category_man)
@@ -753,7 +753,7 @@ class Salary:
             ).distinct().select_related('goods').annotate(
             num=F('goods__amount'), suma=F('goods__summa')
             ).aggregate(Total=Sum(F('num')*F('suma')))['Total'] # сумма тендерных бонусов
-            bids_tender = bids_tender * tender_pr if bids_tender else 0
+            bids_tender = round(bids_tender * tender_pr) if bids_tender else 0
 
             if plan_stavka_:
                 #rate_serve = self.plan_stavka()
@@ -766,11 +766,11 @@ class Salary:
 
             salary_rate = self.salary_team_manager(master_man)
             try:
-                comp = salary_rate['team ' + 'Системный блок'] * master_pr
+                comp = round(salary_rate['team ' + 'Системный блок'] * master_pr)
             except:
                 comp = 0
             try:
-                parts = salary_rate['team ' + 'Комплектующие'] * master_pr
+                parts = round(salary_rate['team ' + 'Комплектующие'] * master_pr)
             except:
                 parts = 0
             summa = stavka + comp + parts + bids_bonus + bids_tender
@@ -779,8 +779,8 @@ class Salary:
                 Бонусы ручные: {bids_bonus}, Бонусы от тендеров: {bids_tender},\
                 Ставка: {stavka}, Всего: {summa}'
                 rate_serve['ставка'] = service.cash_rate
-                rate_serve['Ручной бонус'] = f'Ручной бонус: {bids_bonus}'
-                rate_serve['Бонусы_от_тендеров'] = f'Бонусы от тендеров: {bids_tender}'
+                rate_serve['Ручной бонус'] = f'{bids_bonus}'
+                rate_serve['Бонусы_от_тендеров'] = f'{bids_tender}'
                 man_cash_rate_already = self.st_cash_rate_already(master_man)
                 rate_serve['получил'] = man_cash_rate_already
                 #rate_serve['получил'] = master_man.cash_rate_already
