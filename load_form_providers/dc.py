@@ -30,27 +30,31 @@ class DC:
     def get_basa(self, fun2=0):
         ff = self.get_price() if fun2 else 0
         CategoryID = ['8', '3', '724', '255', '1', '9', '27', '2', '23', '6', '5']
+
+        content_ = None
         try:
             r = requests.post('https://api.dclink.com.ua/api/GetPriceAll', data={
                 'login': self.DC_LOGIN,
                 'password': self.DC_PASSWORD
             }, timeout=30)
+            content_ = r.content
         except Exception as e:
             print(e)
-            r = ''
-
-        price_columns = [
-            'Article', 'CategoryID', 'Name',
-            'Availability', 'PriceUSD', 'RRP_UAH',
-            'Code','Url'
-                        ]
 
         price_filename = 'load_form_providers/dclink-price.xml'
         try:
             with open(price_filename, 'wb') as f:
                 f.write(r.content)
         except Exception as e:
-            print('Dc wrong data loaded old price')
+            print('не удалось записать контент в файл(ошибка в данных)')
+
+        return content_
+
+        price_columns = [
+            'Article', 'CategoryID', 'Name',
+            'Availability', 'PriceUSD', 'RRP_UAH',
+            'Code','Url'
+                        ]
 
         if not ff:
             data,index = get_from_dc(r, CategoryID)
@@ -109,6 +113,7 @@ class DC:
 
     def get_sort_basa2(self):
         res=self.get_basa()
+        return res
         if not res.empty:
             res2=res.rename(columns={'Article':'partnumber_parts', 'Name':'name_parts',
             'PriceUSD':'providerprice_parts',

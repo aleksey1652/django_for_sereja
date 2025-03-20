@@ -45,12 +45,17 @@ class ELKO:
             headers={'Authorization': self.token,"Content-Type": "application/json"},
             timeout=30)
         except:
-            r = None
+            print('ошибка скачивания elko')
+            return None
 
         if r and r.status_code == 200:
             elko = r.json()
+            json_ = json.dumps(elko)
             with open('load_form_providers/elko-price.json', 'w') as write_file:
                 json.dump(elko,write_file)
+            return json_
+        print('ошибка elko данных')
+        return None
 
         #r2 = requests.get('https://uaapi.elko.cloud/v3.0/Catalogs/Products', params={
             #'CategoryCode': '',
@@ -78,6 +83,7 @@ class ELKO:
 
     def get_sort_basa2(self):
         res=self.get_basa()
+        return res
         if not res.empty:
             """for x in res.iloc:
                 if not x.empty:

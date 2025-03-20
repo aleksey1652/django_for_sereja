@@ -26,15 +26,27 @@ class ASBIS:
             'WIC', 'DESCRIPTION', 'MY_PRICE', 'AVAIL', 'SMALL_IMAGE', 'Url', 'GROUP_NAME',
             'RETAIL_PRICE'
         ]
-        if not fun2:
-            try:
-                r = requests.get(self.price_url, timeout=30)
-            except:
-                return pd.DataFrame()
-            data, index = get_from_xml_asbis2(r, self.usd_ua)
-            basa = pd.DataFrame(
-            data, columns=price_columns, index=index) if r.status_code == 200 else pd.DataFrame()
-            return basa
+
+        data = None
+
+        try:
+            r = requests.get(self.price_url, timeout=30)
+            data = r.content
+        except:
+            print('ошибка в данных ASBIS')
+            return data
+            #return pd.DataFrame()
+        #data, index = get_from_xml_asbis2(r, self.usd_ua)
+        #basa = pd.DataFrame(
+        #data, columns=price_columns, index=index) if r.status_code == 200 else pd.DataFrame()
+        #return basa
+
+        file_name = 'load_form_providers/asbis-price.xml'
+
+        with open(file_name, 'wb') as f:
+            f.write(data)
+
+        return data
 
         filename = download_file(self.price_url, 'load_form_providers/asbis-price.xml')
 
@@ -44,6 +56,7 @@ class ASBIS:
 
     def get_sort_basa2(self):
         res=self.get_basa()
+        return res
         if not res.empty:
             res2=res.rename(columns={'WIC':'partnumber_parts', 'DESCRIPTION':'name_parts',
             'MY_PRICE':'providerprice_parts','AVAIL':'availability_parts',

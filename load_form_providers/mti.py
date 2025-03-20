@@ -50,8 +50,12 @@ class MTI:
 
         price_filename = 'load_form_providers/mti_price.xml'
         if r and r.status_code == 200:
+
             with open(price_filename, 'w') as f:
                 f.write(r.text)
+
+            return r.text
+        return None
 
         price_columns = [
             'prodname', 'partnum', 'price_uah',
@@ -82,6 +86,8 @@ class MTI:
         store_dfs = []
 
         if not ff:
+            data = self.__data('W600')
+            return data
             for store in ['W600']:
                 store_dfs.append(self.__data(store))
 
@@ -97,6 +103,7 @@ class MTI:
 
     def get_sort_basa2(self):
         res=self.get_basa()
+        return res
         if not res.empty:
             res2=res.rename(columns={'partnum':'partnumber_parts', 'prodname':'name_parts',
             'price_uah':'providerprice_parts','store':'availability_parts',

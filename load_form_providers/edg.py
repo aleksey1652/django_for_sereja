@@ -33,8 +33,11 @@ class EDG:
                 if r.status_code ==200:
                     with open(filename, 'wb') as f:
                         f.write(r.content)
+                    return r.content
+                return None
             except:
-                return pd.DataFrame()
+                return None
+                #return pd.DataFrame()
 
             data,index = get_from_xml_edg2(r)
             basa = pd.DataFrame(
@@ -49,6 +52,7 @@ class EDG:
 
     def get_sort_basa2(self):
         res=self.get_basa()
+        return res
         if not res.empty:
             res2=res.rename(columns={'Code':'partnumber_parts', 'Name':'name_parts', 'Price':'providerprice_parts',
             'StockName':'availability_parts', 'Images':'images', 'Url':'url_parts', 'Subcategory':'subcategory', 'RRP': 'RRP_UAH'})

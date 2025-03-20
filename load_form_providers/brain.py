@@ -142,12 +142,25 @@ class BRAIN:
         if r.json()['status']:
             #filename = download_file(r.json()['url'])
             #return self.__get_from_brain2(filename)
-            content_ = download_url(r.json()['url'])
+            #content_ = download_url(r.json()['url'])
 
-            with open('load_form_providers/brain-price.json', 'w') as write_file:
-                json.dump(content_,write_file)
+            try:
+                content_ = requests.get(r.json()['url'], timeout=120)
 
-            return self.__get_from_brain2(content_)
+                brain = content_.json()
+                json_ = json.dumps(brain)
+            except Exception as e:
+                print(e)
+                brain = None
+
+            if brain:
+                with open('load_form_providers/brain-price.json', 'w') as write_file:
+                    json.dump(brain,write_file)
+
+                return json_
+
+            #return self.__get_from_brain2(content_)
+        return None
 
     def get_price(self):
         with open("load_form_providers/list_articles.json", "r") as write_file:
@@ -168,6 +181,8 @@ class BRAIN:
         s = self.__met()
 
         if not ff:
+            data = self.__board2(s, 29)
+            return data
             l_full_data = []
             l_full_index = []
             dict_ = dict()
@@ -194,6 +209,8 @@ class BRAIN:
         return basa
 
     def get_sort_basa2(self):
+        res = self.get_basa()
+        return res
         res, d =self.get_basa()
         if not res.empty:
             res2=res.rename(columns={'Article':'partnumber_parts', 'Name':'name_parts',
