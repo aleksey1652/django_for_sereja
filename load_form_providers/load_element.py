@@ -23,25 +23,54 @@ from django.db.models import Q
 from django.db.models import Min
 from load_form_providers.dc_descr_catalog import to_model_price_from_dc, to_tech_price_from_dc
 from descriptions.views import shorts_in_comps
-#providerprice_parts x_code price aall remainder test_comp in_comps
+
+from load_form_providers.providers_to_price import *
+#providerprice_parts x_code price aall remainder test_comp in_comps prov
+
+def for_clear_status(part):
+    """
+    """
+    now = timezone.now()
+    list_providers = ['dc','asbis','elko','mti','brain','edg',
+    'itlink','erc', 'be', 'dw', 'pccooler']
+    if not Parts_full.objects.filter(partnumber_parts=part.partnumber_parts,
+    providers__name_provider__in=list_providers,availability_parts='yes'
+    ).exists():
+        part.availability_parts = 'no'
+        part.providerprice_parts = 0
+        part.rrprice_parts = 0
+        part.name_parts_main = None
+        part.date_chg = now
+        return part
+    return None
+
 
 def clear_status_if_not_exists():
     tuple_kind = ('cool', 'imb', 'amb', 'case', 'ssd', 'hdd', 'aproc','iproc',
     'video', 'ps', 'mem', 'vent', 'cables')
-    list_providers = ['dc','asbis','elko','mti','brain','edg',
-    'itlink','erc', 'be', 'dw', 'pccooler']
 
     full_update_status_no = Parts_full.objects.filter(kind__in = tuple_kind,
     providers__name_provider='-', availability_parts='yes', remainder__isnull=True)
 
-    for f in full_update_status_no:
-        if not Parts_full.objects.filter(partnumber_parts=f.partnumber_parts,
-        providers__name_provider__in=list_providers,availability_parts='yes',
-        providerprice_parts__gt=0).exists():
-            f.availability_parts = 'no'
-            f.providerprice_parts = 0
-            f.rrprice_parts = 0
-            f.save()
+    parts = list(full_update_status_no)
+
+    updated_parts_ = [
+        for_clear_status(part)
+        for part in parts
+    ]
+
+    updated_parts = [part for part in updated_parts_ if part]
+
+    try:
+        with transaction.atomic():
+            Parts_full.objects.filter(providers__name_provider='-').bulk_update(
+            updated_parts, ['providerprice_parts', 'availability_parts',
+            'rrprice_parts', 'date_chg', 'name_parts_main']
+            )
+    except:
+        updated_parts = []
+
+    return len(updated_parts)
 
 def short_procent_diff(pr1, pr2):
     #for Short_per_x_code_single
@@ -226,7 +255,7 @@ def need_comps_update(k,k_new):
             f.save()
             return ff.count()
     return ff.count()
-
+#
 def status(avail, avail_prov):
     try:
         avail = str(avail)
@@ -553,10 +582,10 @@ def full_from_string_filter(string_filter,queryset):
         return 0, None
 
 def Short_per_price_update(short):
-
+    # для Short_per_x_code
     # new code - обновление цен по жесткой привязке к партнамберу
+    # и без short.save(), но + return short для одноврем записи в бд
     now = timezone.now()
-
     if short.parts_full.all().exists():
         full = short.parts_full.filter(
         availability_parts='yes').exclude(providerprice_parts=0
@@ -570,7 +599,7 @@ def Short_per_price_update(short):
                 short.auto = True
             short.kind2 = False # включаем если есть товар
             short.date_chg = now
-            short.save()
+            #short.save()
         else:
             search_term = short.name_parts
             queryset = Computers.objects.filter(
@@ -587,7 +616,8 @@ def Short_per_price_update(short):
                 short.kind2 = True # выключаем если нет товара и не в сборке
                 # инструкция для работников: ставить "в сборке" для детали
                 # вручную при добавлении в комп (чтоб избежать рассинхр!)
-                short.save()
+                #short.save()
+    return short
 
 def Short_per_x_code_single(short):
 
@@ -627,14 +657,29 @@ def Short_per_x_code_single(short):
             short.save()
 
 def Short_per_x_code():
+    #  цены в комп детали
+
     CHOISE = ('cool', 'imb', 'amb', 'case', 'ssd', 'hdd', 'aproc',
     'iproc', 'video', 'ps', 'mem', 'vent', 'mon', 'wifi', 'km', 'soft', 'cables')
     #now = timezone.now()
     short_all = Parts_short.objects.exclude(
     name_parts='пусто').filter(kind__in = CHOISE)
-    for short in short_all:
+    short_list = list(short_all)
+    """for short in short_all:
         #Short_per_x_code_single(short) old code with var part_number
         Short_per_price_update(short) #new code with no var part_number
+    """
+    update = [Short_per_price_update(short) for short in short_list]
+
+    with transaction.atomic():
+        short_all.bulk_update(
+        update, ['auto', 'x_code', 'kind2', 'date_chg']
+        )
+
+    len_ = len(update) if update else 0
+
+    return len_
+
 
 def get_itlink():
     usd = USD.objects.last()
@@ -785,435 +830,119 @@ def get_itlink():
     return count_no, count_on, pp
 
 
-def RUN():
-    count = 0
-    d = DC()
-    dict_set = {}
-    try:
-        usd = USD.objects.last()
-        usd_ua = usd.usd if usd.usd else 37
-        print(f'Dollar/UAH : {usd_ua}')
-        #usd_ua = round(d.get_exch(), 2)
-        #print(f'Dc Dollar/UAH : {usd_ua}')
-    except:
-        usd_ua = False
-        print('no ua price')
-
-    Str_ = ['dc', 'asbis', 'elko', 'mti', 'edg']
-    ok_dict = {}
-    error_list=[]
-    l = [DC(), ASBIS(usd_ua), ELKO(usd_ua), MTI(usd_ua), EDG()]
-
-    dict_ = dict()
-    b = BRAIN()
-    try:
-        res, dict_ = b.get_sort_basa2()
-        dict_set['brain'] = res
-        count+=1
-        print(f'brain is complite')
-        ok_dict['brain'] = 1
-    except Exception as e:
-        print(f"Somthing wrong in brain {e}")
-
-    for y,x in enumerate(l):
-        try:
-            #dict_set[Str_[y]] = x.get_sort_basa()
-            #from load_form_providers.load_element import RUN pff
-            test = x.get_sort_basa2()
-            if not test.empty:
-                dict_set[Str_[y]] = test
-                count+=1
-                print(f'{Str_[y]} is complite')
-                ok_dict[Str_[y]] = 1
-            else:
-                print(f'{Str_[y]} is empty')
-        except Exception as e:
-            print(f"Somthing wrong in {Str_[y]}---{e}")
-            ok_dict[Str_[y]] = 0
-            error_list.append(y)
-            continue
-    if error_list:
-        tme.sleep(60)
-        for a,b in enumerate(l):
-            if a in error_list:
-                try:
-                    test = l[a].get_sort_basa2()
-                    if not test.empty:
-                        dict_set[Str_[a]] = test
-                        count+=1
-                        print(f'{Str_[a]} is complite')
-                        ok_dict[Str_[a]] = 1
-                        time.sleep(20)
-                except:
-                    try:
-                        test = l[a].get_sort_basa2()
-                        if not test.empty:
-                            dict_set[Str_[a]] = test
-                            count+=1
-                            print(f'{Str_[a]} is complite')
-                            ok_dict[Str_[a]] = 1
-                            time.sleep(20)
-                    except Exception as e:
-                        print(f"Somthing wrong in {Str_[a]}---{e}")
-                        continue
-    #print(f'Got {str(count)} objects')
-    #with open('load_form_providers/dict_sort.pickle', 'wb') as f:
-    #    pickle.dump(dict_set, f)
-    #print('pickle file saved')
-    #with open('load_form_providers/usd_ua.pickle', 'wb') as f:
-    #    pickle.dump(usd_ua, f)
-    #u = USD.objects.first()
-    #u.usd = usd_ua
-    #u.save()
-    #print('usd_ua saved')
-    #print('pickle file saved')
-    #try:
-    #    with open("load_form_providers/dict_sort.pickle", "rb") as f:
-    #        dict_set=pickle.load(f)
-    #except:
-    #    print('not file dict_sort.pickle')
-    p=Panda_db(dict_set)
-    #p.set_panda_set(dict_set) art1
-    #basa = p.full_panda_set()
-
-    return (p, count, ok_dict, dict_)
-#get_xls
 def Parsing_from_providers():
-    list_no = ('cool','imb','amb','case','ssd','hdd','aproc','iproc',
-    'video','ps','mem','vent','mon','wifi','km','soft','cables')
-    brain_cat={'Процессоры':"to_article2_1(n)",'Модули памяти':"'mem'",
-    'Накопители HDD - 3.5", 2.5", внутренние':"'hdd'",'Мониторы':"'mon'",
-    'Материнские платы':"to_article2_1(n,pr=0)",'Корпуса':"'case'",
-    'Видеокарты':"'video'",'Системы охлаждения':"to_vent(n)",'Накопители SSD':"'ssd'",
-    'Сетевое оборудование активное':"'wifi'",'Корпуса  имп.':"'ps'"}
-    mti_cat={'114':"to_article2_1(n)",'1668':"'mem'",'115':"'hdd'",
-    '143':"'mon'",'112':"to_article2_1(n,pr=0)",'118':"'case'", '121': "'vent'",
-    '111':"'video'",'116':"'ssd'",'193':"'wifi'",'119':"'ps'",'199':"'wifi'"}
-    dc_cat={'1':"to_article2_1(n)",'2':"'mem'",'3':"'hdd'",
-    '5':"'mon'",'6':"to_article2_1(n,pr=0)",'8':"'case'",
-    '9':"'video'",'23':"to_vent(n)",'27':"'ssd'",'255':"'wifi'",'724':"'ps'"}
-    edg_cat={'Системи охолодження, Cooler':"to_vent(n)",
-    'Блоки живлення ATX':"'ps'", 'Корпуси':"'case'"}
-    elko_cat={'CPU':"to_article2_1(n)",'MEM':"'mem'",'HDS':"'hdd'",
-    'LC3':"'mon'",'MBA':"'amb'",'CAS':"'case'",'VGP':"'video'",'COC':"to_vent(n)",
-    'SSM':"'ssd'",'WRA':"'wifi'",'SSU':"'ssd'",'PSU':"'ps'",'MBI':"'imb'",
-    'COS': "'vent'"}
-    asbis_cat={'CPU Desktop':"to_article2_1(n)",'Memory Desktop':"'mem'",
-    'HDD Video Surveillance':"'hdd'",'Monitor LED':"'mon'",'Monitor LCD':"'mon'",
-    'HDD NAS':"'hdd'",'Video Card':"'video'",'Cooling System':"'cool'",
-    'SSD Client':"'ssd'",'HDD Desktop':"'hdd'"}
-    all_cat = {'brain':brain_cat,'mti':mti_cat,'dc':dc_cat,
-                'edg':edg_cat,'elko':elko_cat,'asbis':asbis_cat}
-    count_on,count_no = 0,0
-    count_provider = 0
-    t2=timezone.now()
-    r,count_provider,ok_dict, dict_ = RUN()
-    #os.environ.setdefault('DJANGO_SETTINGS_MODULE','sereja.settings')
-    #django.setup()
-    #from cat.models import *
-    aall=Articles.objects.filter(item_price__in=list_no)
-    if not aall.exists():
-        from load_form_providers.load_element_to_zero_db import main
-        main()
-    #list_providers = ['dc','asbis','elko','mti','brain','edg','itlink','erc']
-    list_providers = ['dc','asbis','elko','mti','brain','edg',] # без 'itlink','erc'
-    # чтоб при обновлении не затирало: 'itlink','erc' !!!!!!!!!!!!!!!!!!
-    if not Providers.objects.all().exists():
-        for l in list_providers + ['-']:
-            Providers.objects.create(name_provider=l)
+    """
+    новый прайс-агрегатор
+    сначала выключаем прайс от постачей: prov_
+    потом скачиваем и формируем dict_full
+    записываем в бд на основе dict_full (сначала для всех в prov_, потом для '-')
+    результат проделанной работы в dict_message
+    возвращаем dict_message
+    доработать обязательно remainder_price !!!
 
-    for a in aall:
-        dd = Parts_full.objects.filter(partnumber_parts=a.article,providers__name_provider='-')
-        if dd.count()>1:
-            d = dd.delete()
-
-    for a in aall:
-        res_search = r.search(a.article)
-        if res_search:
-            for k,v in res_search.items():
-                if isinstance(v.partnumber_parts,str):
-                    try:
-                        pa = v.partnumber_parts[:49].strip()
-                        n = v.name_parts[:99].strip()
-                        av = status(str(v.availability_parts), k)
-                        pr = v.providerprice_parts
-                        rrp = v.RRP_UAH
-                        try:
-                            if isinstance(pr, str):
-                                pr = float(re.sub(',' ,'.', pr))
-                        except:
-                            pr = 0
-                        try:
-                            rrp = round(float(rrp))
-                        except:
-                            rrp = 0
-                    except:
-                        print('error data')
-                        continue
-                    prov = Providers.objects.get(name_provider=k)
-                    p1 = Parts_full.objects.filter(partnumber_parts=pa,providers=prov)
-                    if not p1:
-                        p1 = Parts_full.objects.create(name_parts=n,
-                        partnumber_parts=pa,providers=prov,
-                        providerprice_parts=pr,date_chg=timezone.now(),
-                        availability_parts=av,kind=a.item_price, rrprice_parts=rrp)
-                        a.parts_full.add(p1)
-                        #print('aall',p1.kind,p1.partnumber_parts,p1.providers)
-                        count_no += 1
-                    elif p1.count() > 0:
-                        temp = p1.first()
-                        temp.availability_parts = av
-                        temp.providerprice_parts = pr
-                        temp.rrprice_parts = rrp
-                        temp.date_chg = timezone.now()
-                        temp.kind = a.item_price
-                        temp.save()
-                        temp3 = Parts_full.objects.filter(partnumber_parts=pa,providers__name_provider='-')
-                        if temp3:
-                            temp3 = temp3.first()
-                            temp3.date_chg = timezone.now()
-                            temp3.save()
-                        count_on += 1
-                        if p1.count() > 1:
-                            #print(f'count:{p1.count()} ')
-                            for x in p1[1:]:
-                                x.delete()
-                        if not a.parts_full.filter(providers__name_provider=k,partnumber_parts=pa).exists():
-                            a.parts_full.add(temp)
-            set_on=set(list_providers)
-            set_search = set(res_search.keys())
-            set_sub = set_on.symmetric_difference(set_search)
-            no = Parts_full.objects.filter(partnumber_parts=pa,providers__name_provider__in=set_sub)
-            temp3 = Parts_full.objects.filter(partnumber_parts=pa,providers__name_provider='-') if no else None
-            if temp3:
-                temp3 = temp3.first()
-                temp3.date_chg = timezone.now()
-                temp3.save()
-            for n in no:
-                nn = n
-                nn.availability_parts = 'no'
-                nn.providerprice_parts = 0
-                nn.rrprice_parts = 0
-                nn.date_chg = timezone.now()
-                nn.save()
-                #no_set_sub.append((n.partnumber_parts,n.providers))
-        else:
-            p0 = Parts_full.objects.filter(partnumber_parts=a.article,providers__name_provider__in=list_providers)
-            temp3 = Parts_full.objects.filter(partnumber_parts=a.article,providers__name_provider='-') if p0 else None
-            if temp3:
-                temp3 = temp3.first()
-                temp3.date_chg = timezone.now()
-                temp3.save()
-            for p in p0:
-                pp = p
-                pp.availability_parts = 'no'
-                pp.providerprice_parts = 0
-                pp.rrprice_parts = 0
-                pp.date_chg = timezone.now()
-                pp.save()
-                #no_prov.append((p.partnumber_parts,p.providers))
-        pp = None
-        try:
-            pp = Parts_full.objects.get(partnumber_parts=a.article,providers__name_provider='-')
-        except:
-            pp = Parts_full.objects.filter(partnumber_parts=a.article,providers__name_provider='-').first()
-        if pp:
-            if pp.availability_parts != 'hand':
-                p_prov = Parts_full.objects.filter(partnumber_parts=a.article,
-                providers__name_provider__in=('dc','asbis','elko',
-                'mti','brain','edg', 'erc', 'itlink', 'be', 'dw', 'pccooler')).values()
-                """p_prov_min =  min(p_prov, key=get_min) if p_prov else {'providerprice_parts':0,'availability_parts':'no'}
-                price = p_prov_min['providerprice_parts'] if p_prov_min['availability_parts'] not in ('q','no','') else 0
-                name_parts_main = Parts_full.objects.get(pk=p_prov_min['id']).providers.name_provider if p_prov_min['availability_parts'] not in ('q','no','') else None
-                st = p_prov_min['availability_parts'] if p_prov else 'no'"""
-                p_prov_min = p_prov.filter(availability_parts='yes',
-                providerprice_parts__gt=0).order_by('providerprice_parts').values(
-                'providerprice_parts', 'rrprice_parts',
-                'providers__name_provider').first() if p_prov else None
-                price = p_prov_min['providerprice_parts'] if p_prov_min else 0
-                rrp_prov = p_prov_min['rrprice_parts'] if p_prov_min else 0
-                name_parts_main = p_prov_min['providers__name_provider'] if p_prov_min else None
-                st = 'yes' if p_prov_min else 'no'
-                remainder_ = remainder_price(pp.remainder)
-                if pp.remainder and st == 'no':
-                    pp.providerprice_parts = remainder_
-                    pp.availability_parts = 'yes'
-                    pp.name_parts_main = 'склад'
-                    pp.rrprice_parts = 0
-                    pp.save()
-                elif pp.remainder and st == 'yes' and remainder_ and remainder_ < price:
-                    # мин цена с учетом склада
-                    pp.providerprice_parts = remainder_
-                    pp.availability_parts = 'yes'
-                    pp.name_parts_main = 'склад'
-                    pp.rrprice_parts = 0
-                    pp.save()
-                else:
-                    pp.providerprice_parts = price
-                    pp.rrprice_parts = rrp_prov
-                    pp.availability_parts = st
-                    pp.name_parts_main = name_parts_main
-                    pp.save()
-        else:
-            p_prov = Parts_full.objects.filter(partnumber_parts=a.article,
-            providers__name_provider__in=('dc','asbis','elko',
-            'mti','brain','edg','itlink','erc', 'be', 'dw', 'pccooler')).values()
-            """p_prov_min =  min(p_prov, key=get_min) if p_prov else {'providerprice_parts':0,'availability_parts':'no'}
-            price = p_prov_min['providerprice_parts'] if p_prov_min['availability_parts'] not in ('q','no','') else 0
-            name_parts_main = Parts_full.objects.get(pk=p_prov_min['id']).providers.name_provider if p_prov_min['availability_parts'] not in ('q','no','') else None
-            st = p_prov_min['availability_parts'] if p_prov else 'no'"""
-            p_prov_min = p_prov.filter(availability_parts='yes',
-            providerprice_parts__gt=0).order_by('providerprice_parts').values(
-            'providerprice_parts', 'rrprice_parts',
-            'providers__name_provider', 'name_parts').first() if p_prov else None
-            price = p_prov_min['providerprice_parts'] if p_prov_min else 0
-            rrp_prov = p_prov_min['rrprice_parts'] if p_prov_min else 0
-            name_parts_main = p_prov_min['providers__name_provider'] if p_prov_min else None
-            st = 'yes' if p_prov_min else 'no'
-
-            prov1 = Providers.objects.get(name_provider='-')
-            if p_prov and p_prov_min and not Parts_full.objects.filter(partnumber_parts=a.article,providers=prov1):
-                kind = p_prov[0]['kind'] if p_prov[0]['kind'] else ''
-                pmain = Parts_full.objects.create(name_parts=p_prov_min['name_parts'],
-                partnumber_parts=a.article,providers=prov1,
-                providerprice_parts=price,date_chg=timezone.now(),
-                availability_parts=st,kind=kind,name_parts_main=name_parts_main,
-                rrprice_parts=rrp_prov)
-                a.parts_full.add(pmain)
-                #print('pmain',pmain.kind,pmain.partnumber_parts,pmain.providers)
-
-    dict_for_db = r.for_db()
-    set_main_no = set()
-    for k,vv in dict_for_db.items():
-        for v in vv:
-            try:
-                pa = v.partnumber_parts[:49]
-                n = v.name_parts[:99]
-                av = status(str(v.availability_parts), k)
-                pr = v.providerprice_parts
-                rrp = v.RRP_UAH
-                try:
-                    if isinstance(v.providerprice_parts, str):
-                        pr = float(re.sub(',' ,'.', v.providerprice_parts))
-                except:
-                    pr = 0
-                try:
-                    rrp = round(float(rrp))
-                except:
-                    rrp = 0
-            except:
-                print('error data')
-                continue
-            aa = Articles.objects.filter(article=pa)
-            kind = eval(all_cat[k][v.subcategory])
-            if kind:
-                if not aa:
-                    a1 = Articles.objects.create(article=pa,item_name=n,item_price=kind)
-                    #print('art1',a1.item_price,a1.article,k)
-                else:
-                    a1 = aa.first()
-                prov2 = Providers.objects.get(name_provider=k)
-                if not a1.parts_full.filter(partnumber_parts=pa,providers=prov2).exists() and Parts_full.objects.filter(partnumber_parts=pa,providers=prov2).exists():
-                    for pp in Parts_full.objects.filter(partnumber_parts=pa,providers=prov2):
-                        a1.parts_full.add(pp)
-                        set_main_no.add(pa)
-                if not Parts_full.objects.filter(partnumber_parts=pa,providers=prov2):
-                    p1 = Parts_full.objects.create(name_parts=n,
-                    partnumber_parts=pa,providers=prov2,
-                    providerprice_parts=pr,date_chg=timezone.now(),
-                    availability_parts=av,kind=kind, rrprice_parts=rrp)
-                    a1.parts_full.add(p1)
-                    #print('a1p1',p1.kind,p1.partnumber_parts,p1.providers)
-                    set_main_no.add(pa)
-                    count_no += 1
-    sete = r.get_set_no()
-    sete.update(set_main_no)
-    #print(set_main_no)
-    prov1 = Providers.objects.get(name_provider='-')
-    for v in sete:
-        if not Parts_full.objects.filter(partnumber_parts=v,providers=prov1):
-            aa = Articles.objects.filter(article=v)
-            a1 = aa.first()
-            p_prov = Parts_full.objects.filter(partnumber_parts=v,
-            providers__name_provider__in=('dc','asbis','elko',
-            'mti','brain','edg')).values()
-            """p_prov_min =  min(p_prov, key=get_min) if p_prov else {'providerprice_parts':0,'availability_parts':'no'}
-            price = p_prov_min['providerprice_parts'] if p_prov_min['availability_parts'] not in ('q','no','') else 0
-            name_parts_main = Parts_full.objects.get(pk=p_prov_min['id']).providers.name_provider if p_prov_min['availability_parts'] not in ('q','no','') else None
-            st = p_prov_min['availability_parts'] if p_prov else 'no'"""
-            p_prov_min = p_prov.filter(availability_parts='yes',
-            providerprice_parts__gt=0).order_by('providerprice_parts').values(
-            'providerprice_parts', 'rrprice_parts',
-            'providers__name_provider', 'name_parts').first() if p_prov else None
-            price = p_prov_min['providerprice_parts'] if p_prov_min else 0
-            rrp_prov = p_prov_min['rrprice_parts'] if p_prov_min else 0
-            name_parts_main = p_prov_min['providers__name_provider'] if p_prov_min else None
-            st = 'yes' if p_prov_min else 'no'
-            if p_prov and p_prov_min:
-                kind = p_prov[0]['kind'] if p_prov[0]['kind'] else ''
-                if kind:
-                    pff = Parts_full.objects.create(name_parts=p_prov_min['name_parts'],
-                    partnumber_parts=v,providers=prov1,
-                    providerprice_parts=price,date_chg=timezone.now(),
-                    availability_parts=st,kind=kind,name_parts_main=name_parts_main,
-                    rrprice_parts=rrp_prov)
-                    #print('pff',pff.kind,pff.partnumber_parts,pff.providers)
-                    if a1:
-                        a1.parts_full.add(pff)
-                    else:
-                        a1 = Articles.objects.create(article=v,item_name=p_prov_min['name_parts'],item_price=kind)
-                        #print('art1',a1.item_price,a1.article,prov1)
-                        a1.parts_full.add(pff)
-                    count_no += 1
-
-
-    #get_xls()
-    #dict_distrib = price_to_distrib2()
-    clear_status_if_not_exists()
-    #to_model_price_from_dc() # цены-наличие в singleparts
+    подключить:
     shorts_in_comps()
     #проверка есть ли шортс в сборках(in_comps в Parts_short)
     #to_tech_price_from_dc(for_brain=dict_) # цены-наличие в tech
     Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
+    """
 
+    prov_ = ('dc', 'asbis', 'elko', 'brain', 'mti', 'edg') # кортеж для Parts_full
 
-    print( f'From {count_provider} providers price update {count_on} and in {count_no} Parts_short add new min_price')
-    #with open("load_form_providers/loads/log.json", "r") as write_file:
-    #    dict_log=json.load(write_file)
-    #print(f'log keys: {dict_log.keys()}')
-    #print(dict_distrib)
-    #dict_load_element = {'time': timezone.now().strftime("%d-%m-%y,%H:%M"),
-    #'mes': f'From {count_provider} providers price update {count_on} and in {count_no} Parts_short add new min_price'}
-    #dict_log['dict_load_element'] = dict_load_element
-    t1=timezone.now()
-    prov_message = ''
-    for k,w in ok_dict.items():
-        if w:
-            prov_message = prov_message + f'{k} ok, '
-        else:
-            prov_message = prov_message + f'{k} bad, '
-    if not Results.objects.filter(who='prov').exists():
-        r = Results(who='prov',
-        who_desc=f'Providers loads result: count_provider: {count_provider} *** {prov_message} ***, update: {count_on} obj, add: {count_no} obj, time :{str(t1-t2)[2:4]} min')
-        r.save()
-    else:
-        r = Results.objects.get(who='prov')
-        r.who_desc = f'Providers loads result: count_provider: {count_provider} *** {prov_message} ***, update: {count_on} obj, add: {count_no} obj, time :{str(t1-t2)[2:4]} min'
-        r.save()
-    r_oher = Results.objects.filter(who__in=('erc','itlink', 'be', 'dw', 'pccooler'))
-    r_oher.update(who_desc='')
-    #with open("load_form_providers/loads/log.json", "w") as write_file:
-    #    json.dump(dict_log,write_file)
-    #my_time = datetime.datetime.today()
-    #t2=time.strptime(my_time, "%H:%M")
+    Parts_full.objects.filter( # выключаем все детали из prov_ + '-'
+    providers__name_provider__in=prov_ + ('-',)).update(
+    availability_parts='no', providerprice_parts=0,
+    rrprice_parts=0, name_parts_main=None)
+    #.exclude(remainder__isnull=False) ???? исключая склад
 
-    print(f"Work time {str(t1-t2)[2:4]}  minuts")
-    #print(f"Program will start at {my_time}")
-    #return f"Work time {(t1.tm_hour)*60+t1.tm_min-(t2.tm_hour)*60-t2.tm_min}  minuts"
+    usd = USD.objects.last()
+    usd_ua = usd.usd # курс установленный вручную из админки
 
+    # dict_full полная библиотека от всех постачей для записи в бд
+    dict_full = {
+    'dc': {},
+    'asbis': {},
+    'elko': {},
+    'brain': {},
+    'mti': {},
+    'edg': {},
+    }
 
-#celery -A sereja beat -l INFO
+    # dict_message библиотека от всех постачей с результатами конечной работы
+    dict_message = {
+    'dc': '',
+    'asbis': '',
+    'elko': '',
+    'brain': '',
+    'mti': '',
+    'edg': '',
+    '-': '',
+    }
 
+    # dict_attr для общего доступа к методам класса From_provders_to_dict
+    dict_attr = {
+    'dc': 'getDC',
+    'asbis': 'getASBIS',
+    'elko': 'getELKO',
+    'brain': 'getBRAIN',
+    'mti': 'getMTI',
+    'edg': 'getEDG',
+    }
+
+    # class_prov для работы с циклом обьектов класса From_provders_to_dict
+    class_prov = {
+    'dc': DC(),
+    'asbis': ASBIS(usd_ua),
+    'elko': ELKO(usd_ua),
+    'brain': BRAIN(),
+    'mti': MTI(usd_ua),
+    'edg': EDG(),
+    }
+
+    start = timezone.now()
+
+    for key, value in class_prov.items():
+        try:
+            res = value.get_sort_basa2() # скачиваем сырые данные от постачей
+        except:
+            tme.sleep(60)
+            try:
+                res = value.get_sort_basa2() # скачиваем еще раз(2-я попытка)
+            except:
+                res = None
+        print(f'{key} data_upload: {type(res)}')
+        f = From_provders_to_dict(usd_ua, res)
+        dict_ = f.GetPriceAll(dict_attr[key]) # словарь с данными для отправки в бд
+        print(f'{key} data_edited size: {len(dict_)}')
+        dict_full[key] = dict_ # потом используем для обновл/созд '-' постача Parts_full
+        dict_message[key] = currentProvToBd(dict_, key) # обновляем/создаем бд,
+        # записывем в dict_message message по работе для текущего key
+
+    dict_message['-'] = mainProvToBd(dict_full) # для '-' обновляем/создаем бд
+
+    end = timezone.now()
+    duration = str(end-start)[2:7]
+    print(f'{duration} min')
+
+    short_in  = shorts_in_comps() #проверка есть ли шортс в сборках(in_comps в Parts_short)
+    print(f'shorts_in_comps: {short_in}')
+
+    short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
+    print(f'Short_per_x_code: {short_all}')
+
+    sklsdWith, sklsdOnly = bdRemainder() # обрабатываем склад
+    # (из "price:2.42; 8" в providerprice_parts при надобности)
+    print(f'кол склад_с_постач: {sklsdWith}, кол склад_только: {sklsdOnly}')
+
+    count_clear = clear_status_if_not_exists() #  очистка "-" пустых
+    test_sklad = f'{sklsdOnly}--clear: {count_clear}' # пока для теста очистки
+
+    updateResults(dict_message, duration, short_all, short_in, sklsdWith, test_sklad
+    ) #записываем в бд(Results.objects) dict_message и доп
+
+    return (dict_message, duration)
+
+# remainder
 """
 
 """
