@@ -152,35 +152,45 @@ def content_parts_filter(key_, value_, num="1"):
     else:
         return value_
 #
-def shorts_in_comps():
-    shorts = Parts_short.objects.filter(kind2=False)
-    for short in shorts:
-        search_term = short.name_parts
-        queryset = Computers.objects.filter(
-        Q(video_computers__exact=search_term)|
-        Q(proc_computers__exact=search_term) |Q (mem_computers__exact=search_term)|
-        Q(mb_computers__exact=search_term) | Q(vent_computers__exact=search_term)|
-        Q(hdd_computers__icontains=search_term) | Q(cool_computers__exact=search_term)|
-        Q(case_computers__exact=search_term) | Q(ps_computers__exact=search_term)|
-        Q(wifi_computers__exact=search_term) | Q(soft_computers__exact=search_term)|
-        Q(cables_computers__exact=search_term)
-        )#.exclude(pc_assembly__name_assembly='For Today') # исключаем For Today
-        if queryset.exclude(pc_assembly__name_assembly='For Today').exists():
-            short.in_comps = True
-            short.computer_shorts.clear()
-            short.save()
-        elif not queryset.exists():
-            short.in_comps = False
-            short.computer_shorts.clear()
-            short.save()
-        elif queryset.filter(pc_assembly__name_assembly='For Today').exists():
-            short.in_comps = False
-            short.computer_shorts.clear()
-            short.computer_shorts.add(
-            queryset.filter(pc_assembly__name_assembly='For Today').first()
-            )
-            short.save()
+def current_in_comps(short):
+    #  для shorts_in_comps
+    search_term = short.name_parts
+    queryset = Computers.objects.filter(
+    Q(video_computers__exact=search_term)|
+    Q(proc_computers__exact=search_term) |Q (mem_computers__exact=search_term)|
+    Q(mb_computers__exact=search_term) | Q(vent_computers__exact=search_term)|
+    Q(hdd_computers__icontains=search_term) | Q(cool_computers__exact=search_term)|
+    Q(case_computers__exact=search_term) | Q(ps_computers__exact=search_term)|
+    Q(wifi_computers__exact=search_term) | Q(soft_computers__exact=search_term)|
+    Q(cables_computers__exact=search_term)
+    )#.exclude(pc_assembly__name_assembly='For Today') # исключаем For Today
+    if queryset.exclude(pc_assembly__name_assembly='For Today').exists():
+        short.in_comps = True
+        short.computer_shorts.clear()
+        short.save()
+    elif not queryset.exists():
+        short.in_comps = False
+        short.computer_shorts.clear()
+        short.save()
+    elif queryset.filter(pc_assembly__name_assembly='For Today').exists():
+        short.in_comps = False
+        short.computer_shorts.clear()
+        short.computer_shorts.add(
+        queryset.filter(pc_assembly__name_assembly='For Today').first()
+        )
+        short.save()
+    return short
 
+
+def shorts_in_comps():
+    #проверка есть ли шортс в сборках(in_comps в Parts_short)
+    len_ = 0
+    shorts = Parts_short.objects.filter(kind2=False)
+    short_list = list(shorts)
+    update = [current_in_comps(short) for short in short_list]
+    if update:
+        len_ = len(update)
+    return len_
 
 
 def get_comp_for_api(comp):
