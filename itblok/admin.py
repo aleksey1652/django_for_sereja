@@ -23,7 +23,7 @@ class ItblokComputersAdmin(admin.ModelAdmin):
     list_filter = (ItSeriesFilter, ItGrupsFilter, 'is_active',
     MEM_TypeFilter, MEM_ListFilter, GPU_ListFilter,
     AMDCPU_ListFilter, IntelCPU_ListFilter, LabelFilter)
-    fields = ('is_active', 'name_computers', 'price_parts',
+    fields = ('is_active', 'name_computers', 'name_computers_ua', 'price_parts',
     'price_special', 'rentability', 'procent_prom', 'price_prom',
     'price_main', 'hend_input', 'cpu', 'cooler', 'mb', 'ram', 'gpu',
     'hdd', 'ssd', 'psu', 'case', 'fan', 'wifi', 'cables', 'soft',
@@ -39,6 +39,7 @@ class ItblokComputersAdmin(admin.ModelAdmin):
     actions = ['set_margin', 'edit_parts_num_admin',
     'change_label', 'edit_parts_pack',]
     save_on_top = True
+    save_as = True
 
     def get_search_results(self, request, queryset, search_term):
         # переопределяем search_fields как в Версуме (по точному названию деталей)

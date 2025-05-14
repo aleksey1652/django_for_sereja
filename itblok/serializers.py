@@ -46,7 +46,7 @@ class ITSer(serializers.ModelSerializer):
 
     class Meta:
         model = ItblokComputers
-        fields = ('name_computers', 'price_parts_new',
+        fields = ('name_computers', 'name_computers_ua', 'price_parts_new',
             'cpu', 'cooler', 'mb', 'ram', 'gpu',
             'hdd', 'ssd', 'psu', 'case', 'fan', 'wifi',
             'cables', 'soft', 'mem_num_computers',
