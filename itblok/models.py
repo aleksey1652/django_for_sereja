@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.db.models import Sum, Count, F, Q
 from django.db.models import signals
@@ -86,17 +88,17 @@ class ItblokComputers(models.Model):
     verbose_name='Название укр', null=True, blank=True)
 
     price_parts = models.FloatField(default=0, db_index=True,
-    verbose_name='Входная цена')
+    verbose_name='Вход')
     price_special = models.FloatField(default=0, db_index=True,
-    verbose_name='Спеццена')
+    verbose_name='Спец')
     rentability = models.FloatField(default=20, db_index=True,
-    verbose_name='Наценка')
+    verbose_name='Нац')
     procent_prom = models.FloatField(default=10, db_index=True,
-    verbose_name='Акц цена процент')
+    verbose_name='Акц_ц%')
     price_prom = models.FloatField(default=0, db_index=True,
-    verbose_name='Результир цена акц')
+    verbose_name='Рез_ц_акц')
     price_main = models.FloatField(default=0, db_index=True,
-    verbose_name='Результир цена')
+    verbose_name='Рез_ц')
 
     hend_input = models.CharField(max_length=300, db_index=True,
     verbose_name='Ручной ввод детали', null=True, blank=True)
@@ -272,6 +274,32 @@ class ItblokComputers(models.Model):
     default="[{'name_parts': 'пока пусто', 'price': 0}]",
     verbose_name='Описание'
     )
+#
+    def comp_name_plus(self):
+        #
+
+        try:
+            mem = '_'.join(re.findall(r'^\d+gb|ddr\d', self.ram.name_parts.lower()))
+        except:
+            mem = ''
+        try:
+            mb = re.findall(r'^\w+', self.mb.name_parts)[0]
+        except:
+            mb = ''
+        try:
+            ssd = re.findall(r'\s(\d+[tg]b)', self.ssd.name_parts.lower())[0]
+        except:
+            ssd = ''
+        try:
+            ps = re.findall(r'\s(\d{2,4})w', self.psu.name_parts.lower())[0] + 'w'
+        except:
+            ps = ''
+        if self.case.name_parts.lower().find('white') != -1:
+            return f'{mem}-{mb}-{ssd}-{ps}-white'
+        return f'{mem}-{mb}-{ssd}-{ps}'
+
+
+    comp_name_plus.short_description = 'Конфиг'
 
     def __str__(self):
         return self.name_computers
@@ -290,6 +318,46 @@ class ItblokComputers(models.Model):
 
             #usd_j = USD.objects.last()
             #usd =  usd_j.usd if usd_j.usd else 0
+
+            if self.hend_input:
+                # если что-то ввели - добавляем новую деталь
+                short_name = self.hend_input
+                #
+                try:
+                    short_ = short.objects.get(name_parts=short_name, kind2=False)
+                    kind_ = short_.kind
+                except:
+                    super().save(*args, **kwargs)
+                    return False
+
+                if kind_ in ('aproc', 'iproc',):
+                    self.cpu = short_
+                if kind_ in ('amb', 'imb',):
+                    self.mb = short_
+                if kind_ == 'cool':
+                    self.cooler = short_
+                if kind_ == 'mem':
+                    self.ram = short_
+                if kind_ == 'video':
+                    self.gpu = short_
+                if kind_ == 'hdd':
+                    self.hdd = short_
+                if kind_ == 'ssd':
+                    self.ssd = short_
+                if kind_ == 'ps':
+                    self.psu = short_
+                if kind_ == 'case':
+                    self.case = short_
+                if kind_ == 'vent':
+                    self.fan = short_
+                if kind_ == 'wifi':
+                    self.wifi = short_
+                if kind_ == 'cables':
+                    self.cables = short_
+                if kind_ == 'soft':
+                    self.soft = short_
+
+                self.hend_input = '' # после ввода очищаем поле
 
             fan = self.fan.x_code if self.fan else 0
             ram = self.ram.x_code if self.ram else 0
@@ -335,46 +403,6 @@ class ItblokComputers(models.Model):
 
             self.description = str(description_list) # структура для правильного
             # вывода в админке
-
-            if self.hend_input:
-                # если что-то ввели - добавляем новую деталь
-                short_name = self.hend_input
-                #
-                try:
-                    short_ = short.objects.get(name_parts=short_name, kind2=False)
-                    kind_ = short_.kind
-                except:
-                    super().save(*args, **kwargs)
-                    return False
-
-                if kind_ in ('aproc', 'iproc',):
-                    self.cpu = short_
-                if kind_ in ('amb', 'imb',):
-                    self.mb = short_
-                if kind_ == 'cool':
-                    self.cooler = short_
-                if kind_ == 'mem':
-                    self.ram = short_
-                if kind_ == 'video':
-                    self.gpu = short_
-                if kind_ == 'hdd':
-                    self.hdd = short_
-                if kind_ == 'ssd':
-                    self.ssd = short_
-                if kind_ == 'ps':
-                    self.psu = short_
-                if kind_ == 'case':
-                    self.case = short_
-                if kind_ == 'vent':
-                    self.fan = short_
-                if kind_ == 'wifi':
-                    self.wifi = short_
-                if kind_ == 'cables':
-                    self.cables = short_
-                if kind_ == 'soft':
-                    self.soft = short_
-
-                self.hend_input = '' # после ввода очищаем поле
 
             super().save(*args, **kwargs)
 #

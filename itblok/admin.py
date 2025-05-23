@@ -17,7 +17,7 @@ class ItblokComputersAdmin(admin.ModelAdmin):
     #
     list_max_show_all = 1000
     change_form_template = 'admin/change_form_itblok.html'
-    list_display = ('name_computers', 'is_active', 'price_parts',
+    list_display = ('name_computers', 'comp_name_plus', 'is_active', 'price_parts',
     'price_special', 'rentability', 'procent_prom', 'price_prom',
     'price_main',)
     list_filter = (ItSeriesFilter, ItGrupsFilter, 'is_active',

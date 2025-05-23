@@ -177,31 +177,72 @@ def edit_parts_pack(request, comp_pack):
 
         count = 0
         if kind_ in ('aproc', 'iproc',):
-            count = comps.update(cpu=short_)
+            for comp in comps:
+                comp.cpu = short_
+                comp.save()
+            #count = comps.update(cpu=short_)
         if kind_ in ('amb', 'imb',):
-            count = comps.update(mb=short_)
+            for comp in comps:
+                comp.mb = short_
+                comp.save()
+            #count = comps.update(mb=short_)
         if kind_ == 'cool':
-            count = comps.update(cooler=short_)
+            for comp in comps:
+                comp.cooler = short_
+                comp.save()
+            #count = comps.update(cooler=short_)
         if kind_ == 'mem':
-            count = comps.update(ram=short_)
+            for comp in comps:
+                comp.ram = short_
+                comp.save()
+            #count = comps.update(ram=short_)
         if kind_ == 'video':
-            count = comps.update(gpu=short_)
+            for comp in comps:
+                comp.gpu = short_
+                comp.save()
+            #count = comps.update(gpu=short_)
         if kind_ == 'hdd':
-            count = comps.update(hdd=short_)
+            for comp in comps:
+                comp.hdd = short_
+                comp.save()
+            #count = comps.update(hdd=short_)
         if kind_ == 'ssd':
-            count = comps.update(ssd=short_)
+            for comp in comps:
+                comp.ssd = short_
+                comp.save()
+            #count = comps.update(ssd=short_)
         if kind_ == 'ps':
-            count = comps.update(psu=short_)
+            for comp in comps:
+                comp.psu = short_
+                comp.save()
+            #count = comps.update(psu=short_)
         if kind_ == 'case':
-            count = comps.update(case=short_)
+            for comp in comps:
+                comp.case = short_
+                comp.save()
+            #count = comps.update(case=short_)
         if kind_ == 'vent':
-            count = comps.update(fan=short_)
+            for comp in comps:
+                comp.fan = short_
+                comp.save()
+            #count = comps.update(fan=short_)
         if kind_ == 'wifi':
-            count = comps.update(wifi=short_)
+            for comp in comps:
+                comp.wifi = short_
+                comp.save()
+            #count = comps.update(wifi=short_)
         if kind_ == 'cables':
-            count = comps.update(cables=short_)
+            for comp in comps:
+                comp.cables = short_
+                comp.save()
+            #count = comps.update(cables=short_)
         if kind_ == 'soft':
-            count = comps.update(soft=short_)
+            for comp in comps:
+                comp.soft = short_
+                comp.save()
+            #count = comps.update(soft=short_)
+
+        count = comps.count()
 
         messages.success(request,f"Изменены  {count} компов: {short_name}")
         return  HttpResponseRedirect(
