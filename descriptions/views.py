@@ -3,6 +3,8 @@ from .models import *
 from django.db.models import Q
 from cat.forms import *
 
+from django.db import transaction
+
 # shorts_in_comps
 
 def content_parts_filter(key_, value_, num="1"):
@@ -152,6 +154,75 @@ def content_parts_filter(key_, value_, num="1"):
     else:
         return value_
 #
+def in_comps_parts(short):
+    """
+    для in_comps_it_all
+    в данной short ставим/убираем галочку in_comps_it
+    """
+
+    kind, name = short.kind, short.name_parts
+
+    dict_ = {'aproc': Parts_short.objects.filter(cpu__isnull=False,
+                name_parts=name, kind=kind),
+                'iproc': Parts_short.objects.filter(cpu__isnull=False,
+                name_parts=name, kind=kind),
+                'amb': Parts_short.objects.filter(mb__isnull=False,
+                name_parts=name, kind=kind),
+                'imb': Parts_short.objects.filter(mb__isnull=False,
+                name_parts=name, kind=kind),
+                'mem': Parts_short.objects.filter(ram__isnull=False,
+                name_parts=name, kind=kind),
+                'hdd': Parts_short.objects.filter(hdd__isnull=False,
+                name_parts=name, kind=kind),
+                'ssd': Parts_short.objects.filter(ssd__isnull=False,
+                name_parts=name, kind=kind),
+                'video': Parts_short.objects.filter(gpu__isnull=False,
+                name_parts=name, kind=kind),
+                'ps': Parts_short.objects.filter(psu__isnull=False,
+                name_parts=name, kind=kind),
+                'vent': Parts_short.objects.filter(fan__isnull=False,
+                name_parts=name, kind=kind),
+                'case': Parts_short.objects.filter(case__isnull=False,
+                name_parts=name, kind=kind),
+                'cool': Parts_short.objects.filter(cooler__isnull=False,
+                name_parts=name, kind=kind),
+                }
+    if kind in dict_:
+        if dict_[kind].exists():
+            short.in_comps_it = True
+            return short
+        short.in_comps_it = False
+        return short
+    return None
+
+
+def in_comps_it_all():
+    """
+    ставим/убираем галочку 'in_comps_it' для всех Parts_short
+    (in_comps_it = True/False - присутствие в itblok сборках)
+    """
+
+    for_update = Parts_short.objects.all()
+
+    parts = list(for_update)
+    updated_parts = [
+        in_comps_parts(part)
+        for part in parts
+    ]
+
+    updated_parts_ok = [part for part in updated_parts if part]
+
+    try:
+        with transaction.atomic():
+            for_update.bulk_update(
+            updated_parts_ok, ['in_comps_it']
+            )
+    except:
+        updated_parts_ok = []
+
+    return len(updated_parts_ok)
+
+
 def current_in_comps(short):
     #  для shorts_in_comps
     search_term = short.name_parts
