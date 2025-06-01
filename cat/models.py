@@ -84,7 +84,7 @@ def result_saves(sender, instance, created, **kwargs):
     #)
 
 signals.post_save.connect(receiver=result_saves, sender=USD)
-#procent_to_payment class_computers class_computers=procent_to_payment(F('class_computers'))
+#
 
 class Parts_full(models.Model):
 
@@ -203,6 +203,7 @@ class Parts_short(models.Model):
     kind2 = models.BooleanField(default=False, verbose_name='выкл/вкл')
     config = models.BooleanField(default=True, verbose_name='конфиг')
     in_comps = models.BooleanField(default=False, verbose_name='в_сборке')
+    in_comps_it = models.BooleanField(default=False, verbose_name='itblok')
     date_chg = models.DateTimeField(null=True, blank=True,
     verbose_name='Дата посл. изменения')
     kind = models.CharField(null=True, blank=True,max_length=50,
@@ -621,7 +622,8 @@ class Articles(models.Model):
         ('soft', 'soft'),
         ('cables', 'cables'),
     )
-    article = models.CharField(max_length=50, db_index=True, verbose_name='Артикул', unique=True)
+    article = models.CharField(max_length=50, db_index=True, verbose_name='Артикул',
+    unique=True)
     providers = models.ManyToManyField(Providers)
     item_name = models.CharField(null=True, blank=True,max_length=100, db_index=True,
     verbose_name='Имя')

@@ -184,7 +184,7 @@ class ComputersAdmin(admin.ModelAdmin):
     change_time_assembly.short_description = 'Массовое изм срока сборки'
 
     def change_promotin_for_pack(self, request, queryset):
-        # change_time_assembly from cat.calc_comp.py
+        # change_promotin_for_comps from cat.calc_comp.py
         selected = queryset.values_list('pk', flat=True)
 
         return  HttpResponseRedirect(
@@ -281,14 +281,14 @@ class Parts_shortAdmin(admin.ModelAdmin):
     list_max_show_all = 1000
     form = Parts_short_se_Form
     list_display = (
-    'name_parts', 'in_comps', 'x_code', 'parts_full_price',
+    'name_parts', 'in_comps', 'in_comps_it', 'x_code', 'parts_full_price',
     'sklad_view', 'min_price', 'auto',
     'kind', 'itblok_versum_view', 'parts_full_view', 'get_providers',
     'description_view', 'special_price', 'config',
     )
-    list_editable = ('x_code', 'min_price', 'in_comps','auto')
+    list_editable = ('x_code', 'min_price', 'in_comps','auto', 'in_comps_it')
     list_filter = (PriceKindFilter, ShortsKind2Filter, ShortsAutoFilter,
-    ShortsIn_compsFilter, SpecialPriceFilter)
+    ShortsIn_compsFilter, 'in_comps_it', SpecialPriceFilter)
     #'hand',Parts_short_x_code_ListFilter
     search_fields = ['name_parts', 'x_code', 'partnumber_list']
     #autocomplete_fields = ['computer_shorts']
