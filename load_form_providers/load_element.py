@@ -5,7 +5,7 @@ from load_form_providers.mti import MTI
 from load_form_providers.itlink import ITLINK
 from load_form_providers.brain import BRAIN
 from load_form_providers.edg import EDG
-from load_form_providers.erc import  ERC
+#from load_form_providers.erc import  ERC
 from django.utils import timezone
 import os, django, pickle, json, re
 from load_form_providers.sheet_class import *
@@ -18,11 +18,11 @@ from django.db.models import Min
 import pandas as pd
 from sereja.settings import BASE_DIR
 import time as tme
-from load_form_providers.erc2 import *
+#from load_form_providers.erc2 import *
 from django.db.models import Q
 from django.db.models import Min
 from load_form_providers.dc_descr_catalog import to_model_price_from_dc, to_tech_price_from_dc
-from descriptions.views import shorts_in_comps
+from descriptions.views import shorts_in_comps, in_comps_it_all, in_comps_parts
 
 from load_form_providers.providers_to_price import *
 #providerprice_parts x_code price aall remainder test_comp in_comps prov
@@ -46,6 +46,7 @@ def for_clear_status(part):
 
 
 def clear_status_if_not_exists():
+    #
     tuple_kind = ('cool', 'imb', 'amb', 'case', 'ssd', 'hdd', 'aproc','iproc',
     'video', 'ps', 'mem', 'vent', 'cables')
 
@@ -375,9 +376,9 @@ def to_article2_1(d,pr=1):
         else:
             return 'aproc'
     else:
-        if re.findall(r'fm3|fm2|am3|am4|9830|320|450|x470|x570|a68|x399|trx40|550|520|amd|x670|650',d.lower()):
+        if re.findall(r'fm3|fm2|am3|am4|9830|320|450|x470|x570|a68|x399|trx40|550|520|amd|x670|650|850|870',d.lower()):
             return 'amb'
-        if re.findall(r'4005|1800|1900|61|41|81|110|310|365|360|z390|x299|410|z490|b460|z590|z690|370|470|510|b560|1200|h570|h610|b660|670|710|760|790|b750|intel',
+        if re.findall(r'4005|1800|1900|61|41|81|110|310|365|360|z390|x299|410|z490|b460|z590|z690|370|470|510|b560|1200|h570|h610|b660|670|710|760|790|b750|810|860|890|intel',
                     d.lower()):
             return 'imb'
         else:
@@ -584,7 +585,7 @@ def full_from_string_filter(string_filter,queryset):
 def Short_per_price_update(short):
     # для Short_per_x_code
     # new code - обновление цен по жесткой привязке к партнамберу
-    # и без short.save(), но + return short для одноврем записи в бд
+
     now = timezone.now()
     if short.parts_full.all().exists():
         full = short.parts_full.filter(
@@ -599,7 +600,7 @@ def Short_per_price_update(short):
                 short.auto = True
             short.kind2 = False # включаем если есть товар
             short.date_chg = now
-            #short.save()
+            short.save()
         else:
             search_term = short.name_parts
             queryset = Computers.objects.filter(
@@ -616,7 +617,7 @@ def Short_per_price_update(short):
                 short.kind2 = True # выключаем если нет товара и не в сборке
                 # инструкция для работников: ставить "в сборке" для детали
                 # вручную при добавлении в комп (чтоб избежать рассинхр!)
-                #short.save()
+                short.save()
     return short
 
 def Short_per_x_code_single(short):
@@ -671,163 +672,34 @@ def Short_per_x_code():
     """
     update = [Short_per_price_update(short) for short in short_list]
 
-    with transaction.atomic():
-        short_all.bulk_update(
-        update, ['auto', 'x_code', 'kind2', 'date_chg']
-        )
-
     len_ = len(update) if update else 0
 
     return len_
 
 
-def get_itlink():
-    usd = USD.objects.last()
-    usd_cuurency = usd.usd if usd.usd else 37
-    set_itlink = set()
-    count_no, count_on = 0, 0
-    dict1={'SSD':'ssd', 'Корпуса для ПК':'case',
-    'Адаптери, перехідники':None, 'Аудіо- та відеопристрої': None,
-    'Повербанки': None, 'Зарядні пристрої': None, 'Кишені и Rack пристрої': None,
-    'Электроинструменты': None, 'Мыши': None, 'Кулери': 'cool',
-    'Контроллеры, интерфейсные платы PCI, PCIE':None, 'Ноутбуки': None,
-    'Клавиатуры':None, 'Хаби USB и кард-рідери':None, 'Материнські плати': 0,
-    'Электросамокаты': None, 'Карманы и Rack устройства': None,
-    'Вентилятори': 'vent', 'Подставки для ноутбуков': None,
-    'Інше': None, 'Жорсткі диски': 'hdd', 'Портативні зарядні станції': None,
-    'Відеокарти':'video', "Модулі пам'яті": 'mem', 'Ноутбуки': None,
-    'Майнинг - райзери, адаптери': None, 'Маніпулятори': None,
-    'Процесори': 1, 'Джерело живлення': 'ps', 'Манипуляторы': None}
 
-    #itlink = pd.read_excel('/home/aleksey1652/Загрузки/прайс.xls', usecols=[0,2,3,6,7],header=None) erc
+def get_itlink():
+    """ """
+
+    filename = ForFiles['itlink']['filename']
+    cols = ForFiles['itlink']['cols']
+
     try:
         MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     except:
         print('error in MEDIA_ROOT')
     try:
-        #p1 = pd.read_excel(MEDIA_ROOT+'/1c.xlsx', usecols=cols,header=None)
-        itlink = pd.read_excel(MEDIA_ROOT+'/прайс.xls', usecols=[0,2,3,6,8,9],header=None)
+        row_data = pd.read_excel(MEDIA_ROOT+filename, usecols=cols, header=None)
     except Exception as e:
-        print(e.__class__)
-        return 0, 0, 0
-    itlink_=itlink.rename(columns={2:'partnumber_parts', 3:'name_parts',
-            8:'providerprice_parts',6:'availability_parts',
-            0:'subcategory',9:'rrp'})
-    for x in itlink_.iloc:
-        if isinstance(x['subcategory'],str) and x['subcategory'] in dict1:
-            temp=dict1[x['subcategory']]
-        elif isinstance(x['subcategory'],int):
-            try:
-                x['subcategory']=temp if temp not in (0,1) else to_article2_1(x["name_parts"],pr=temp)
-            except:
-                print(f" without category: {x['subcategory']}")
-                continue
-            if x['subcategory'] in ('ssd','hdd','video','cool','ps','case','iproc',
-            'aproc','imb','amb','mem','vent'):
-                set_itlink.add(x['partnumber_parts'])
-                try:
-                    pa,n,pr,av,kind,rrp = (
-                    x['partnumber_parts'].strip(),
-                    x['name_parts'].strip(),
-                    x['providerprice_parts'],
-                    x['availability_parts'],
-                    x['subcategory'],
-                    x['rrp'],)
-                except Exception as e:
-                    print(e.__class__)
-                    continue
-                try:
-                    pr = round(float(pr))
-                except:
-                    pr = 0
-                try:
-                    rrp = round(float(rrp))
-                except:
-                    rrp = 0
-                if isinstance(av,str) and av in (
-                'есть', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1'):
-                    av = 'yes'
-                elif isinstance(av,int) and av != 0:
-                    av = 'yes'
-                else:
-                    av = 'q'
-                #print((pa,av),end=' ')
-                prov,_ = Providers.objects.get_or_create(name_provider='itlink')
-                prov1 = Providers.objects.get(name_provider='-')
-                p1 = Parts_full.objects.filter(partnumber_parts=pa,providers=prov)
-                try:
-                    a1,_ = Articles.objects.get_or_create(article=pa,item_name=n,item_price=kind)
-                except:
-                    a1 = Articles.objects.get(article=pa)
-                if not p1:
-                    p_itl = Parts_full.objects.create(name_parts=n,
-                    partnumber_parts=pa,providers=prov,
-                    providerprice_parts=pr,date_chg=timezone.now(),
-                    availability_parts=av,kind=kind, rrprice_parts=rrp)
-                    a1.parts_full.add(p_itl)
-                    count_no += 1
-                elif p1.count() > 0:
-                    temp2 = p1.first()
-                    if not a1.parts_full.filter(pk=temp2.pk):
-                        a1.parts_full.add(temp2)
-                    temp2.availability_parts = av
-                    temp2.providerprice_parts = pr
-                    temp2.rrprice_parts = rrp
-                    temp2.date_chg = timezone.now()
-                    temp2.kind = kind
-                    temp2.save()
-                    count_on += 1
-                    if p1.count() > 1:
-                        #print(f'count:{p1.count()} ')
-                        for x in p1[1:]:
-                            x.delete()
-                if Parts_full.objects.filter(partnumber_parts=pa,providers=prov1).exists():
-                    if av == 'yes':
-                        pl = Parts_full.objects.filter(partnumber_parts=pa,providers=prov1)[0]
-                        try:
-                            if float(pl.providerprice_parts)!= 0 and float(pl.providerprice_parts) >= float(pr):
-                                pl.providerprice_parts = pr
-                                pl.rrprice_parts = rrp
-                                pl.name_parts_main = 'itlink'
-                                pl.availability_parts = av
-                                pl.date_chg=timezone.now()
-                                pl.save()
-                                get_distrib2(pl.kind, pl.partnumber_parts)
-                            elif float(pl.providerprice_parts) == 0 and float(pr):
-                                pl.providerprice_parts = pr
-                                pl.rrprice_parts = rrp
-                                pl.name_parts_main = 'itlink'
-                                pl.availability_parts = av
-                                pl.date_chg=timezone.now()
-                                pl.save()
-                                get_distrib2(pl.kind, pl.partnumber_parts)
-                        except:
-                            print(f'error in itlink element:{pa}')
-                else:
-                    pr = pr if av == 'yes' else 0
-                    name_parts_main = 'itlink' if av == 'yes' else None
-                    p_main = Parts_full.objects.create(name_parts=n,
-                    partnumber_parts=pa,providers=prov1,
-                    providerprice_parts=pr,date_chg=timezone.now(),
-                    availability_parts=av,kind=kind,name_parts_main=name_parts_main,
-                    rrprice_parts=rrp)
-                    a1.parts_full.add(p_main)
-                    get_distrib2(kind,pa)
-    pp = Parts_full.objects.exclude(
-    partnumber_parts__in=set_itlink).filter(providers__name_provider='itlink')
-    pp.update(availability_parts='no',providerprice_parts=0,date_chg = timezone.now())
-    if not Results.objects.filter(who='itlink').exists():
-        r = Results(who='itlink',
-        who_desc=f'Itlink add: {count_no} objects, and update: {count_on} objects')
-        r.save()
-    else:
-        r = Results.objects.get(who='itlink')
-        r.who_desc = f'Itlink add: {count_no} objects, and update: {count_on} objects'
-        r.save()
+        return e
 
-    Short_per_x_code()
+    it = From_file_to_bd(row_data)
+    _ = it.getDataFile('get_itlink')
 
-    return count_no, count_on, pp
+    short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
+    #print(f'Short_per_x_code: {short_all}')
+
+    return _
 
 
 def Parsing_from_providers():
@@ -848,12 +720,17 @@ def Parsing_from_providers():
     """
 
     prov_ = ('dc', 'asbis', 'elko', 'brain', 'mti', 'edg') # кортеж для Parts_full
+    # prov_ ниже - новый алг: оставляем прайс от пров старым если не загрузили
+    #prov_ = [] # список для Parts_full (наполняем позже, если загрузили)
+    prov_file = ('itlink', 'erc', 'be', 'dw', 'pccooler') # кортеж для Parts_full '-'
 
     Parts_full.objects.filter( # выключаем все детали из prov_ + '-'
-    providers__name_provider__in=prov_ + ('-',)).update(
+    providers__name_provider__in=prov_ + ('-',)).exclude(
+    name_parts_main__in=prov_file).update(
     availability_parts='no', providerprice_parts=0,
     rrprice_parts=0, name_parts_main=None)
     #.exclude(remainder__isnull=False) ???? исключая склад
+    print(f'test: {prov_}')
 
     usd = USD.objects.last()
     usd_ua = usd.usd # курс установленный вручную из админки
@@ -869,6 +746,7 @@ def Parsing_from_providers():
     }
 
     # dict_message библиотека от всех постачей с результатами конечной работы
+    empty_error = False # маркер для dict_message (если True - загрузили с файла)
     dict_message = {
     'dc': '',
     'asbis': '',
@@ -880,13 +758,14 @@ def Parsing_from_providers():
     }
 
     # dict_attr для общего доступа к методам класса From_provders_to_dict
+    #  имя файла для доступа к вчерашней(или более ранней) инфе из файла
     dict_attr = {
-    'dc': 'getDC',
-    'asbis': 'getASBIS',
-    'elko': 'getELKO',
-    'brain': 'getBRAIN',
-    'mti': 'getMTI',
-    'edg': 'getEDG',
+    'dc': ('getDC', 'load_form_providers/dclink-price.xml'),
+    'asbis': ('getASBIS', 'load_form_providers/asbis-price.xml'),
+    'elko': ('getELKO', 'load_form_providers/elko-price.json'),
+    'brain': ('getBRAIN', 'load_form_providers/brain-price.json'),
+    'mti': ('getMTI', 'load_form_providers/mti_price.xml'),
+    'edg': ('getEDG', 'load_form_providers/edg-price.xml'),
     }
 
     # class_prov для работы с циклом обьектов класса From_provders_to_dict
@@ -912,11 +791,19 @@ def Parsing_from_providers():
                 res = None
         print(f'{key} data_upload: {type(res)}')
         f = From_provders_to_dict(usd_ua, res)
-        dict_ = f.GetPriceAll(dict_attr[key]) # словарь с данными для отправки в бд
+        dict_ = f.GetPriceAll(dict_attr[key][0]) # словарь с данными для отправки в бд
+        if not dict_:
+            # загружаем прайс из файла если не загрузили
+            print('загружаем прайс из файла')
+            dict_ = f.GetPriceAll(dict_attr[key][0], file=dict_attr[key][1])
+            empty_error = True # маркер для dict_message
         print(f'{key} data_edited size: {len(dict_)}')
         dict_full[key] = dict_ # потом используем для обновл/созд '-' постача Parts_full
         dict_message[key] = currentProvToBd(dict_, key) # обновляем/создаем бд,
         # записывем в dict_message message по работе для текущего key
+        if empty_error:
+            dict_message[key]['empty_error'] = 1 # работаем но сигнализируем ошибку
+
 
     dict_message['-'] = mainProvToBd(dict_full) # для '-' обновляем/создаем бд
 
@@ -924,18 +811,21 @@ def Parsing_from_providers():
     duration = str(end-start)[2:7]
     print(f'{duration} min')
 
-    short_in  = shorts_in_comps() #проверка есть ли шортс в сборках(in_comps в Parts_short)
-    print(f'shorts_in_comps: {short_in}')
-
-    short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
-    print(f'Short_per_x_code: {short_all}')
-
     sklsdWith, sklsdOnly = bdRemainder() # обрабатываем склад
     # (из "price:2.42; 8" в providerprice_parts при надобности)
     print(f'кол склад_с_постач: {sklsdWith}, кол склад_только: {sklsdOnly}')
 
     count_clear = clear_status_if_not_exists() #  очистка "-" пустых
     test_sklad = f'{sklsdOnly}--clear: {count_clear}' # пока для теста очистки
+
+    short_in  = shorts_in_comps() #проверка есть ли шортс в сборках(in_comps в Parts_short)
+    print(f'shorts_in_comps: {short_in}')
+
+    short_in_it = in_comps_it_all() #проверка есть ли шортс в сборках itblok
+    print(f'short_in_it: {short_in_it}')
+
+    short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
+    print(f'Short_per_x_code: {short_all}')
 
     updateResults(dict_message, duration, short_all, short_in, sklsdWith, test_sklad
     ) #записываем в бд(Results.objects) dict_message и доп
