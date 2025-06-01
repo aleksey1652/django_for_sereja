@@ -294,7 +294,7 @@ class ItblokComputers(models.Model):
             ps = re.findall(r'\s(\d{2,4})w', self.psu.name_parts.lower())[0] + 'w'
         except:
             ps = ''
-        if self.case.name_parts.lower().find('white') != -1:
+        if self.case and self.case.name_parts.lower().find('white') != -1:
             return f'{mem}-{mb}-{ssd}-{ps}-white'
         return f'{mem}-{mb}-{ssd}-{ps}'
 
@@ -324,7 +324,7 @@ class ItblokComputers(models.Model):
                 short_name = self.hend_input
                 #
                 try:
-                    short_ = short.objects.get(name_parts=short_name, kind2=False)
+                    short_ = short.objects.get(name_parts=short_name)
                     kind_ = short_.kind
                 except:
                     super().save(*args, **kwargs)
