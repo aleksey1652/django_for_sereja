@@ -6,24 +6,12 @@ import os,re
 import datetime
 import time as tme
 from django.utils import timezone
-import pandas as pd
-from get_service import Service
-from load_form_providers.load_element import *
-from pars.fury import *
-from pars.itblok import *
-from pars.versum import *
-from pars.ua import *
-from pars.art import *
-from scrapy import get_video,get_cpu,get_mb,get_case,get_ps,get_cool,get_hdd_ssd,get_mem
+#import pandas as pd
 from django.urls import reverse
 from django.contrib import messages
-from sereja.tasks import *
 from celery.schedules import crontab
-from cat.models import *
-from descriptions.models import *
 from django.contrib import messages
 from django.db.models import Min
-from cat.forms import ShortSearchForm,ArticleCreateForm,ShortCreateForm,ShortdeForm,FulldeForm,Pc_assemblyForm,MailForm
 from django.db.models import Q
 from django.conf import settings
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -31,18 +19,30 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import serializers
-from .serializers import *
-from sereja.settings import *
 from celery.result import AsyncResult
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
-#from money.models import Gross_profit, Expense, Koefficient, Plan
+
 from money.onec_transforms import *
 from markdowns.views import mark_comps_parts
-#from django.core.files.storage import FileSystemStorage versum_api
-#Parts_full providerprice_parts x_code price uploader
-#from pars.itblok import compare_it_art versum_api_new
-#from django.core.paginator import Paginator versum_single_parts uploader
+#from load_form_providers.load_element import * !!! in sereja.tasks import
+#from load_form_providers.erc2 import * !!! in sereja.tasks import
+from pars.fury import *
+from pars.itblok import *
+from pars.versum import *
+from pars.ua import *
+from pars.art import *
+from cat.models import *
+from descriptions.models import *
+
+from cat.forms import ShortSearchForm,ArticleCreateForm,ShortCreateForm,ShortdeForm,FulldeForm,Pc_assemblyForm,MailForm
+from .serializers import *
+from sereja.settings import *
+from get_service import Service
+from scrapy import get_video,get_cpu,get_mb,get_case,get_ps,get_cool,get_hdd_ssd,get_mem
+from sereja.tasks import *
+#
+
 @csrf_exempt
 @require_POST
 def webhook(request):
@@ -94,9 +94,14 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс.xls')
-        count_no, count_on, pp = get_itlink()
+        _ = get_itlink()
+        try:
+            test = _[0]
+        except:
+            test = 'error type'
+
         messages.success(request,
-        f'From file it was add in db: {count_no} and update: {count_on} ')
+        f'From file it was add in db: {test} and update: *')
     if request.method == 'POST' and 'erc' in request.FILES:
         try:
             usd_ = USD.objects.first().usd
