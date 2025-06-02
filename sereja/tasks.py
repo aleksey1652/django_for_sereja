@@ -9,6 +9,7 @@ from django.template import Engine, Context
 
 #from cat.models import *
 from load_form_providers.load_element import *
+from load_form_providers.erc2 import *
 from cat.views_to_admin_try import get_soup_art
 from pars.fury import *
 from pars.itblok import *
@@ -62,6 +63,10 @@ def task_fury():
 @app.task
 def task_itblok():
     load_itblok()
+
+@app.task
+def task_itlink():
+    get_itlink()
 
 @app.task
 def task_versum():
