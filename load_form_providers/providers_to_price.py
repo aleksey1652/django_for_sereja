@@ -1,6 +1,8 @@
 import requests, re, json
+import pandas as pd
 from lxml import etree
 import heapq
+import os
 
 from cat.models import Providers, Parts_full, Results
 
@@ -11,8 +13,43 @@ from django.db.models import F, FloatField, IntegerField, CharField, Value
 from django.db.models.functions import Substr, Cast, StrIndex
 
 
+def to_article2_1(d,pr=1):
+    """ убрать в load_element, erc2 и оставить только здесь """
+
+    if pr==1:
+        if d.lower().find('core') !=-1:
+            return 'iproc'
+        elif d.lower().find('pentium') !=-1:
+            return 'iproc'
+        elif d.lower().find('celeron') !=-1:
+            return 'iproc'
+        elif d.lower().find('xeon') !=-1:
+            return 'iproc'
+        elif d.lower().find('intel') !=-1:
+            return 'iproc'
+        else:
+            return 'aproc'
+    else:
+        if re.findall(r'fm3|fm2|am3|am4|9830|320|450|x470|x570|a68|x399|trx40|550|520|amd|x670|650|850|870',d.lower()):
+            return 'amb'
+        if re.findall(r'4005|1800|1900|61|41|81|110|310|365|360|z390|x299|410|z490|b460|z590|z690|370|470|510|b560|1200|h570|h610|b660|670|710|760|790|b750|810|860|890|intel',
+                    d.lower()):
+            return 'imb'
+        else:
+            return 'amb'
+
+
 def bdRemainder():
-    # прверить алгоритм!!!
+    """
+    Склад
+
+    обновляем в Parts_full цену по складу, включаем если надо,
+    в 1-го поставщика 'склад' если надо
+
+    count_empty - только склад,
+    count_no_empty - цена на складе дешевле чем от постачей
+    возвращаем count_no_empty, count_empty
+    """
 
     now = timezone.now()
 
@@ -29,7 +66,7 @@ def bdRemainder():
     ).filter(price_remainder__lt=F('providerprice_parts'))
 
     count_no_empty = no_empty.update(
-    providerprice_parts=F('price_remainder'),
+    providerprice_parts=F('price_remainder'), name_parts_main='склад',
     date_chg=now) # склад цену в providerprice_parts
 
     empty = remainder_.filter(availability_parts='no').annotate( # есть только на складе
@@ -44,13 +81,19 @@ def bdRemainder():
     count_empty = empty.update(
     providerprice_parts=F('price_remainder'),
     availability_parts='yes',
+    name_parts_main='склад',
     date_chg=now) # склад цену в providerprice_parts и включаем 'yes'
 
     return (count_no_empty, count_empty) # кол склад_с_постач, кол склад_только
 
 
 def bdUpdate(dict_, part):
-    #
+    """
+    для конкретного prov_ обновляем Parts_full
+    используя dict_ скач/обраб от prov_
+    возвращаем обновленный part
+    """
+
     now = timezone.now()
 
     try:
@@ -68,7 +111,11 @@ def bdUpdate(dict_, part):
     return part
 
 def bdCreate(dict_, prov_):
-    #
+    """
+    для конкретного prov_ создаем Parts_full
+    используя dict_ скач/обраб от prov_
+    возвращаем full или None(при неудаче)
+    """
 
     prov = Providers.objects.get(name_provider=prov_)
 
@@ -92,8 +139,92 @@ def bdCreate(dict_, prov_):
     return full
 
 
+def bdCreateFile(dict_res, article, prov):
+    """
+    для '-' создаем Parts_full
+    используя dict_res
+    prov для 1поставщика name_parts_main
+    """
+
+    now = timezone.now()
+    prov_ = Providers.objects.get(name_provider='-')
+
+    try:
+        dict_ = dict_res[article]
+        full = Parts_full(
+        name_parts=dict_['name_parts'],
+        partnumber_parts=dict_['partnumber_parts'],
+        availability_parts='yes',
+        providerprice_parts=dict_['providerprice_parts'],
+        rrprice_parts=dict_['RRP_UAH'],
+        kind=dict_['kind'],
+        date_chg=now,
+        providers=prov_,
+        name_parts_main=prov,
+        )
+    except:
+        return None
+
+    return full
+
+def bdUpdateFile(part):
+    """
+    !!! дораб это
+    для конкретного prov_ обновляем Parts_full
+    используя dict_ скач/обраб от prov_
+    """
+
+    now = timezone.now()
+    avail = 'yes'
+    article = part.partnumber_parts
+
+    try:
+        full_min = Parts_full.objects.filter(partnumber_parts=article,
+        providerprice_parts__gt=0, availability_parts='yes'
+        ).exclude(
+        providers__name_provider='-'
+        ).order_by('providerprice_parts').first()
+
+        price = full_min.providerprice_parts
+        rrp = full_min.rrprice_parts
+        prov = full_min.providers.name_provider
+    except:
+        if not part.remainder:
+            avail = 'no'
+            price = 0
+            rrp = 0
+            prov = None
+        else:
+            return part
+
+    part.providerprice_parts = price
+    part.rrprice_parts = rrp
+    part.availability_parts = avail
+    part.date_chg = now
+    part.name_parts_main = prov
+
+    return part
+
+def bdOldUpdateFile(part, prov):
+    """
+    !!! дораб это
+    для конкретного prov_ обновляем Parts_full
+    используя dict_ скач/обраб от prov_
+    """
+
+    now = timezone.now()
+
+    return part
+
+
 def bdUpdateMain(dict_full, part):
-    #
+    """
+    для "-" Parts_full обновляем
+    используя dict_full скач/обраб от prov_
+    используем find_min_price: находим постача с мин ценой
+    возвращаем обновленный part
+    """
+
     now = timezone.now()
     avail = 'yes'
 
@@ -105,6 +236,7 @@ def bdUpdateMain(dict_full, part):
         avail = 'no'
         price = 0
         prov_min = None
+        rrp = 0
 
     part.providerprice_parts = price
     part.rrprice_parts = rrp
@@ -116,7 +248,13 @@ def bdUpdateMain(dict_full, part):
     return part
 
 def bdCreateMain(dict_full, article):
-    #
+    """
+    для "-" Parts_full создаем новый full
+    используя dict_full скач/обраб от prov_
+    используем find_min_price: находим постача с мин ценой
+    возвращаем full или None(при неудаче)
+    """
+
     now = timezone.now()
     avail = 'yes'
     prov = Providers.objects.get(name_provider='-')
@@ -144,10 +282,40 @@ def bdCreateMain(dict_full, article):
     return full
 
 
+def find_min_bd(data, article):
+    """ищем мин цену от files_providers, если есть - добавляем к data,
+       возвращаем data неизменной или обновленной от files_providers
+    """
+
+    files_providers = ('itlink', 'erc', 'be', 'dw', 'pccooler')
+
+    files = Parts_full.objects.filter(
+    partnumber_parts=article, providers__name_provider__in=files_providers,
+    availability_parts='yes', providerprice_parts__gt=0)
+
+    if files.exists():
+        min_prov = files.annotate(
+        provider=F('providers__name_provider'),
+        RRP_UAH=F('rrprice_parts')
+        ).values(
+        'provider', 'providerprice_parts',
+        'RRP_UAH', 'availability_parts',
+        'name_parts', 'partnumber_parts', 'kind'
+        ).order_by('providerprice_parts').first()
+
+        dict_ = dict(min_prov)
+        if dict_:
+            data[dict_['provider']] = {dict_['partnumber_parts']: dict_}
+
+    return data
+
+
 def find_min_price(data, article):
-    """ищем мин цену из сумарного словаря поставщиков
+    """ищем мин цену из сумарного словаря поставщиков + от файловых постачей find_min_bd,
        возвращаем кортеж, например: ('dc', {словарь с инфой, в том числе и мин ценой})
     """
+
+    data = find_min_bd(data, article) # добавляем в data файловых постачей, если они есть
 
     heap = [
         (source[article]['providerprice_parts'], key, source[article])
@@ -206,6 +374,84 @@ def updateResults(dict_message, duration, short_all, short_in, sklsdWith, sklsdO
         r.save()
 
     return True
+
+
+def currentFileToBd(dict_res, prov):
+    """
+    создание/апдейт для "-" name_parts_main prov из руч-скач файла prov
+    """
+
+    mes_prov = {
+    'name_prov': 'main',
+    'new': 0,
+    'update': 0,
+    'diff_error': 0,
+    'empty_error': 0
+    }
+
+    set_prov = set(dict_res)
+
+    old_main = Parts_full.objects.filter(providers__name_provider='-',
+    name_parts_main=prov).exclude(partnumber_parts__in=set_prov)
+    # "-" где 1-й поставщик: prov, но его нет в set_prov, сделаем апдейт цены
+    # для "-" если есть от других постачей или делаем неактивным
+
+    for_update = Parts_full.objects.filter(providers__name_provider='-',
+    partnumber_parts__in=set_prov) #  все "-" от свежего set_prov
+
+    old_parts = list(old_main)
+    old_updated_parts = [
+        bdUpdateFile(part)
+        for part in old_parts
+    ]
+
+    try:
+        with transaction.atomic():
+            old_main.bulk_update(
+            old_updated_parts, [
+            'providerprice_parts', 'rrprice_parts', 'availability_parts', 'date_chg',
+            'name_parts_main']
+            )
+    except:
+        old_updated_parts = []
+
+    parts = list(for_update)
+    updated_parts = [
+        bdUpdateFile(part)
+        for part in parts
+    ]
+
+    try:
+        with transaction.atomic():
+            for_update.bulk_update(
+            updated_parts, [
+            'providerprice_parts', 'rrprice_parts', 'availability_parts', 'date_chg',
+            'name_parts_main']
+            )
+    except:
+        updated_parts = []
+
+    new_parts = [
+        bdCreateFile(dict_res, article, prov)
+        for article in set_prov if not \
+        Parts_full.objects.filter(providers__name_provider='-',
+        partnumber_parts=article).exists()
+    ] # создаем новые "-" от свежего set_prov
+
+    new_parts_ok = [new for new in new_parts if new] # на случай, если bdCreateFile None
+
+    try:
+        with transaction.atomic():
+            new_in_bd = Parts_full.objects.bulk_create(new_parts_ok)
+    except:
+        new_in_bd = []
+
+    diff = len(new_parts) - len(new_parts_ok)
+    mes_prov['new'] = len(new_in_bd)
+    mes_prov['update'] = f'свежий прайс: {len(updated_parts)};без: {len(old_updated_parts)}'
+    mes_prov['diff_error'] = diff
+
+    return mes_prov
 
 
 def mainProvToBd(dict_):
@@ -369,7 +615,7 @@ OnlyGroups = {
 'PSU', 'SSM', 'MBI', 'SSU', 'CPU', 'COS',
 ),
 'mti': (
-'199', '143' '119','111', '115', '118',
+'199', '143', '119', '111', '115', '118',
 '112', '1668', '116', '114', '121', '122'
 ),
 'brain': (
@@ -561,8 +807,11 @@ class From_provders_to_dict:
     def _loadFromFile(filename):
         # альтернативная загрузка xml данных от поставщика
 
-        with open(filename, 'rb') as fobj:
-            xml = fobj.read()
+        try:
+            with open(filename, 'rb') as fobj:
+                xml = fobj.read()
+        except FileNotFoundError:
+            return None
 
         return xml
 
@@ -570,8 +819,11 @@ class From_provders_to_dict:
     def _loadFromFileJson(filename):
         # альтернативная загрузка json данных от поставщика
 
-        with open(filename, "r") as w:
-            json_ = json.load(w)
+        try:
+            with open(filename, "r") as w:
+                json_ = json.load(w)
+        except FileNotFoundError:
+            return None
 
         return json_
 
@@ -826,9 +1078,10 @@ class From_provders_to_dict:
         '122': 'cool',
         '121': 'vent',
         '118': 'case',
-        '111': 'hdd',
+        '115': 'hdd',
         '119': 'ps',
         '143': 'video',
+        '111': 'video',
         '116': 'ssd',
         '1668': 'mem',
         '143': 'mon',
@@ -1070,6 +1323,223 @@ class From_provders_to_dict:
             return f"Метод {current} не найден"
 
 
+#
+ForFiles = {
+'list_category': (
+    'kind', 'partnumber_parts',
+    'name_parts', 'availability_parts',
+    'providerprice_parts','RRP_UAH'
+    ),
+'itlink': {
+    'mes': {
+        'name_prov': 'itlink',
+        'new': 0,
+        'update': 0,
+        'diff_error': 0,
+        'empty_error': 0
+    },
+    'catalog': {
+        'SSD':'ssd',
+        'Корпуса для ПК':'case',
+        'Кулери': 'cool',
+        'Материнські плати': 0,
+        'Вентилятори': 'vent',
+        'Жорсткі диски': 'hdd',
+        'Відеокарти':'video',
+        "Модулі пам'яті": 'mem',
+        'Процесори': 1,
+        'Джерело живлення': 'ps',
+    },
+    'filename': '/прайс.xls',
+    'cols': (0,2,3,6,8,9)
+}
+}
+
+def itlink_avail(values):
+    """
+    метод для преобразования availability_parts для itlink
+    """
+
+    try:
+        avail = 'yes' if int(values) > 0 else 'no'
+    except (ValueError, TypeError):
+        avail = 'yes' if values == 'есть' else 'no'
+
+    return avail
+
+
+class From_file_to_bd:
+    """  """
+
+    def __init__(self, content):
+        # загружаем скачанный контент
+        self.content = content
+
+
+    def clearProvDb(self, provname):
+        """ """
+
+        count = Parts_full.objects.filter( # выключаем все детали из provname
+        providers__name_provider=provname).update(
+        availability_parts='no', providerprice_parts=0, rrprice_parts=0)
+
+        return count
+
+
+    def itlink_dictToOrder(self, dict_, row_category):
+        """ """
+
+        rrp = dict_['RRP_UAH']
+        rrp = rrp if pd.notna(rrp) else 0
+        dict_['RRP_UAH'] = rrp
+
+        if row_category in (0,1):
+            row_category = to_article2_1(dict_['name_parts'], pr=row_category)
+        dict_['kind'] = row_category
+
+        dict_['availability_parts'] = itlink_avail(dict_['availability_parts'])
+
+        dict_['name_parts'] = dict_['name_parts'][:50]
+
+        return dict_
+
+    def get_itlink(self):
+        """
+        """
+
+        dict_res = {}
+        itlink = self.content
+
+        itlink_catalog = ForFiles['itlink']['catalog']
+        list_category = ForFiles['list_category']
+
+        count = self.clearProvDb('itlink')
+
+        current_category = None
+
+        for row in itlink.itertuples(index=False):
+            if row[0] in itlink_catalog:
+                current_category = row[0]
+            if row[0] not in itlink_catalog and not pd.notna(row[1]):
+                current_category = None
+            if pd.notna(row[1]) and current_category:
+                temp = dict(
+                zip(
+                list_category, tuple(row)
+                ))
+                new_dict = self.itlink_dictToOrder(temp, itlink_catalog[current_category])
+                dict_res[new_dict['partnumber_parts']] = new_dict
+
+        return dict_res
+
+    def getDataFile(self, current):
+        """
+        Универсальный вызов для всех get_itlink, ..., getEDG
+        current = 'get_itlink' (например)
+        возвращает один из get_itlink, ..., getEDG
+        """
+
+
+        start = timezone.now()
+
+        current_fun = getattr(self, current, None)  # Проверяем наличие метода current
+        if callable(current_fun):  # Вызываем, если метод существует
+            dict_res = current_fun()
+
+        if not dict_res:
+            # доработать с Results ForFiles['itlink']['mes']
+            return ('ERROR', '00: 00')
+
+        mes = currentProvToBd(dict_res, 'itlink') # создание апдейт для itlink
+
+        mes_file = currentFileToBd(dict_res, 'itlink') # создание апдейт для "-" от itlink
+
+        end = timezone.now()
+
+        duration = str(end-start)[2:7]
+        #print(f'{duration} min')
+
+        time_message = f';\n time: {duration}min'
+
+        str_message = f"{mes['name_prov']}: new = {mes['new']}, update =\
+        {mes['update']}, error = {mes['diff_error']}/{mes['empty_error']}"
+
+        str_main_mes = f";\n{mes_file['name_prov']}: new = {mes_file['new']}, update =\
+        {mes_file['update']}, error = {mes_file['diff_error']}/{mes_file['empty_error']}"
+
+        prov_message = str_message + str_main_mes + time_message # + sklsd
+
+        if not Results.objects.filter(who='itlink').exists():
+            r = Results(who='itlink',
+            who_desc=prov_message)
+            r.save()
+        else:
+            r = Results.objects.get(who='itlink')
+            r.who_desc = prov_message
+            r.save()
+
+        return (mes, duration)
+
+
+
 """
 3,5" 3Tb Seagate
+3,5" 6Tb Seagate
+
+def in_comps_parts(short):
+    kind, name = short.kind, short.name_parts
+    dict_ = {'aproc': Parts_short.objects.filter(cpu__isnull=False,
+                name_parts=name, kind=kind),
+                'iproc': Parts_short.objects.filter(cpu__isnull=False,
+                name_parts=name, kind=kind),
+                'amb': Parts_short.objects.filter(mb__isnull=False,
+                name_parts=name, kind=kind),
+                'imb': Parts_short.objects.filter(mb__isnull=False,
+                name_parts=name, kind=kind),
+                'mem': Parts_short.objects.filter(ram__isnull=False,
+                name_parts=name, kind=kind),
+                'hdd': Parts_short.objects.filter(hdd__isnull=False,
+                name_parts=name, kind=kind),
+                'ssd': Parts_short.objects.filter(ssd__isnull=False,
+                name_parts=name, kind=kind),
+                'video': Parts_short.objects.filter(gpu__isnull=False,
+                name_parts=name, kind=kind),
+                'ps': Parts_short.objects.filter(psu__isnull=False,
+                name_parts=name, kind=kind),
+                'vent': Parts_short.objects.filter(fan__isnull=False,
+                name_parts=name, kind=kind),
+                'case': Parts_short.objects.filter(case__isnull=False,
+                name_parts=name, kind=kind),
+                'cool': Parts_short.objects.filter(cooler__isnull=False,
+                name_parts=name, kind=kind),
+                }
+    if kind in dict_:
+        if dict_[kind].exists():
+            short.in_comps_it = True
+            return short
+    return None
+
+def in_comps_it_all():
+    #
+    for_update = Parts_short.objects.all()
+
+    parts = list(for_update)
+    updated_parts = [
+        in_comps_parts(part)
+        for part in parts
+    ]
+
+    updated_parts_ok = [part for part in updated_parts if part]
+
+    try:
+        with transaction.atomic():
+            for_update.bulk_update(
+            updated_parts_ok, ['in_comps_it']
+            )
+    except:
+        updated_parts_ok = []
+
+
+
+
 """
