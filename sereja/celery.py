@@ -15,6 +15,10 @@ app.conf.beat_schedule = {
         'task': 'sereja.tasks.task_providers',
         'schedule': crontab(minute=0, hour=0)
     },
+    'itblok_comps': {
+        'task': 'sereja.tasks.task_itblok_comps',
+        'schedule': crontab(minute=20, hour=0)
+    },
     'pars-tech': {
         'task': 'sereja.tasks.task_tech_price',
         'schedule': crontab(minute=30, hour=0)

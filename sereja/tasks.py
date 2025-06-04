@@ -17,6 +17,7 @@ from pars.versum import *
 from pars.ua import *
 from pars.art import *
 from rivals.views import *
+from itblok.views import save_itblok_comps
 
 def render_template(template, context):
     engine = Engine.get_default()
@@ -68,9 +69,11 @@ def task_itblok():
 def task_itlink():
     get_itlink()
 
+
 @app.task
-def task_versum():
-    load_versum()
+def task_itblok_comps():
+    save_itblok_comps()
+#
 
 @app.task
 def task_ua():
