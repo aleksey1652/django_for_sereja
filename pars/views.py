@@ -247,6 +247,20 @@ def uploader(request,w):
         request,
         'Price updating '+(timezone.now()+timezone.timedelta(hours=3)).strftime("%m/%d--%H:%M")
         )
+
+    if w == 'itblok_comps':
+        try:
+            task_itblok_comps.delay()
+        except:
+            save_itblok_comps()
+            messages.success(
+            request, 'Itblok updating without tasc'+timezone.now().strftime("%m/%d--%H:%M")
+            )
+        messages.success(
+        request,
+        'Itblok comps updating '+(timezone.now()+timezone.timedelta(hours=3)).strftime("%m/%d--%H:%M")
+        )
+
     if w == 'tech':
         try:
             task_tech_price.delay()
