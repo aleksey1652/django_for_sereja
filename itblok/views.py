@@ -13,12 +13,33 @@ import re, json
 
 from .models import *
 from cat.models import Parts_short as short
-from cat.models import USD
+from cat.models import USD, Results
 from cat.forms import ComputersForm
 from cat.forms_admin_comps import Form_num_vent, Form_text_input
 from singleparts.forms import labelsForm
 from .serializers import ITSer
 
+
+def save_itblok_comps():
+    """
+    для sereja.tasks - пересчет цены и внутр описания для каждого компа
+    и запись в Results 
+    """
+
+    comps = ItblokComputers.objects.all()
+
+    [comp.save() for comp in comps]
+
+    prov_message = f'пересчитаные цены в компах, кол: {comps.count()}компов'
+
+    if not Results.objects.filter(who='itblok_comps').exists():
+        r = Results(who='itblok_comps',
+        who_desc=prov_message)
+        r.save()
+    else:
+        r = Results.objects.get(who='itblok_comps')
+        r.who_desc = prov_message
+        r.save()
 
 
 def it_margin_exch(request, it_pk):
