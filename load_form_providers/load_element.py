@@ -361,28 +361,6 @@ def to_vent(d):
         return 'vent'
     return 'cool'
 
-def to_article2_1(d,pr=1):
-    if pr==1:
-        if d.lower().find('core') !=-1:
-            return 'iproc'
-        elif d.lower().find('pentium') !=-1:
-            return 'iproc'
-        elif d.lower().find('celeron') !=-1:
-            return 'iproc'
-        elif d.lower().find('xeon') !=-1:
-            return 'iproc'
-        elif d.lower().find('intel') !=-1:
-            return 'iproc'
-        else:
-            return 'aproc'
-    else:
-        if re.findall(r'fm3|fm2|am3|am4|9830|320|450|x470|x570|a68|x399|trx40|550|520|amd|x670|650|850|870',d.lower()):
-            return 'amb'
-        if re.findall(r'4005|1800|1900|61|41|81|110|310|365|360|z390|x299|410|z490|b460|z590|z690|370|470|510|b560|1200|h570|h610|b660|670|710|760|790|b750|810|860|890|intel',
-                    d.lower()):
-            return 'imb'
-        else:
-            return 'amb'
 
 def get_xls():
     count = 0
@@ -677,12 +655,21 @@ def Short_per_x_code():
     return len_
 
 
-
-def get_itlink():
+def from_file_provider(prov):
     """ """
 
-    filename = ForFiles['itlink']['filename']
-    cols = ForFiles['itlink']['cols']
+    current_prov = prov_fun(prov) # получаем например 'itlink' из 'get_itlink'
+    if not current_prov:
+        # доработать с Results ForFiles[current_prov]['mes']
+        return ('ERROR', 'noname')
+
+    try:
+        usd_ = USD.objects.first().usd
+    except:
+        usd_ = 1
+
+    filename = ForFiles[current_prov]['filename']
+    cols = ForFiles[current_prov]['cols']
 
     try:
         MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -693,8 +680,8 @@ def get_itlink():
     except Exception as e:
         return e
 
-    it = From_file_to_bd(row_data)
-    _ = it.getDataFile('get_itlink')
+    it = From_file_to_bd(row_data, usd=usd_)
+    _ = it.getDataFile(prov)
 
     short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
     #print(f'Short_per_x_code: {short_all}')
