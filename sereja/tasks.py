@@ -9,7 +9,7 @@ from django.template import Engine, Context
 
 #from cat.models import *
 from load_form_providers.load_element import *
-from load_form_providers.erc2 import *
+#from load_form_providers.erc2 import get_bequiet, get_DiWeave, get_pccooler
 from cat.views_to_admin_try import get_soup_art
 from pars.fury import *
 from pars.itblok import *
@@ -65,9 +65,9 @@ def task_fury():
 def task_itblok():
     load_itblok()
 
-@app.task
+"""@app.task
 def task_itlink():
-    get_itlink()
+    get_itlink()"""
 
 
 @app.task
