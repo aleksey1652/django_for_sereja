@@ -94,7 +94,8 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс.xls')
-        _ = get_itlink()
+        _ = from_file_provider('get_itlink')
+        # from tasks.py from load_form_providers.load_element
         try:
             test = _[0]
         except:
@@ -103,10 +104,7 @@ def uploader(request,w):
         messages.success(request,
         f'From file it was add in db: {test} and update: *')
     if request.method == 'POST' and 'erc' in request.FILES:
-        try:
-            usd_ = USD.objects.first().usd
-        except:
-            usd_ = 1
+
         try:
             myfile = request.FILES['erc']
         except:
@@ -117,9 +115,14 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс_erc.xls')
-        count_no, count_on, pp = get_erc(usd_)  # erc2.py
+        _ = from_file_provider('get_erc')
+        # from tasks.py from load_form_providers.load_element
+        try:
+            test = _[0]
+        except:
+            test = 'error type'
         messages.success(request,
-        f'From file it was add in db: {count_no} and update: {count_on} ')
+        f'From file it was add in db: {test} and update: *')
     if request.method == 'POST' and 'be' in request.FILES:
         try:
             usd_ = USD.objects.first().usd
@@ -135,9 +138,14 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс_be.xls')
-        count_no, count_on, pp = get_bequiet(usd_)  # erc2.py
+        _ = from_file_provider('get_bequiet')
+        # from tasks.py from load_form_providers.load_element
+        try:
+            test = _[0]
+        except:
+            test = 'error type'
         messages.success(request,
-        f'From file it was add in db: {count_no} and update: {count_on} ')
+        f'From file it was add in db: {test} and update: *')
     if request.method == 'POST' and 'pccooler' in request.FILES:
         try:
             usd_ = USD.objects.first().usd
@@ -153,9 +161,14 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс_pccooler.xlsx')
-        count_no, count_on, pp = get_pccooler(usd_)  # erc2.py
+        _ = from_file_provider('get_pccooler')
+        # from tasks.py from load_form_providers.load_element
+        try:
+            test = _[0]
+        except:
+            test = 'error type'
         messages.success(request,
-        f'From file it was add in db: {count_no} and update: {count_on} ')
+        f'From file it was add in db: {test} and update: *')
         #fs = FileSystemStorage()
         #filename = fs.save(myfile.name, myfile)
         #uploaded_file_url = fs.url(filename)
@@ -181,9 +194,14 @@ def uploader(request,w):
                                     )
                                     )
         handle_uploaded_file(myfile,'./media/прайс_DiWeave.xlsx')
-        count_no, count_on, pp = get_DiWeave(usd_) # erc2.py
+        _ = from_file_provider('get_DiWeave')
+        # from tasks.py from load_form_providers.load_element
+        try:
+            test = _[0]
+        except:
+            test = 'error type'
         messages.success(request,
-        f'From file it was add in db: {count_no} and update: {count_on} ')
+        f'From file it was add in db: {test} and update: *')
         #fs = FileSystemStorage()
         #filename = fs.save(myfile.name, myfile)
         #uploaded_file_url = fs.url(filename)
