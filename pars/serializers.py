@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from cat.models import *
 from descriptions.models import *
-
+# parent_option
 
 dict_change_params = {
                     'Cooler': {
@@ -130,6 +130,7 @@ class CoolerSerializer(serializers.Serializer):
     cooler_height = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
     #cover = serializers.ImageField(max_length=None, use_url=True)
     #more = serializers.CharField()
@@ -179,6 +180,7 @@ class CpuSerializer(serializers.Serializer):
     cpu_render = serializers.CharField(source='cpu_render_ru')
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
     #cpu_render_ukr = serializers.CharField()
 
@@ -219,6 +221,7 @@ class MbSerializer(serializers.Serializer):
     depend_from_type = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class MbSerializer2(serializers.ModelSerializer):
@@ -259,6 +262,7 @@ class RamSerializer(serializers.Serializer):
     #more = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class RamSerializer2(serializers.ModelSerializer):
@@ -289,6 +293,7 @@ class HddSerializer(serializers.Serializer):
     hdd_ca = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class HddSerializer2(serializers.ModelSerializer):
@@ -317,6 +322,7 @@ class PsuSerializer(serializers.Serializer):
     psu_f = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class PsuSerializer2(serializers.ModelSerializer):
@@ -361,6 +367,7 @@ class GpuSerializer(serializers.Serializer):
     gpu_type_ukr = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class GpuSerializer2(serializers.ModelSerializer):
@@ -391,6 +398,7 @@ class FanSerializer(serializers.Serializer):
     case_fan_size = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class FanSerializer2(serializers.ModelSerializer):
@@ -430,6 +438,7 @@ class CaseSerializer(serializers.Serializer):
     case_height = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class CaseSerializer2(serializers.ModelSerializer):
@@ -462,6 +471,7 @@ class SsdSerializer(serializers.Serializer):
     ssd_type_cells = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class SsdSerializer2(serializers.ModelSerializer):
@@ -493,6 +503,7 @@ class CablesSerializer(serializers.Serializer):
     cab_set = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class WiFiSerializer(serializers.Serializer):
@@ -510,6 +521,7 @@ class WiFiSerializer(serializers.Serializer):
     net_int = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class SoftSerializer(serializers.Serializer):
@@ -527,6 +539,7 @@ class SoftSerializer(serializers.Serializer):
     soft_set = serializers.CharField()
     config = serializers.CharField()
     parent_option = serializers.CharField()
+    extended_option = serializers.CharField()
     special_price = serializers.CharField()
 
 class PromotionSerializer(serializers.ModelSerializer):
