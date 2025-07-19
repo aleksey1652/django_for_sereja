@@ -129,6 +129,8 @@ class Cooler(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -249,6 +251,8 @@ class CPU(models.Model):
     max_length=50, db_index=True, choices=CHOISE_UA)
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -366,6 +370,8 @@ class MB(models.Model):
     verbose_name='Depend_from_type')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -411,6 +417,8 @@ class RAM(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -481,6 +489,8 @@ class HDD(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -580,6 +590,8 @@ class PSU(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -707,6 +719,8 @@ class GPU(models.Model):
 
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -788,6 +802,8 @@ class FAN(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -920,6 +936,8 @@ class CASE(models.Model):
     verbose_name='case_height')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='цена')
@@ -987,6 +1005,8 @@ class SSD(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
     price = models.FloatField(max_length=300, db_index=True, verbose_name='Price')
@@ -1019,6 +1039,8 @@ class WiFi(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
 
@@ -1048,6 +1070,8 @@ class Cables(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
 
@@ -1078,6 +1102,8 @@ class Soft(models.Model):
     verbose_name='More')
     parent_option = models.CharField(max_length=300, db_index=True,
     verbose_name='parent_option', default='-')
+    extended_option = models.CharField(max_length=300, db_index=True,
+    verbose_name='extended_option', default='-')
     is_active = models.BooleanField(default=True)
     config = models.BooleanField(default=True, verbose_name='конфигуратор/нет')
 
