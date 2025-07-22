@@ -1132,7 +1132,8 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.itlink_dictToOrder(temp, itlink_catalog[current_category])
-                dict_res[new_dict['partnumber_parts']] = new_dict
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
 
         return dict_res
 
@@ -1162,7 +1163,8 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.erc_dictToOrder(temp, erc_catalog[current_category])
-                dict_res[new_dict['partnumber_parts']] = new_dict
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
 
         return dict_res
 
@@ -1192,7 +1194,8 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.be_dictToOrder(temp, be_catalog[current_category])
-                dict_res[new_dict['partnumber_parts']] = new_dict
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
 
         return dict_res
 
@@ -1225,7 +1228,8 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.dw_dictToOrder(temp, kind)
-                dict_res[new_dict['partnumber_parts']] = new_dict
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
 
         return dict_res
 
@@ -1258,7 +1262,8 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.pccooler_dictToOrder(temp, kind)
-                dict_res[new_dict['partnumber_parts']] = new_dict
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
 
         set_be = set(dict_res.keys()) # !!! нужен импорт single_clear, pccooler_to_single
         single_clear(set_be) # выключает обьекты single(кулеры и вентиляторы) если
