@@ -25,7 +25,7 @@
 <br></br>
 {% endif %}
 
-<nav class="navbar navbar-expand navbar-light mr-5 ml-5 p-0" style="background-color: #F5DEB3;width: 1290px">
+<nav class="navbar navbar-expand navbar-light mr-5 ml-5 p-0" style="background-color: #F5DEB3;width: 1282px">
 <div class="d-flex bd-highlight" id="navbarsExample05">
   <ul class="navbar-nav ">
     <li class="navbar-text">
@@ -69,6 +69,26 @@
         <a class="dropdown-item" href="{% url 'forversum' 'cpu' 0 %}">for_Versum_site</a>
         <a class="dropdown-item" href="{% url 'forversum_other' 'cpu' 0 %}">for_Versum_single_parts</a>
         <a class="dropdown-item" href="{% url 'promotion' 'versum' 0 %}">Promotion</a>
+      </div>
+    </div>
+    </li>
+    <li class="p-2 bd-highlight">
+      <div class="dropdown">
+      <a class="nav-link dropdown-toggle " href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tech_new</a>
+      <div class="dropdown-menu" aria-labelledby="dropdown05">
+        <a class="dropdown-item" href="{% url 'price_get_tech_models' 'dc' %}">For_all</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'km' %}">KM</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'kb' %}">Keyboards</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'mouse' %}">Mouses</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'pad' %}">Pads</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'head' %}">Headsets</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'web' %}">Webcams</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'wifi' %}">WiFis</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'acust' %}">Acoustics</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'tab' %}">Tables</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'chair' %}">Chairs</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'cab' %}">Cabels</a>
+        <a class="dropdown-item" href="{% url 'tech_per_kind' 'filter' %}">Filters</a>
       </div>
     </div>
     </li>
