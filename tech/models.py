@@ -1,12 +1,8 @@
 from django.db import models
 from datetime import datetime, date, time
-#from django.db.models import signals
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
-#from sereja.tasks_for_models import send_mail_task
-#from django.db.models.functions import Length
-#from django.db.models import CharField
-#CharField.register_lookup(Length) get_price
+
 import re
 
 def procent_to_payment(difference):
@@ -158,11 +154,11 @@ class Monitors(models.Model):
     verbose_name='гарантiя ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -303,11 +299,11 @@ class KM(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -453,11 +449,11 @@ class Keyboards(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -505,7 +501,7 @@ class Keyboards(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Клавіатура'
-        verbose_name_plural = 'Клавіатури'
+        verbose_name_plural = '3 Клавіатури'
 
 
 class Mouses(models.Model):
@@ -580,11 +576,11 @@ class Mouses(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -691,11 +687,11 @@ class Pads(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -856,11 +852,11 @@ class Headsets(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -977,11 +973,11 @@ class Webcams(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1090,11 +1086,11 @@ class WiFis(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1232,11 +1228,11 @@ class Acoustics(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1375,11 +1371,11 @@ class Tables(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1518,11 +1514,11 @@ class Chairs(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1630,11 +1626,11 @@ class Accessories(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1763,11 +1759,11 @@ class Cabelsplus(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1886,11 +1882,11 @@ class Filters(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
@@ -1937,8 +1933,8 @@ class Filters(models.Model):
     class Meta:
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
-        verbose_name = 'Фiльтр сетьовий'
-        verbose_name_plural = 'х12 Фiльтри сетьовi'
+        verbose_name = 'Фільтр живлення'
+        verbose_name_plural = 'х12 Фільтри живлення'
 
 class Others(models.Model):
 
@@ -1993,11 +1989,11 @@ class Others(models.Model):
     verbose_name='гарантия ру')
     you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
     verbose_name='you_vid')
-    cover1 = models.ImageField(null=True, blank=True,
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото1')
-    cover2 = models.ImageField(null=True, blank=True,
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото2')
-    cover3 = models.ImageField(null=True, blank=True,
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
