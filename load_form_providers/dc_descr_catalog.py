@@ -12,8 +12,11 @@ from tech.models import *
 from cat.models import Parts_full, USD, Results
 from .other_descr_catalog import From_provders_filePrices
 from .dc_descr_adv import to_False_or_True,get_discr_categ_dc,get_foto_price_name
+from .dc_descr_adv import newMonitor, newKM, newKeyboards, newMouses, newPads,\
+newHeadsets, newWebcams, newWiFis, newAcoustics, newTables, newChairs,\
+newCabelsplus, newFilters
 
-#from load_form_providers.get_service import get_from_xml, from_price_get_new_models
+#from load_form_providers.get_service Cooler_OTHER get_from_xml, from_price_get_new_models
 # to_model_price_from_dc upload_edit_foto to_tech_price_from_dc from_price_get_new_tech
 
 
@@ -135,6 +138,7 @@ def from_file_get_part(filename, periphery=False):
             else:
                 d[y.tag] = y.text
         if d['Code']:
+            url_item = 'https://opt.dclink.com.ua/item.htm?id='
             d['Url'] = url_item + d['Code']
         else:
             d['Url'] = ''
@@ -742,14 +746,147 @@ def to_tech_price_from_dc(for_brain=None):
         if '45' in dc_dict:
             objects_tech_edit(obj, usd_cuurency, dc_dict['45'])
 
+# словарь tech_ для работы с from_price_new_tech_per_kind
+# lambda для отложенного вызова функций с еще несформированными словарми,
+# являющимися аргументами функции
+tech_ = {
+'mon': (
+        lambda d1, d2, d3, f=newMonitor: f(d1, d2, d3),
+        '5',
+        Monitors.objects.all().values_list('part_number', flat=True),
+        ),
+'km': (
+        lambda d1, d2, d3, f=newKM: f(d1, d2, d3),
+        '968',
+        KM.objects.all().values_list('part_number', flat=True),
+        ),
+'kb': (
+        lambda d1, d2, d3, f=newKeyboards: f(d1, d2, d3),
+        '33',
+        Keyboards.objects.all().values_list('part_number', flat=True),
+        ),
+'mouse': (
+        lambda d1, d2, d3, f=newMouses: f(d1, d2, d3),
+        '11',
+        Mouses.objects.all().values_list('part_number', flat=True),
+        ),
+'pad': (
+        lambda d1, d2, d3, f=newPads: f(d1, d2, d3),
+        '24',
+        Pads.objects.all().values_list('part_number', flat=True),
+        ),
+'head': (
+        lambda d1, d2, d3, f=newHeadsets: f(d1, d2, d3),
+        '56',
+        Headsets.objects.all().values_list('part_number', flat=True),
+        ),
+'web': (
+        lambda d1, d2, d3, f=newWebcams: f(d1, d2, d3),
+        '54',
+        Webcams.objects.all().values_list('part_number', flat=True),
+        ),
+'wifi': (
+        lambda d1, d2, d3, f=newWiFis: f(d1, d2, d3),
+        '1410',
+        WiFis.objects.all().values_list('part_number', flat=True),
+        ),
+'acust': (
+        lambda d1, d2, d3, f=newAcoustics: f(d1, d2, d3),
+        '25',
+        Acoustics.objects.all().values_list('part_number', flat=True),
+        ),
+'tab': (
+        lambda d1, d2, d3, f=newTables: f(d1, d2, d3),
+        '1376',
+        Tables.objects.all().values_list('part_number', flat=True),
+        ),
+'chair': (
+        lambda d1, d2, d3, f=newChairs: f(d1, d2, d3),
+        '125',
+        Chairs.objects.all().values_list('part_number', flat=True),
+        ),
+'cab': (
+        lambda d1, d2, d3, f=newCabelsplus: f(d1, d2, d3),
+        '648',
+        Cabelsplus.objects.all().values_list('part_number', flat=True),
+        ),
+'filter': (
+        lambda d1, d2, d3, f=newFilters: f(d1, d2, d3),
+        '45',
+        Filters.objects.all().values_list('part_number', flat=True),
+        ),
+}
+
+
+def from_price_new_tech_per_kind(kind_tech):
+    """
+    находим новые детали по конкретной категориям tech (kind_tech='mon', ...)
+    """
+
+    category_periphery = (
+    '11', '24', '33', '56', '125', '1410', '125', '5', '255',
+    '45', '54', '648', '125', '968', '1376', '25',
+    )
+
+    with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
+        xml = fobj.read()
+
+    DC_LOGIN = 'itblok'
+    DC_PASSWORD = 'VIA5qPUv'
+    list_periphery, dict_category_periphery, dict_category_foto = get_from_xml(
+    xml, DC_LOGIN, DC_PASSWORD, periphery=True) # исп-ем для получения описаний
+
+    try:
+        root = etree.fromstring(xml)
+    except:
+        print('Wrong  data')
+        return []
+
+    l=root.getchildren()
+    dc_dict = dict()
+    for x in l:
+        d={}
+        try:
+            for y in x.getchildren():
+                if not y.text:
+                    d[y.tag] = 'None'
+                else:
+                    d[y.tag] = y.text
+            if d['CategoryID'] in category_periphery:
+                if not d['CategoryID'] in dc_dict:
+                    dc_dict[d['CategoryID']] = {d['Article']: d}
+                else:
+                    dc_dict[d['CategoryID']][d['Article']] = d
+        except:
+            print('error but next')
+    try:
+        dict_set = set(dc_dict[tech_[kind_tech][1]].keys()) #dc_dict['5'] для "mon"
+    except:
+        dict_set = set()
+    q_set = set(tech_[kind_tech][2])
+    res = dict_set - q_set
+    res_list_dict = [
+    {'name_parts': x,
+    'partnumber_parts': dc_dict[tech_[kind_tech][1]][x]['Name']} for x in res
+    ]
+    for_result = json.dumps(res_list_dict,
+    ensure_ascii=False)
+    r, _ = Results.objects.get_or_create(who=f'{kind_tech}_dc')
+    r.json_data = for_result
+    r.save()
+    for key in res:
+        tech_[kind_tech][0](dict_category_periphery,
+        dc_dict[tech_[kind_tech][1]][key],
+        dict_category_foto,
+        )
+        # берем например newMonitor из tech_ и вставляем 3 словаря в ( ) как параметры
+        # функции newMonitor(), аналог отдельной кат-ии из from_price_get_new_tech,
+        # смотри там как работает, здесь тоже но с отложенным вызовом с lambda
+
 
 
 def from_price_get_new_tech(prov):
-    # находим новые детали по категориям tech (prov=dc)
-
-    from .dc_descr_adv import newMonitor, newKM, newKeyboards, newMouses, newPads,\
-    newHeadsets, newWebcams, newWiFis, newAcoustics, newTables, newChairs,\
-    newCabelsplus, newFilters
+    """ находим новые детали по категориям tech (prov=dc) """
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
