@@ -1,5 +1,5 @@
 """
-
+price_get_tech_models
 """
 
 from django.urls import path
@@ -16,15 +16,20 @@ urlpatterns = [
     path('assembly/<int:pc_id>/', views.pc_assembly, name='assembly'),
     #path('home/assembly/comp/<int:pc_id>-<str:itm>/', views.test, name='test'),
     path('assembly/comp/<int:pc_id>-<int:itm>/', views.kind_price_item, name='assembly_item'),
-    path('assembly/comp_all/<int:pc_id>-<int:itm>/', views.kind_price_item_all, name='assembly_item_all'),
+    path('assembly/comp_all/<int:pc_id>-<int:itm>/', views.kind_price_item_all,
+    name='assembly_item_all'),
     #path('<str:price_id>/', views.Views_kind_price.as_view(), name='kind_price'),
     path('compnew/<int:pc_ass>', views.computercreate, name='computercreate'),
     path('renamegroup/<str:page>-<int:pc_ass>', tests.rename_group, name='rename_group'),
     path('addseries/<str:page>-<int:pc_ass>', tests.add_series, name='add_series'),
     path('renameseries/<str:page>', tests.rename_series, name='rename_series'),
     path('testgroup/<int:kind>', tests.test_group, name='test_group'),
-    path('price_get_new_models/<str:prov>', tests.price_get_new_models, name='price_get_new_models'),
-    path('price_get_tech_models/<str:prov>', tests.price_get_tech_models, name='price_get_tech_models'),
+    path('price_get_new_models/<str:prov>', tests.price_get_new_models,
+    name='price_get_new_models'),
+    path('price_get_tech_models/<str:prov>', tests.price_get_tech_models,
+    name='price_get_tech_models'),
+    path('tech_per_kind/<str:kind_tech>', tests.tech_per_kind,
+    name='tech_per_kind'), # from dc_descr_catalog.from_price_new_tech_per_kind
     path('test_price/<int:d>', views.test_price, name='test_price'),
     path('special_price/<int:pc_pk>', views.special_price, name='special_price'),
     path('test_assembly/<int:short_id>-<int:id_>-<int:pc_id>/', views.test_assembly,

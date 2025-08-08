@@ -10,12 +10,12 @@ from django.contrib import messages
 from django.db.models import Min
 import pandas as pd
 import time
-#from pars.views import content_versum2
+#
 from .forms import Pc_assemblyForm
 from descriptions.views import test_distrib_price_none
 from load_form_providers.load_element import to_article2_1
-from load_form_providers.dc_descr_catalog import from_price_get_new_models, from_price_get_new_tech
-#providerprice_parts test_group price_get_new_models test_group
+from load_form_providers.dc_descr_catalog import from_price_get_new_models, from_price_get_new_tech, from_price_new_tech_per_kind
+#
 
 def content_versum2(name_parts,kind,num={}):
     # переделанная фун от(см 6 строки выше): если нет привязки к шорт от прайса,
@@ -454,11 +454,29 @@ def tasc_tech_parts_from_prov(prov_):
 def price_get_tech_models(request,prov):
     tasc_tech_parts_from_prov.delay(prov_=prov)
 
-    return  HttpResponseRedirect(
+    """return  HttpResponseRedirect(
                                 reverse('assembly_page',
                                 kwargs={'page_id': 'versum'}
                                 )
-                                )
+                                )"""
+    return  HttpResponseRedirect(
+                            reverse('uploader',
+                            kwargs={'w':'-'}
+                            )
+                            )
+
+@app.task
+def tasc_new_tech_per_kind(kind_tech_):
+    from_price_new_tech_per_kind(kind_tech_)
+
+def tech_per_kind(request,kind_tech):
+    tasc_new_tech_per_kind.delay(kind_tech_=kind_tech)
+
+    return  HttpResponseRedirect(
+                            reverse('uploader',
+                            kwargs={'w':'-'}
+                            )
+                            )
 
 def price_get_new_models(request,prov):
     tasc_new_parts_from_prov.delay(prov_=prov)
