@@ -82,9 +82,9 @@ CHOISE_UA = (
 class ItblokComputers(models.Model):
     is_active = models.BooleanField(default=True)
     date_computers = models.DateTimeField(auto_now=True)
-    name_computers = models.TextField(max_length=300, db_index=True,
+    name_computers = models.CharField(max_length=300, db_index=True,
     verbose_name='Название ру', unique=True)
-    name_computers_ua = models.TextField(max_length=300, db_index=True,
+    name_computers_ua = models.CharField(max_length=300, db_index=True,
     verbose_name='Название укр', null=True, blank=True)
 
     price_parts = models.FloatField(default=0, db_index=True,

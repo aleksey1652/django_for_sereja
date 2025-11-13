@@ -41,6 +41,22 @@ class ItblokComputersAdmin(admin.ModelAdmin):
     save_on_top = True
     save_as = True
 
+    formfield_overrides = {
+        # Только для поля 'parts' конкретно
+    }
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name in ('name_computers', 'name_computers_ua'):
+            formfield.widget.attrs.update({
+                'style': 'width: 900px;',
+                'class': 'vTextField',
+            })
+        return formfield
+
+    class Media:
+        js = ('admin/js/comps_it_paginations.js',)
+
     def get_search_results(self, request, queryset, search_term):
         # переопределяем search_fields как в Версуме (по точному названию деталей)
         queryset, may_have_duplicates = super().get_search_results(
