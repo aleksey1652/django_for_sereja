@@ -20,7 +20,7 @@ class MonitorsSer(serializers.ModelSerializer):
         'sc_weight', 'sc_col_ua', 'sc_col_ru', 'sc_ai_ua', 'sc_ai_ru',
         'sc_warr_ua', 'sc_warr_ru', 'warranty',
         'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -40,7 +40,7 @@ class KMSer(serializers.ModelSerializer):
         'km_pow_mouse_ua', 'km_pow_mouse_ru', 'km_k_vol', 'km_mouse_vol',
         'km_k_weight', 'km_mouse_weight', 'km_col_ua', 'km_col_ru',
         'km_warr_ua', 'km_warr_ru', 'warranty', 'you_vid', 'label',
-        'creditoff', 'cover1', 'cover2', 'cover3', 'part_number_web')
+        'creditoff', 'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -61,7 +61,7 @@ class KeyboardsSer(serializers.ModelSerializer):
         'kb_weight', 'kb_usb', 'kb_ps', 'kb_bt', 'kb_usb_resiver',
         'kb_usb_type_c', 'kb_col_ua', 'kb_col_ru', 'kb_warr_ua',
         'kb_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -81,7 +81,7 @@ class MousesSer(serializers.ModelSerializer):
         'mouse_pow_ru', 'mouse_length_cable', 'mouse_vol',
         'mouse_weight', 'mouse_col_ua', 'mouse_col_ru',
         'mouse_warr_ua', 'mouse_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -98,7 +98,7 @@ class PadsSer(serializers.ModelSerializer):
         'vendor', 'pad_bot_ua', 'pad_bot_ru', 'pad_vol', 'pad_light',
         'pad_col_ua', 'pad_col_ru', 'pad_warr_ua', 'pad_warr_ru', 'warranty',
         'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -123,7 +123,7 @@ class HeadsetsSer(serializers.ModelSerializer):
         'hs_time', 'hs_con_type', 'hs_ver', 'hs_water_res',
         'hs_light', 'hs_pow_ua', 'hs_pow_ru',
         'hs_warr_ua', 'hs_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -140,7 +140,7 @@ class WebcamsSer(serializers.ModelSerializer):
         'web_focus', 'web_int', 'web_max_f', 'web_angle',
         'web_weight', 'web_col_ua', 'web_col_ru',
         'web_warr_ua', 'web_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -158,7 +158,7 @@ class WiFisSer(serializers.ModelSerializer):
         'net_wifi_ghz', 'net_wifi_max_spd_ua', 'net_wifi_max_spd_ru',
         'net_wifi_bt','net_wifi_warr_ua',
         'net_wifi_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -177,7 +177,7 @@ class AcousticsSer(serializers.ModelSerializer):
         'a_fm', 'a_control', 'a_pow_ua', 'a_pow_ru',
         'a_bot_ua', 'a_bot_ru', 'a_vol', 'a_weight', 'a_col_ua',
         'a_col_ru', 'a_warr_ua', 'a_warr_ru', 'warranty', 'you_vid',
-        'label', 'creditoff', 'cover1', 'cover2', 'cover3', 'part_number_web')
+        'label', 'creditoff', 'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -197,7 +197,7 @@ class TablesSer(serializers.ModelSerializer):
         'tb_bot_r_ru', 'tb_hight', 'tb_width', 'tb_depth', 'tb_weight',
         'tb_col_ua', 'tb_col_ru',
         'tb_warr_ua', 'tb_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -217,7 +217,7 @@ class ChairsSer(serializers.ModelSerializer):
         'ch_back_angle', 'ch_hand', 'ch_hight', 'ch_mech_ua',
         'ch_mech_ru', 'ch_max_weight', 'ch_weight', 'ch_col_ua', 'ch_col_ru',
         'ch_warr_ua', 'ch_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -234,7 +234,7 @@ class AccessoriesSer(serializers.ModelSerializer):
         'vendor', 'acc_type_ua', 'acc_type_ru', 'acc_desc_ua',
         'acc_desc_ru', 'acc_col_ua', 'acc_col_ru',
         'acc_warr_ua', 'acc_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -252,7 +252,7 @@ class CabelsplusSer(serializers.ModelSerializer):
         'cab_conn_ru', 'cab_flat', 'cab_tissue', 'cab_metal',
         'cab_g_type', 'cab_ver', 'cab_long', 'cab_color_ua', 'cab_color_ru',
         'cab_warr_ua', 'cab_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -269,7 +269,7 @@ class FiltersSer(serializers.ModelSerializer):
         'fi_max_i', 'fi_max_pow', 'fi_con',
         'fi_bot_ua', 'fi_bot_ru', 'fi_col_ua', 'fi_col_ru',
         'fi_warr_ua', 'fi_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)
@@ -286,7 +286,7 @@ class OthersSer(serializers.ModelSerializer):
         'vendor', 'oth_type_ua', 'oth_type_ru', 'oth_desc_ua',
         'oth_desc_ru',
         'oth_warr_ua', 'oth_warr_ru', 'warranty', 'you_vid', 'label', 'creditoff',
-        'cover1', 'cover2', 'cover3', 'part_number_web')
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
 
     def get_pay_num(self, obj):
         return procent_to_payment(obj.get_price_rent - obj.discount)

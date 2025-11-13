@@ -160,6 +160,8 @@ class Monitors(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -305,6 +307,8 @@ class KM(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -455,6 +459,8 @@ class Keyboards(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -582,6 +588,8 @@ class Mouses(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -693,6 +701,8 @@ class Pads(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -858,6 +868,8 @@ class Headsets(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -979,6 +991,8 @@ class Webcams(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1092,6 +1106,8 @@ class WiFis(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1234,6 +1250,8 @@ class Acoustics(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1377,6 +1395,8 @@ class Tables(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1520,6 +1540,8 @@ class Chairs(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1632,6 +1654,8 @@ class Accessories(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1765,6 +1789,8 @@ class Cabelsplus(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1888,6 +1914,8 @@ class Filters(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
@@ -1995,6 +2023,8 @@ class Others(models.Model):
     verbose_name='фото2')
     cover3 = models.ImageField(null=True, blank=True, max_length=300,
     verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
     groups = models.ForeignKey(
                                'self', on_delete=models.PROTECT,
                                related_name="tags",
