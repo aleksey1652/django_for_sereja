@@ -142,11 +142,16 @@ def newMonitor(dict_category_periphery, dc_products, dict_category_foto):
         res[dc_products['Code']]['Концентратор USB'],
         ) if 'Концентратор USB' in res[dc_products['Code']] else False
         game = to_False_or_True(
-        res[dc_products['Code']]['Ігрові технології'],
+        res[dc_products['Code']]["Ігрові технології"],
+        str_or_minus=True
         ) if 'Ігрові технології' in res[dc_products['Code']] else '-'
         fi = to_False_or_True(
         res[dc_products['Code']]['Безрамковий монітор'],
         ) if 'Безрамковий монітор' in res[dc_products['Code']] else False
+        vesa = to_False_or_True(
+        res[dc_products['Code']]['VESA'],
+        str_or_minus=True
+        ) if 'VESA' in res[dc_products['Code']] else '-'
 
         Monitors.objects.create(
         name=name_,
@@ -182,7 +187,7 @@ def newMonitor(dict_category_periphery, dc_products, dict_category_foto):
         sc_usb=usb,
         sc_fi=fi,
         sc_os=game,
-        sc_vesa=key_in_dict(res[dc_products['Code']], 'Кріплення на стіну'),
+        sc_vesa=vesa,
         sc_vol=key_in_dict(res[dc_products['Code']], 'Габарити (ШхВхГ)'),
         sc_weight=key_in_dict(res[dc_products['Code']], 'Вага'),
         sc_col_ua=key_in_dict(res[dc_products['Code']], 'Колір'),
@@ -216,24 +221,24 @@ def newKM(dict_category_periphery, dc_products, dict_category_foto):
         dict_category_periphery, dc_products, dict_category_foto, name_t)
 
         light = to_False_or_True(
-        res[dc_products['Code']]['Підсвічування (клавіатура)']
-        ) if 'Підсвічування (клавіатура)' in res[dc_products['Code']] else False
+        res[dc_products['Code']]['Підсвічування клавіатури']
+        ) if 'Підсвічування клавіатури' in res[dc_products['Code']] else False
         km_ua_ = to_False_or_True(
         res[dc_products['Code']]['Українська розкладка']
         ) if 'Українська розкладка' in res[dc_products['Code']] else False
         buttoms = to_False_or_True(
-        res[dc_products['Code']]['Кількість клавіш (клавіатура)'],
-        cifar= True) if 'Кількість клавіш (клавіатура)' in res[
+        res[dc_products['Code']]['Кількість клавіш клавіатури'],
+        cifar= True) if 'Кількість клавіш клавіатури' in res[
         dc_products['Code']] else 0
         mouse_light = to_False_or_True(
-        res[dc_products['Code']]['Підсвічування (миша)']
-        ) if 'Підсвічування (миша)' in res[dc_products['Code']] else False
+        res[dc_products['Code']]['Підсвічування миші']
+        ) if 'Підсвічування миші' in res[dc_products['Code']] else False
         mouse_w = to_False_or_True(
-        res[dc_products['Code']]['Вага (клавіатура)'],
-        str_or_minus= True) if 'Вага (клавіатура)' in res[dc_products['Code']] else '-'
+        res[dc_products['Code']]['Вага клавіатури'],
+        str_or_minus= True) if 'Вага клавіатури' in res[dc_products['Code']] else '-'
         k_w = to_False_or_True(
-        res[dc_products['Code']]['Вага (миша)'],
-        str_or_minus= True) if 'Вага (миша)' in res[dc_products['Code']] else '-'
+        res[dc_products['Code']]['Вага миші'],
+        str_or_minus= True) if 'Вага миші' in res[dc_products['Code']] else '-'
 
         KM.objects.create(
         name=name_,
@@ -249,17 +254,17 @@ def newKM(dict_category_periphery, dc_products, dict_category_foto):
         vendor=key_in_dict(dc_products, 'Vendor'),
         km_connect_ua=key_in_dict(res[dc_products['Code']], 'Підключення'),
         km_int=key_in_dict(res[dc_products['Code']], 'Інтерфейс'),
-        km_key_type_ua=key_in_dict(res[dc_products['Code']], 'Тип клавіш (клавіатура)'),
+        km_key_type_ua=key_in_dict(res[dc_products['Code']], 'Тип клавіш клавіатури'),
         km_k_light=light,
         km_ua=km_ua_,
-        km_pow_k_ua=key_in_dict(res[dc_products['Code']], 'Живлення (клавіатура)'),
-        km_sensor_ua=key_in_dict(res[dc_products['Code']], 'Тип сенсора (миша)'),
+        km_pow_k_ua=key_in_dict(res[dc_products['Code']], 'Живлення клавіатури'),
+        km_sensor_ua=key_in_dict(res[dc_products['Code']], 'Тип сенсора миші'),
         km_numb_buttoms=buttoms,
-        km_dpi=key_in_dict(res[dc_products['Code']], 'Роздільна здатність (миша)'),
+        km_dpi=key_in_dict(res[dc_products['Code']], 'Роздільна здатність миші'),
         km_mouse_light=mouse_light,
-        km_pow_mouse_ua=key_in_dict(res[dc_products['Code']], 'Живлення (миша)'),
-        km_k_vol=key_in_dict(res[dc_products['Code']], 'Габарити (клавіатура)'),
-        km_mouse_vol=key_in_dict(res[dc_products['Code']], 'Габариты (мышь)'),
+        km_pow_mouse_ua=key_in_dict(res[dc_products['Code']], 'Живлення миші'),
+        km_k_vol=key_in_dict(res[dc_products['Code']], 'Габарити клавіатури'),
+        km_mouse_vol=key_in_dict(res[dc_products['Code']], 'Габарити миші'),
         km_k_weight=mouse_w,
         km_mouse_weight=k_w,
         km_col_ua=key_in_dict(res[dc_products['Code']], 'Колір'),
@@ -742,14 +747,11 @@ def newAcoustics(dict_category_periphery, dc_products, dict_category_foto):
     # создаем одиночный Acoustics
     # dc_products - получен из dc_dict[d['CategoryID']]['Article']
     name_t = 'Акустическая система '
-
     try:
         if Acoustics.objects.filter(part_number=dc_products['Article']).exists():
             return False
-
         res, foto_, temp_price, name_ = get_foto_price_name(
         dict_category_periphery, dc_products, dict_category_foto, name_t)
-
         a_usb_ = to_False_or_True(
         res[dc_products['Code']]['USB']
         ) if 'USB' in res[dc_products['Code']] else False
@@ -772,7 +774,6 @@ def newAcoustics(dict_category_periphery, dc_products, dict_category_foto):
         res[dc_products['Code']]["Аудіо"],
         str_or_minus=True
         ) if 'Аудіо' in res[dc_products['Code']] else '-'
-
         Acoustics.objects.create(
         name=name_,
         is_active=False,
@@ -787,7 +788,7 @@ def newAcoustics(dict_category_periphery, dc_products, dict_category_foto):
         vendor=key_in_dict(dc_products, 'Vendor'),
         a_format=key_in_dict(res[dc_products['Code']], 'Формат акустики'),
         a_p=key_in_dict(res[dc_products['Code']], 'Потужність'),
-        a_f=rkey_in_dict(res[dc_products['Code']], 'Частотний діапазон'),
+        a_f=key_in_dict(res[dc_products['Code']], 'Частотний діапазон'),
         a_s_n=key_in_dict(res[dc_products['Code']], 'Співвідношення сигнал/шум'),
         a_audio=a_audio_,
         a_usb=a_usb_,
@@ -798,10 +799,9 @@ def newAcoustics(dict_category_periphery, dc_products, dict_category_foto):
         a_control=a_control_,
         a_pow_ua=key_in_dict(res[dc_products['Code']], 'Живлення'),
         a_bot_ua=key_in_dict(res[dc_products['Code']], 'Матеріал корпусу'),
-        a_vol=key_in_dict(res[dc_products['Code']], 'Габарити'),
-        a_weight=key_in_dict(res[dc_products['Code']], 'Вага'),
+        a_vol=key_in_dict(res[dc_products['Code']], 'Габарити загальні'),
+        a_weight=key_in_dict(res[dc_products['Code']], 'Вага загальна'),
         a_col_ua=key_in_dict(res[dc_products['Code']], 'Колір'),
-
         a_warr_ua=key_in_dict(dc_products, 'Warranty'),
         a_warr_ru=key_in_dict(dc_products, 'Warranty'),
         cover1=foto_[0],
@@ -815,7 +815,6 @@ def newAcoustics(dict_category_periphery, dc_products, dict_category_foto):
         except Exception as es:
             print(es)
             return False
-
     return True
 
 

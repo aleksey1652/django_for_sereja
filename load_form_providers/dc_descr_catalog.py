@@ -17,7 +17,7 @@ newHeadsets, newWebcams, newWiFis, newAcoustics, newTables, newChairs,\
 newCabelsplus, newFilters
 
 #from load_form_providers.get_service Cooler_OTHER get_from_xml, from_price_get_new_models
-# to_model_price_from_dc upload_edit_foto to_tech_price_from_dc from_price_get_new_tech
+# to_model_price_from_dc upload_edit_foto to_tech_price_from_dc 
 
 
 def get_foto_list(categ, DC_LOGIN, DC_PASSWORD):
@@ -68,7 +68,7 @@ def get_from_xml(xml, DC_LOGIN, DC_PASSWORD, ff=True, periphery=False):
         'https://api.dclink.com.ua/api/GetItemPropertiesByCategory', data={
             'login': DC_LOGIN,
             'password': DC_PASSWORD,
-             'category': cat
+            'category': cat
         })
         data = discr2_row.json()
         dict_category_periphery[cat] = data
@@ -2229,22 +2229,22 @@ def start_tech():
                 'Комплект (клавиатура+мышь) ', '', dc_products['Name'][:99]
                 )
                 light = to_False_or_True(
-                res[dc_products['Code']]['Підсвічування (клавіатура)']
+                res[dc_products['Code']]['Підсвічування клавіатури']
                 )
                 km_ua_ = to_False_or_True(
                 res[dc_products['Code']]['Українська розкладка']
                 )
                 buttoms = to_False_or_True(
-                res[dc_products['Code']]['Кількість клавіш (клавіатура)'],
+                res[dc_products['Code']]['Кількість клавіш клавіатури'],
                 cifar= True)
                 mouse_light = to_False_or_True(
-                res[dc_products['Code']]['Підсвічування (миша)']
+                res[dc_products['Code']]['Підсвічування миші']
                 )
                 mouse_w = to_False_or_True(
-                res[dc_products['Code']]['Вага (клавіатура)'],
+                res[dc_products['Code']]['Вага клавіатури'],
                 str_or_minus= True)
                 k_w = to_False_or_True(
-                res[dc_products['Code']]['Вага (миша)'],
+                res[dc_products['Code']]['Вага миші'],
                 str_or_minus= True)
 
                 KM.objects.create(
@@ -2259,17 +2259,17 @@ def start_tech():
                 vendor=dc_products['Vendor'],
                 km_connect_ua=res[dc_products['Code']]['Підключення'],
                 km_int=res[dc_products['Code']]['Інтерфейс'],
-                km_key_type_ua=res[dc_products['Code']]['Тип клавіш (клавіатура)'],
+                km_key_type_ua=res[dc_products['Code']]['Тип клавіш клавіатури'],
                 km_k_light=light,
                 km_ua=km_ua_,
-                km_pow_k_ua=res[dc_products['Code']]['Живлення (клавіатура)'],
-                km_sensor_ua=res[dc_products['Code']]['Тип сенсора (миша)'],
+                km_pow_k_ua=res[dc_products['Code']]['Живлення клавіатури'],
+                km_sensor_ua=res[dc_products['Code']]['Тип сенсора миші'],
                 km_numb_buttoms=buttoms,
-                km_dpi=res[dc_products['Code']]['Роздільна здатність (миша)'],
+                km_dpi=res[dc_products['Code']]['Роздільна здатність миші'],
                 km_mouse_light=mouse_light,
-                km_pow_mouse_ua=res[dc_products['Code']]['Живлення (миша)'],
-                km_k_vol=res[dc_products['Code']]['Габарити (клавіатура)'],
-                km_mouse_vol=res[dc_products['Code']]['Габариты (мышь)'],
+                km_pow_mouse_ua=res[dc_products['Code']]['Живлення миші'],
+                km_k_vol=res[dc_products['Code']]['Габарити клавіатури'],
+                km_mouse_vol=res[dc_products['Code']]['Габарити миші'],
                 km_k_weight=mouse_w,
                 km_mouse_weight=k_w,
                 km_col_ua=res[dc_products['Code']]['Колір'],
@@ -2737,8 +2737,8 @@ def start_tech():
                 a_control=a_control_,
                 a_pow_ua=res[dc_products['Code']]['Живлення'],
                 a_bot_ua=res[dc_products['Code']]['Матеріал корпусу'],
-                a_vol=res[dc_products['Code']]['Габарити'],
-                a_weight=res[dc_products['Code']]['Вага'],
+                a_vol=res[dc_products['Code']]['Габарити загальні'],
+                a_weight=res[dc_products['Code']]['Вага загальна'],
                 a_col_ua=res[dc_products['Code']]['Колір'],
 
                 a_warr_ua=dc_products['Warranty'],
@@ -3141,3 +3141,36 @@ def start_tech3():
                 mon.update(sc_os=game)
             except Exception as e:
                 print(list_, e)
+
+
+def edit_monitor():
+    # доливаем параметры в моніторы: sc_os, sc_vesa (Ігрові технології, Кріплення на стіну)
+    DC_LOGIN = 'itblok'
+    DC_PASSWORD = 'VIA5qPUv'
+    with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
+        xml = fobj.read()
+    list_periphery, dict_category_periphery, dict_category_foto = get_from_xml(
+    xml, DC_LOGIN, DC_PASSWORD, periphery=True)
+    dict_res = {}
+    error = set()
+    for list_ in list_periphery:
+        if list_['CategoryID'] == '5':
+            try:
+                dc_products = list_
+                #print(dc_products['Name'])
+                res = get_discr_categ_dc(dict_category_periphery[dc_products['CategoryID']],
+                                        dc_products['Code'])
+                game = to_False_or_True(
+                res[dc_products['Code']]["Ігрові технології"],
+                str_or_minus=True
+                )
+                vesa = to_False_or_True(
+                res[dc_products['Code']]['VESA'],
+                str_or_minus=True
+                )#res[dc_products['Code']]['Кріплення на стіну']
+                mon = Monitors.objects.filter(part_number=dc_products['Article'])
+                _ = mon.update(sc_os=game, sc_vesa=vesa)
+                dict_res[dc_products['Article']] = res
+            except Exception as e:
+                error.add(e)
+    return (dict_res, error)
