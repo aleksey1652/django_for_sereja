@@ -5,12 +5,13 @@ from django.db.models import signals
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from sereja.tasks_for_models import send_mail_task
-#from httplib2 import Http
+#in_comps_it
 #from json import dumps
 from django.db.models.functions import Length
 from django.db.models import CharField, F, ExpressionWrapper, FloatField
 from descriptions.models import *
 CharField.register_lookup(Length)
+from django.utils.safestring import mark_safe
 
 
 def procent_to_payment(procent = F('class_computers')):
@@ -19,12 +20,12 @@ def procent_to_payment(procent = F('class_computers')):
     dict_procent = {
     1.15: 3, 1.16: 3, 1.17: 3, 1.18: 3, 1.19: 3, 1.2: 3, 1.21: 3, 1.22: 3,
     1.23: 3, 1.24: 3, 1.25: 3,
-    1.26: 4, 1.27: 4,
-    1.28: 4, 1.29: 5,
-    1.3: 5, 1.31: 6,
-    1.32: 6, 1.33: 7,
-    1.34: 7, 1.35: 8, 1.36: 8,
-    1.37: 9, 1.38: 10,
+    1.26: 3, 1.27: 4,
+    1.28: 4, 1.29: 4,
+    1.3: 5, 1.31: 5,
+    1.32: 6, 1.33: 6,
+    1.34: 7, 1.35: 7, 1.36: 8,
+    1.37: 8, 1.38: 9, 1.39: 10,
     }
 
     try:
@@ -255,8 +256,15 @@ class Parts_short(models.Model):
 
     def parts_full_view(self):
         if self.parts_full.exists():
-            return '; '.join(self.parts_full.all().order_by(
-            'providerprice_parts').values_list('partnumber_parts', flat=True)[:3])
+            full_list = self.parts_full.all().order_by(
+            'providerprice_parts'
+            ).values_list('partnumber_parts', flat=True)[:5]
+            return mark_safe(
+            ''.join(f'<div style="font-size: 8px; line-height: 1;">{full}</div>'\
+            for full in full_list)
+            )
+            #return '; '.join(self.parts_full.all().order_by(
+            #'providerprice_parts').values_list('partnumber_parts', flat=True)[:5])
         else:
             return 'No relations'
 
