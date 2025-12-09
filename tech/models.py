@@ -1039,7 +1039,7 @@ class Webcams(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Вебкамера'
-        verbose_name_plural = '6 Вебкамери'
+        verbose_name_plural = '7 Вебкамери'
 
 
 class WiFis(models.Model):
@@ -1154,7 +1154,7 @@ class WiFis(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'WiFi'
-        verbose_name_plural = '7 WiFi'
+        verbose_name_plural = '8 WiFi'
 
 
 class Acoustics(models.Model):
@@ -1298,7 +1298,7 @@ class Acoustics(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Акустика'
-        verbose_name_plural = '8 Акустика'
+        verbose_name_plural = '9 Акустика'
 
 
 class Tables(models.Model):
@@ -1443,7 +1443,7 @@ class Tables(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Стiл'
-        verbose_name_plural = 'х10 Столи'
+        verbose_name_plural = 'х11 Столи'
 
 
 class Chairs(models.Model):
@@ -1588,7 +1588,7 @@ class Chairs(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Крiсло'
-        verbose_name_plural = '9 Крiсла'
+        verbose_name_plural = 'x10 Крiсла'
 
 
 class Accessories(models.Model):
@@ -1702,7 +1702,7 @@ class Accessories(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Аксесуари для ПК'
-        verbose_name_plural = 'х13 Аксесуари для ПК'
+        verbose_name_plural = 'х14 Аксесуари для ПК'
 
 
 class Cabelsplus(models.Model):
@@ -1838,7 +1838,7 @@ class Cabelsplus(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Кабель'
-        verbose_name_plural = 'х11 Кабелi'
+        verbose_name_plural = 'х12 Кабелi'
 
 
 class Filters(models.Model):
@@ -1962,7 +1962,7 @@ class Filters(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Фільтр живлення'
-        verbose_name_plural = 'х12 Фільтри живлення'
+        verbose_name_plural = 'х13 Фільтри живлення'
 
 class Others(models.Model):
 
@@ -2071,5 +2071,130 @@ class Others(models.Model):
         unique_together = ('part_number', 'is_active')
         ordering = ['name']
         verbose_name = 'Унiверсальне,рiзне'
-        verbose_name_plural = 'х14 Унiверсальне_рiзне'
+        verbose_name_plural = 'х15 Унiверсальне_рiзне'
 #
+
+class Mike(models.Model):
+
+    name = models.CharField(max_length=300, unique=True, verbose_name="Iм'я")
+    category_ru = models.CharField(null=True, blank=True, max_length=300,
+    verbose_name='категорiя_ру')
+    category_ua = models.CharField(null=True, blank=True, max_length=300,
+    verbose_name='категорiя_укр')
+    part_number = models.CharField(max_length=300, db_index=True,
+    verbose_name='партнамбер')
+    part_number_web = models.CharField(max_length=300, db_index=True,
+    verbose_name='партнамбер_веб', default='-')
+    is_active = models.BooleanField(default=True, verbose_name='вкл/викл')
+    full = models.BooleanField(default=True, verbose_name='заповн/нi')
+    hotline = models.BooleanField(default=False, verbose_name='h')
+    delivery = models.BooleanField(default=False, verbose_name='d')
+    creditoff = models.BooleanField(default=False, verbose_name='c')
+    label = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='label')
+
+    price_rent = models.FloatField(max_length=300, db_index=True,
+    verbose_name='цiна з нац')
+    get_price_rent = models.PositiveIntegerField(default=0,
+    db_index=True, verbose_name='%')
+    discount = models.FloatField(default=0, db_index=True, verbose_name='скдк')
+    r_price = models.FloatField(max_length=300, db_index=True,
+    verbose_name='r_price')
+    rrp_price = models.FloatField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name='rrp')
+    auto = models.BooleanField(default=False, verbose_name='руч/п')
+    price_ua = models.FloatField(max_length=300, db_index=True, verbose_name='цена грн')
+    price_usd = models.FloatField(max_length=300, db_index=True,
+    verbose_name='цiна $')
+    rentability = models.FloatField(default=5, db_index=True, verbose_name='нацiнка')
+    provider = models.CharField(default='dc', max_length=300,
+    db_index=True, verbose_name='пост')
+
+    vendor = models.CharField(null=True, blank=True,max_length=300,
+    db_index=True, verbose_name='vendor')
+    mk_type_connect_ua = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Тип підключення укр")
+    mk_type_connect_ru = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Тип підключення ру")
+    mk_int = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Інтерфейс")
+    mk_focus_ua = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Спрямованість укр")
+    mk_focus_ru = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Спрямованість ру")
+    mk_freq = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Частотний діапазон")
+    mk_db_ua = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Чутливість укр")
+    mk_db_ru = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Чутливість ру")
+
+    mk_col_ua = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='колор_укр')
+    mk_col_ru = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='колор_ру')
+    mk_weight = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='вага')
+    mk_vol = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='габарити')
+    mk_warr_ua = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='гарантия укр')
+    mk_warr_ru = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='гарантия ру')
+    you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='you_vid')
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото1')
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото2')
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
+    groups = models.ForeignKey(
+                               'self', on_delete=models.PROTECT,
+                               related_name="tags",
+                               related_query_name="tag",
+                               null=True, blank=True, verbose_name='Связь'
+                               )
+
+    def __str__(self):
+        return self.name
+
+    def pay_num(self):
+        # кол-во платежей ОЧ
+        try:
+            return procent_to_payment(self.get_price_rent - self.discount)
+        except Exception as e:
+            return f'{e}'
+    pay_num.short_description = 'оч'
+
+    def get_sum_part_number(self):
+        if self.tags.exists():
+            return f"{';'.join(self.tags.all().values_list('part_number', flat=True))}"
+
+        return self.part_number
+
+    get_sum_part_number.short_description = 'связь-партнм'
+
+    def get_r_price_rrp_price(self):
+        rrp = self.rrp_price if self.rrp_price else 0
+        return f"{self.r_price}/ {rrp}"
+    get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.mk_warr_ru)
+    warranty.short_description = 'waranty'
+
+    class Meta:
+        unique_together = ('part_number', 'is_active')
+        ordering = ['name']
+        verbose_name = 'Мiкрофон'
+        verbose_name_plural = '6 Мiкрофони'

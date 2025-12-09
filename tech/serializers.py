@@ -4,6 +4,27 @@ from .models import *
 class MediaSerializer(serializers.Serializer):
     file = serializers.FileField()
 #
+
+
+class MikeSer(serializers.ModelSerializer):
+
+    pay_num = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Mike
+        fields = ('name', 'category_ru', 'category_ua', 'part_number',
+        'price_rent', 'pay_num', 'provider', 'vendor', 'hotline', 'delivery',
+        'mk_type_connect_ua', 'mk_type_connect_ru',
+        'mk_int', 'mk_focus_ua', 'mk_focus_ru', 'mk_db_ua',
+        'mk_db_ru', 'mk_col_ua', 'mk_col_ru', 'mk_weight', 'mk_freq', 'mk_vol',
+        'mk_warr_ua', 'mk_warr_ru', 'warranty',
+        'you_vid', 'label', 'creditoff',
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
+
+    def get_pay_num(self, obj):
+        return procent_to_payment(obj.get_price_rent - obj.discount)
+
+
 class MonitorsSer(serializers.ModelSerializer):
 
     pay_num = serializers.SerializerMethodField()

@@ -1510,3 +1510,104 @@ class OthersAdmin(admin.ModelAdmin):
                                     )
                                     )
     change_pack_few.short_description = 'Массовое изм hotline_label_delivery'
+
+
+class Mike_Inline(admin.StackedInline):
+    model = Mike
+    fields = ('part_number', 'price_usd')
+    save_as = True
+    extra = 0
+
+@admin.register(Mike)
+class MikeAdmin(admin.ModelAdmin):
+    list_max_show_all = 1000
+    list_filter = ('vendor', ProvFilter, 'is_active', FullFilter,
+    TechFilter, 'auto', 'hotline', 'creditoff', LabelFilter)
+    search_fields = ['part_number', 'name']
+    list_display = (
+    'name', 'get_sum_part_number', 'is_active', 'price_rent', 'get_price_rent',
+    'discount', 'pay_num',
+    'r_price', 'rrp_price', 'auto', 'price_ua', 'price_usd', 'provider',
+    'hotline', 'delivery', 'creditoff',
+    )
+    list_editable = ('r_price', 'price_rent', 'auto')
+    actions = ['change_rentability', 'change_pack_few', 'change_auto',
+    'change_is_active', 'change_discount']
+    autocomplete_fields = ['groups',]
+    save_as = True
+    save_on_top = True
+
+    inlines = [
+        Mike_Inline,
+    ]
+
+    class Media:
+        css = {
+            'all': ('admin/css/admin_customss.css',),
+        }
+        js = ('admin/js/auto_savess.js',)
+
+    def get_rentability(self, object):
+        return f'{str(object.price_rent)}({str(object.rentability)})'
+
+    get_rentability.short_description = "Цена с наценкой"
+
+    def change_rentability(self, request, queryset):
+        #test_queryset = queryset.update(kind='imb')
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('change_rentability_tech',
+                                    kwargs={'obj_pack': ','.join(str(pk) for pk in selected),
+                                    'obj_model': 'others'}
+                                    )
+                                    )
+    change_rentability.short_description = 'Массовое изм наценки'
+
+    def change_discount(self, request, queryset):
+        #test_queryset = queryset.update(kind='imb')
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('change_discount',
+                                    kwargs={'obj_pack': ','.join(str(pk) for pk in selected),
+                                    'obj_model': 'others'}
+                                    )
+                                    )
+    change_discount.short_description = 'Массовое изм скидки'
+
+    def change_is_active(self, request, queryset):
+        #test_queryset = queryset.update(kind='imb')
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('change_is_active_tech',
+                                    kwargs={'obj_pack': ','.join(str(pk) for pk in selected),
+                                    'obj_model': 'others'}
+                                    )
+                                    )
+    change_is_active.short_description = 'Массовое вкл/выкл'
+
+    def change_auto(self, request, queryset):
+        #test_queryset = queryset.update(kind='imb')
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('change_auto_tech',
+                                    kwargs={'obj_pack': ','.join(str(pk) for pk in selected),
+                                    'obj_model': 'others'}
+                                    )
+                                    )
+    change_auto.short_description = 'Массовое изм ручной цены'
+
+    def change_pack_few(self, request, queryset):
+        #test_queryset = queryset.update(kind='imb')
+        selected = queryset.values_list('pk', flat=True)
+
+        return  HttpResponseRedirect(
+                                    reverse('change_few_things_obj_tech',
+                                    kwargs={'obj_pack': ','.join(str(pk) for pk in selected),
+                                    'obj_model': 'others'}
+                                    )
+                                    )
+    change_pack_few.short_description = 'Массовое изм hotline_label_delivery'

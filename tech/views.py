@@ -39,6 +39,7 @@ def change_discount(request, obj_pack, obj_model):
     'cabelsplus': Cabelsplus.objects.all(),
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
+    'mike': Mike.objects.all(),
     }
 
     form = DiscountForm()
@@ -90,6 +91,7 @@ def change_rentability_tech(request, obj_pack, obj_model):
     'cabelsplus': Cabelsplus.objects.all(),
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
+    'mike': Mike.objects.all(),
     }
 
     form = RentabilityForm()
@@ -141,6 +143,7 @@ def change_is_active_tech(request, obj_pack, obj_model):
     'cabelsplus': Cabelsplus.objects.all(),
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
+    'mike': Mike.objects.all(),
     }
 
     form = IsActiveForm()
@@ -193,6 +196,7 @@ def change_auto_tech(request, obj_pack, obj_model):
     'cabelsplus': Cabelsplus.objects.all(),
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
+    'mike': Mike.objects.all(),
     }
 
     form = AutoForm()
@@ -244,6 +248,7 @@ def change_few_things_obj_tech(request, obj_pack, obj_model):
     'cabelsplus': Cabelsplus.objects.all(),
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
+    'mike': Mike.objects.all(),
     }
 
     form = SinglePackFewForm()
@@ -299,7 +304,7 @@ def change_few_things_obj_tech(request, obj_pack, obj_model):
     return render(request, 'money/admin_test.html', context)
 
 def do_full_path(data_set):
-    # добавляет в пути фото1,2,3 полный путь
+    # добавляет в пути фото1,2,3,4 полный путь
 
     for ser in data_set:
         try:
@@ -312,6 +317,10 @@ def do_full_path(data_set):
             pass
         try:
             ser['cover3'] = 'http://versum.site:5222' + ser['cover3']
+        except:
+            pass
+        try:
+            ser['cover4'] = 'http://versum.site:5222' + ser['cover4']
         except:
             pass
 
@@ -346,6 +355,9 @@ class distrib_tech(APIView):
         wifi = WiFis.objects.filter(is_active=True, groups__isnull=True)
         serializer = WiFisSer(wifi, many=True)
         Dict_full['wifi'] = do_full_path(serializer.data)
+        mike = Mike.objects.filter(is_active=True, groups__isnull=True)
+        serializer = MikeSer(mike, many=True)
+        Dict_full['mike'] = do_full_path(serializer.data)
         acoustics = Acoustics.objects.filter(is_active=True, groups__isnull=True)
         serializer = AcousticsSer(acoustics, many=True)
         Dict_full['acoustics'] = do_full_path(serializer.data)
