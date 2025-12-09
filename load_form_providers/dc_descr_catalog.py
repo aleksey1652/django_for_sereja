@@ -11,13 +11,13 @@ from singleparts.models import *
 from tech.models import *
 from cat.models import Parts_full, USD, Results
 from .other_descr_catalog import From_provders_filePrices
-from .dc_descr_adv import to_False_or_True,get_discr_categ_dc,get_foto_price_name
+from .dc_descr_adv import to_False_or_True,get_discr_categ_dc,get_foto_price_name, key_in_dict
 from .dc_descr_adv import newMonitor, newKM, newKeyboards, newMouses, newPads,\
 newHeadsets, newWebcams, newWiFis, newAcoustics, newTables, newChairs,\
-newCabelsplus, newFilters
+newCabelsplus, newFilters, newMike
 
 #from load_form_providers.get_service Cooler_OTHER get_from_xml, from_price_get_new_models
-# to_model_price_from_dc upload_edit_foto to_tech_price_from_dc 
+# to_model_price_from_dc upload_edit_foto to_tech_price_from_dc
 
 
 def get_foto_list(categ, DC_LOGIN, DC_PASSWORD):
@@ -55,7 +55,7 @@ def get_from_xml(xml, DC_LOGIN, DC_PASSWORD, ff=True, periphery=False):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25',
+    '45', '54', '648', '125', '968', '1376', '25', '970',
     )
 
     category = category_periphery if periphery else category_main
@@ -114,7 +114,7 @@ def from_file_get_part(filename, periphery=False):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25',
+    '45', '54', '648', '125', '968', '1376', '25', '970',
     )
 
     category = category_periphery if periphery else category_main
@@ -623,7 +623,7 @@ def to_tech_price_from_dc(for_brain=None):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25',
+    '45', '54', '648', '125', '968', '1376', '25', '970',
     )
     status_ = {'*****':'yes','****':'yes','***':'yes','**':'yes','*':'yes'}
 
@@ -676,6 +676,7 @@ def to_tech_price_from_dc(for_brain=None):
     partnums_tech += list(Chairs.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Cabelsplus.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Filters.objects.all().values_list('part_number',flat=True))
+    partnums_tech += list(Mike.objects.all().values_list('part_number',flat=True))
 
     f = From_provders_filePrices(partnums_tech, dc_dict, usd_cuurency)
     if for_brain:
@@ -745,6 +746,9 @@ def to_tech_price_from_dc(for_brain=None):
     for obj in Filters.objects.all():
         if '45' in dc_dict:
             objects_tech_edit(obj, usd_cuurency, dc_dict['45'])
+    for obj in Mike.objects.all():
+        if '970' in dc_dict:
+            objects_tech_edit(obj, usd_cuurency, dc_dict['970'])
 
 # словарь tech_ для работы с from_price_new_tech_per_kind
 # lambda для отложенного вызова функций с еще несформированными словарми,
@@ -815,6 +819,11 @@ tech_ = {
         '45',
         Filters.objects.all().values_list('part_number', flat=True),
         ),
+'mike': (
+        lambda d1, d2, d3, f=newMike: f(d1, d2, d3),
+        '970',
+        Filters.objects.all().values_list('part_number', flat=True),
+        ),
 }
 
 
@@ -825,7 +834,7 @@ def from_price_new_tech_per_kind(kind_tech):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25',
+    '45', '54', '648', '125', '968', '1376', '25', '970',
     )
 
     with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
@@ -890,7 +899,7 @@ def from_price_get_new_tech(prov):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25',
+    '45', '54', '648', '125', '968', '1376', '25', '970',
     )
 
     with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
@@ -924,6 +933,24 @@ def from_price_get_new_tech(prov):
                     dc_dict[d['CategoryID']][d['Article']] = d
         except:
             print('error but next')
+
+    try:
+        dict_set = set(dc_dict['970'].keys())
+    except:
+        dict_set = set()
+    q_set = set(Mike.objects.all().values_list('part_number', flat=True))
+    res = dict_set - q_set
+    res_list_dict = [
+    {'name_parts': x, 'partnumber_parts': dc_dict['970'][x]['Name']} for x in res
+    ]
+    for_result = json.dumps(res_list_dict,
+    ensure_ascii=False)
+    r, _ = Results.objects.get_or_create(who=f'mike_{prov}')
+    r.json_data = for_result
+    r.save()
+    for key in res:
+        newMike(dict_category_periphery, dc_dict['970'][key], dict_category_foto)
+
     try:
         dict_set = set(dc_dict['5'].keys())
     except:
@@ -3173,4 +3200,89 @@ def edit_monitor():
                 dict_res[dc_products['Article']] = res
             except Exception as e:
                 error.add(e)
+    return (dict_res, error)
+
+
+def new_mike_test():
+    #
+    DC_LOGIN = 'itblok'
+    DC_PASSWORD = 'VIA5qPUv'
+    with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
+        xml = fobj.read()
+    list_periphery, dict_category_periphery, dict_category_foto = get_from_xml(
+    xml, DC_LOGIN, DC_PASSWORD, periphery=True)
+    dict_res = {}
+    error = set()
+    list_error = []
+    for list_ in list_periphery:
+        if list_['CategoryID'] == '970':
+            try:
+                dc_products = list_
+                name_t = 'Микрофон '
+                if Mike.objects.filter(part_number=dc_products['Article']).exists():
+                    continue
+                res, foto_, temp_price, name_ = get_foto_price_name(
+                dict_category_periphery, dc_products, dict_category_foto, name_t)
+
+                type = \
+                res[dc_products['Code']]['Тип підключення']\
+                 if 'Тип підключення' in res[dc_products['Code']] else '-'
+                int_ = \
+                res[dc_products['Code']]['Інтерфейс']\
+                 if 'Інтерфейс' in res[dc_products['Code']] else '-'
+                focus = \
+                res[dc_products['Code']]['Спрямованість']\
+                 if 'Спрямованість' in res[dc_products['Code']] else '-'
+                frequency = \
+                res[dc_products['Code']]['Частотний діапазон']\
+                 if 'Частотний діапазон' in res[dc_products['Code']] else '-'
+                db = \
+                res[dc_products['Code']]['Чутливість']\
+                 if 'Чутливість' in res[dc_products['Code']] else '-'
+                vol = \
+                res[dc_products['Code']]['Габарити']\
+                 if 'Габарити' in res[dc_products['Code']] else '-'
+                w = \
+                res[dc_products['Code']]['Вага']\
+                 if 'Вага' in res[dc_products['Code']] else '-'
+                color = \
+                res[dc_products['Code']]['Колір']\
+                 if 'Колір' in res[dc_products['Code']] else '-'
+
+                Mike.objects.create(
+                name=name_,
+                is_active=False,
+                full=False,
+                category_ru='Микрофон',
+                category_ua='Мiкрофон',
+                part_number=dc_products['Article'],
+                price_rent=round(temp_price * 1.05 * 42),
+                r_price=round(temp_price * 1.05 * 42),
+                price_ua=round(temp_price * 42),
+                price_usd=temp_price,
+                vendor=key_in_dict(dc_products, 'Vendor'),
+                mk_type_connect_ua=type,
+                mk_type_connect_ru=type,
+                mk_int=int_,
+                mk_focus_ua=focus,
+                mk_focus_ru=focus,
+                mk_freq=frequency,
+                mk_db_ua=db,
+                mk_db_ru=db,
+                mk_col_ua=color,
+                mk_col_ru=color,
+                mk_weight=w,
+                mk_vol=vol,
+
+                mk_warr_ua=key_in_dict(dc_products, 'Warranty'),
+                mk_warr_ru=key_in_dict(dc_products, 'Warranty'),
+                cover1=foto_[0],
+                cover2=foto_[1],
+                cover3=foto_[-1],
+                )
+
+                dict_res[dc_products['Article']] = res
+            except Exception as e:
+                error.add(e)
+                list_error.append({dc_products['Article']: e})
     return (dict_res, error)

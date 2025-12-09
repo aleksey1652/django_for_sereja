@@ -102,6 +102,86 @@ def get_foto_price_name(dict_category_periphery, dc_products, dict_category_foto
 
     return (res, foto_, temp_price, name_)
 
+
+def newMike(dict_category_periphery, dc_products, dict_category_foto):
+    # создаем одиночный микрофон
+    # dc_products - получен из dc_dict[d['CategoryID']]['Article']
+    name_t = 'Микрофон '
+
+    try:
+        if Mike.objects.filter(part_number=dc_products['Article']).exists():
+            return False
+
+        res, foto_, temp_price, name_ = get_foto_price_name(
+        dict_category_periphery, dc_products, dict_category_foto, name_t)
+
+        type = \
+        res[dc_products['Code']]['Тип підключення']\
+         if 'Тип підключення' in res[dc_products['Code']] else '-'
+        int_ = \
+        res[dc_products['Code']]['Інтерфейс']\
+         if 'Інтерфейс' in res[dc_products['Code']] else '-'
+        focus = \
+        res[dc_products['Code']]['Спрямованість']\
+         if 'Спрямованість' in res[dc_products['Code']] else '-'
+        frequency = \
+        res[dc_products['Code']]['Частотний діапазон']\
+         if 'Частотний діапазон' in res[dc_products['Code']] else '-'
+        db = \
+        res[dc_products['Code']]['Чутливість']\
+         if 'Чутливість' in res[dc_products['Code']] else '-'
+        vol = \
+        res[dc_products['Code']]['Габарити']\
+         if 'Габарити' in res[dc_products['Code']] else '-'
+        w = \
+        res[dc_products['Code']]['Вага']\
+         if 'Вага' in res[dc_products['Code']] else '-'
+        color = \
+        res[dc_products['Code']]['Колір']\
+         if 'Колір' in res[dc_products['Code']] else '-'
+
+        Mike.objects.create(
+        name=name_,
+        is_active=False,
+        full=False,
+        category_ru='Микрофон',
+        category_ua='Мiкрофон',
+        part_number=dc_products['Article'],
+        price_rent=round(temp_price * 1.05 * 42),
+        r_price=round(temp_price * 1.05 * 42),
+        price_ua=round(temp_price * 42),
+        price_usd=temp_price,
+        vendor=key_in_dict(dc_products, 'Vendor'),
+        mk_type_connect_ua=type,
+        mk_type_connect_ru=type,
+        mk_int=int_,
+        mk_focus_ua=focus,
+        mk_focus_ru=focus,
+        mk_freq=frequency,
+        mk_db_ua=db,
+        mk_db_ru=db,
+        mk_col_ua=color,
+        mk_col_ru=color,
+        mk_weight=w,
+        mk_vol=vol,
+
+        mk_warr_ua=key_in_dict(dc_products, 'Warranty'),
+        mk_warr_ru=key_in_dict(dc_products, 'Warranty'),
+        cover1=foto_[0],
+        cover2=foto_[1],
+        cover3=foto_[-1],
+        )
+    except Exception as e:
+        try:
+            print(dc_products['Article'], e)
+            return False
+        except Exception as es:
+            print(es)
+            return False
+
+    return True
+
+
 def newMonitor(dict_category_periphery, dc_products, dict_category_foto):
     # создаем одиночный монитор
     # dc_products - получен из dc_dict[d['CategoryID']]['Article']
