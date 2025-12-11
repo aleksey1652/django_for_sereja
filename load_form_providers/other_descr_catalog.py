@@ -47,7 +47,8 @@ class From_provders_filePrices:
         'Веб-камеры': '54',
         #'Мониторы': '5',
         'Наушники, гарнитуры, микрофоны': '56',
-        #'Наушники, гарнитуры, микрофоны': '970',
+        #'Наушники, гарнитуры, микрофоны': '970', в дс микрофоны одиночная кат-я, здесь общая
+        'Микрофоны': '970', # поэтому создадим все же микрофоны из подкатегории CategoryName
         }
         # категории brain в dict_ категории
 
@@ -64,16 +65,6 @@ class From_provders_filePrices:
                         'count_update': __count_update,
                         'status': 'no_file'})
 
-        dict_new = { # из self.dict_ создаем dict_new со слитыми категориями
-        **self.dict_,
-        "56": {
-            **self.dict_.get("56", {}),
-            **self.dict_.get("970", {}),
-        } # self.dict_ - словарь dc
-        } # записываем раздел '970' (микрофоны)
-        # в '56', т.к. в brain это одна общая категория
-
-
         if isinstance(json_data, dict):
 
             for data_json_data in json_data.values():
@@ -88,21 +79,24 @@ class From_provders_filePrices:
                             rrp = float(data_json_data['RetailPrice'])
                         except:
                             rrp = 0
-                        if dict_sub[data_json_data['Group']] in dict_new:
+                        if data_json_data['CategoryName'] == 'Микрофоны':
+                            # если подкатегория Микрофоны, изменяем категорию Group
+                            data_json_data['Group'] = 'Микрофоны'
+                        if dict_sub[data_json_data['Group']] in self.dict_:
                             # если категория-brain в dict_
-                            if data_json_data['Article'] in dict_new[
+                            if data_json_data['Article'] in self.dict_[
                             dict_sub[data_json_data['Group']]
                             ]:
                                 # если партнамбер уже существует и цена ниже - меняем в dict_
                                 try:
                                     price_dict = float(
-                                    dict_new[dict_sub[
+                                    self.dict_[dict_sub[
                                     data_json_data['Group']]][data_json_data['Article']][
                                     'PriceUSD'])
                                 except:
                                     price_dict = 0
                                 if price_ < price_dict:
-                                    dict_new[
+                                    self.dict_[
                                     dict_sub[
                                     data_json_data['Group']]][data_json_data['Article']] = \
                                     {'PriceUSD': price_,
@@ -111,7 +105,7 @@ class From_provders_filePrices:
                                     __count_update += 1
                             else:
                                 # если партнамбера нет - записываем в dict_
-                                dict_new[
+                                self.dict_[
                                 dict_sub[data_json_data['Group']]][data_json_data['Article']] =\
                                 {'PriceUSD': price_,
                                 'provider': 'brain',
@@ -119,8 +113,8 @@ class From_provders_filePrices:
                                 __count_new += 1
                         else:
                             # если категория-brain нет dict_ - создаем кат и записываем нов об-т
-                            dict_new[dict_sub[data_json_data['Group']]] = {}
-                            dict_new[
+                            self.dict_[dict_sub[data_json_data['Group']]] = {}
+                            self.dict_[
                             dict_sub[data_json_data['Group']]][data_json_data['Article']] =\
                             {'PriceUSD': price_,
                             'provider': 'brain',
@@ -153,6 +147,7 @@ class From_provders_filePrices:
         'Комплекти (клавіатура+миша)': '968',
         'Навушники та мікрофони': '56',
         #'Навушники та мікрофони': '970',
+        'мікрофон': '970', # создадим все же микрофоны
         'Акустичні системи': '25',
         'Ігрові столи': '1376',
         'Мережеві фільтри': '45',
@@ -180,20 +175,11 @@ class From_provders_filePrices:
                     'count_update': __count_update,
                     'status': 'xml_data_bad'})
 
-        dict_new = { # из self.dict_ создаем dict_new со слитыми категориями
-        **self.dict_,
-        "56": {
-            **self.dict_.get("56", {}),
-            **self.dict_.get("970", {}),
-        } # self.dict_ - словарь dc
-        } # записываем раздел '970' (микрофоны)
-        # в '56', т.к. в brain это одна общая категория
-
         for data in result_data:
             try:
                 temp = dict()
                 for k in data.getchildren():
-                    if k.tag in ['Code', 'Price', 'StockName', 'Subcategory', 'RRP']:
+                    if k.tag in ['Code', 'Price', 'StockName', 'Subcategory', 'RRP', 'NameUkr']:
                         temp[k.tag] = k.text
                 if temp['Subcategory'] in dict_sub and temp['Code'] in\
                 self.set_parts and temp['StockName'] in status_:
@@ -202,21 +188,24 @@ class From_provders_filePrices:
                         rrp = float(temp['RRP'])
                     except:
                         rrp = 0
-                    if dict_sub[temp['Subcategory']] in dict_new:
+                    if 'NameUkr' in temp and temp['NameUkr'].lower().find('мікрофон') != -1:
+                        # если NameUkr - содержит мікрофон, изменяем категорию Subcategory
+                        temp['Subcategory'] = 'мікрофон'
+                    if dict_sub[temp['Subcategory']] in self.dict_:
                         # если категория-edg в dict_
-                        if temp['Code'] in dict_new[
+                        if temp['Code'] in self.dict_[
                         dict_sub[temp['Subcategory']]
                         ]:
                             # если партнамбер уже существует и цена ниже - меняем в dict_
                             try:
                                 price_dict = float(
-                                dict_new[dict_sub[
+                                self.dict_[dict_sub[
                                 temp['Subcategory']]][temp['Code']][
                                 'PriceUSD'])
                             except:
                                 price_dict = 0
                             if price_ < price_dict:
-                                dict_new[
+                                self.dict_[
                                 dict_sub[
                                 temp['Subcategory']]][temp['Code']] = \
                                 {'PriceUSD': price_,
@@ -225,7 +214,7 @@ class From_provders_filePrices:
                                 __count_update += 1
                         else:
                             # если партнамбера нет - записываем в dict_
-                            dict_new[
+                            self.dict_[
                             dict_sub[temp['Subcategory']]][temp['Code']] =\
                             {'PriceUSD': price_,
                             'provider': 'edg',
@@ -233,8 +222,8 @@ class From_provders_filePrices:
                             __count_new += 1
                     else:
                         # если категория-edg нет dict_ - создаем кат и записываем нов об-т
-                        dict_new[dict_sub[temp['Subcategory']]] = {}
-                        dict_new[
+                        self.dict_[dict_sub[temp['Subcategory']]] = {}
+                        self.dict_[
                         dict_sub[temp['Subcategory']]][temp['Code']] =\
                         {'PriceUSD': price_,
                         'provider': 'edg',
