@@ -706,10 +706,10 @@ def Parsing_from_providers():
     Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
     """
 
-    prov_ = ('dc', 'asbis', 'elko', 'brain', 'mti', 'edg') # кортеж для Parts_full
+    prov_ = ('dc', 'asbis', 'elko', 'brain', 'mti', 'edg', 'itlink',) # кортеж для Parts_full
     # prov_ ниже - новый алг: оставляем прайс от пров старым если не загрузили
     #prov_ = [] # список для Parts_full (наполняем позже, если загрузили)
-    prov_file = ('itlink', 'erc', 'be', 'dw', 'pccooler') # кортеж для Parts_full '-'
+    prov_file = ('erc', 'be', 'dw', 'pccooler') # кортеж для Parts_full '-'
 
     Parts_full.objects.filter( # выключаем все детали из prov_ + '-'
     providers__name_provider__in=prov_ + ('-',)).exclude(
@@ -730,6 +730,7 @@ def Parsing_from_providers():
     'brain': {},
     'mti': {},
     'edg': {},
+    'itlink': {},
     }
 
     # dict_message библиотека от всех постачей с результатами конечной работы
@@ -741,6 +742,7 @@ def Parsing_from_providers():
     'brain': '',
     'mti': '',
     'edg': '',
+    'itlink': '',
     '-': '',
     }
 
@@ -753,6 +755,7 @@ def Parsing_from_providers():
     'brain': ('getBRAIN', 'load_form_providers/brain-price.json'),
     'mti': ('getMTI', 'load_form_providers/mti_price.xml'),
     'edg': ('getEDG', 'load_form_providers/edg-price.xml'),
+    'itlink': ('getItlink', 'load_form_providers/itlink-price.xml'),
     }
 
     # class_prov для работы с циклом обьектов класса From_provders_to_dict
@@ -763,6 +766,7 @@ def Parsing_from_providers():
     'brain': BRAIN(),
     'mti': MTI(usd_ua),
     'edg': EDG(),
+    'itlink': ITLINK(),
     }
 
     start = timezone.now()
@@ -821,5 +825,23 @@ def Parsing_from_providers():
 
 # remainder
 """
+data = {
+    get_text(item.find("WIC")): {
+        "partnumber_parts": get_text(item.find("WIC")),
+        "name_parts": get_text(item.find("DESCRIPTION")),
+        "availability_parts": asbis_avail(get_text(item.find("AVAIL"))),
+        "kind": _asbis_kind(get_text(item.find("GROUP_NAME")),
+        get_text(item.find("DESCRIPTION")),
+        get_text(item.find("VENDOR_NAME")),
+        ),
+        "providerprice_parts": round(get_float(item.find("MY_PRICE")) / usd, 1),
+        "RRP_UAH": get_float(item.find("RETAIL_PRICE")),
+    }
+    for item in asbis_price if get_text(item.find("GROUP_NAME")) in ('Системная плата для настольного ПК',)\
+    and asbis_avail(get_text(item.find("AVAIL"))) == 'yes'
+}
 
+for item in asbis_price:
+    if get_text(item.find("GROUP_NAME")) == 'Системная плата для настольного ПК':
+        print(get_text(item.find("DESCRIPTION")))
 """

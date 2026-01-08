@@ -7,70 +7,37 @@ from lxml import etree
 from xml.etree.ElementTree import ParseError
 
 class ITLINK:
-    ITLINK_LOGIN = 'hotbox'
-    ITLINK_PASSWORD = 'рщеищч321!'
+    #ITLINK_LOGIN = 'hotbox'
+    #ITLINK_PASSWORD = 'рщеищч321!'
 
-    price_url = 'http://it-link.ua/Home/pricelist?id=%20%20%20%20%20A135'
-
-    def get_price(self):
-        with open("load_form_providers/list_articles.json", "r") as write_file:
-            list_get_list2=json.load(write_file)
-        return list_get_list2
+    price_url = 'https://it-link.ua/api/v1.0/Price?id=YTVjNzY4ZjQtZDRiMS0xMWVhLTgwYzQtMDAwYzI5ZTU4ZDUx&cid=N2NkYWU3NzAtZDRiOC0xMWVhLTgwYzQtMDAwYzI5ZTU4ZDUx'
 
     def get_basa(self, fun2=0):
-        ff = self.get_price() if fun2 else 0
-        with requests.Session() as rs:
-            r = rs.post(
-                'http://it-link.ua/account/LogOn',
-                data={
-                    'username': self.ITLINK_LOGIN,
-                    'password': self.ITLINK_PASSWORD,
-                    'rememberMe': False
-                }
-            )
+        """ """
+        content_ = None
+        try:
+            itlink = requests.get(self.price_url)
+            if itlink.status_code == 200:
+                content_ = itlink.content
+                root = etree.fromstring(content_)
+        except Exception as e:
+            print(e)
+            return content_
 
-            """price_columns = [
-                'price', 'model', 'article', 'availability'
-            ]
-            filename = download_file(self.price_url, 'itlink-price.xml', rs)
+        price_filename = 'load_form_providers/itlink-price.xml'
+        with open(price_filename, "wb") as f:
+            f.write(etree.tostring(
+            root,
+            pretty_print=True,
+            encoding="utf-8",
+            xml_declaration=True
+             ))
 
-            m = get_from_xml(filename)"""
-
-            """if m:
-                basa = pd.DataFrame(m, columns=price_columns)
-            else:
-                price_columns = ['Article', 'Availability', 'Price']
-                basa = pd.DataFrame(get_from_html(filename), columns=price_columns) if filename else pd.DataFrame()"""
-            filename = download_file(self.price_url, 'load_form_providers/itlink-price.xml', rs)
-            price_columns = ['Article', 'Availability', 'Price', 'Meas', 'Url']
-            basa = pd.DataFrame(get_from_html(filename, ff), columns=price_columns) if filename else pd.DataFrame()
-
-        return basa
-
-    def get_sort_basa(self):
-        res=self.get_basa(fun2=1)
-        ff = self.get_price()
-
-        def com_l(d,element):
-            if element:
-                for x in d:
-                        if x.Article==element:
-                            return True, x
-                return False, pd.DataFrame()
-            else:
-                return False, pd.DataFrame()
-
-        list_itlink=[]
-        for x in ff:
-            s1,s2 = com_l(res.iloc,x)
-            if s1:
-                list_itlink.append(s2)
-            else:
-                list_itlink.append(pd.DataFrame())
-        return list_itlink
+        return content_
 
     def get_sort_basa2(self):
-        return [pd.DataFrame()]
+        res=self.get_basa()
+        return res
 
     def send_res(self, w=0):
         try:

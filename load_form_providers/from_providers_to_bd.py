@@ -13,6 +13,58 @@ from django.db.models import F, FloatField, IntegerField, CharField, Value
 from django.db.models.functions import Substr, Cast, StrIndex
 
 
+def find_min_bd(data, article):
+    """ищем мин цену от files_providers, если есть - добавляем к data,
+       возвращаем data неизменной или обновленной от files_providers
+    """
+
+    files_providers = ('erc', 'be', 'dw', 'pccooler')
+
+    files = Parts_full.objects.filter(
+    partnumber_parts=article, providers__name_provider__in=files_providers,
+    availability_parts='yes', providerprice_parts__gt=0)
+
+    if files.exists():
+        min_prov = files.annotate(
+        provider=F('providers__name_provider'),
+        RRP_UAH=F('rrprice_parts')
+        ).values(
+        'provider', 'providerprice_parts',
+        'RRP_UAH', 'availability_parts',
+        'name_parts', 'partnumber_parts', 'kind'
+        ).order_by('providerprice_parts').first()
+
+        dict_ = dict(min_prov)
+        if dict_:
+            data[dict_['provider']] = {dict_['partnumber_parts']: dict_}
+
+    return data
+
+def find_min_price(data, article):
+    """ищем мин цену из сумарного словаря поставщиков + от файловых постачей find_min_bd,
+       возвращаем кортеж, например: ('dc', {словарь с инфой, в том числе и мин ценой})
+    """
+
+    data = find_min_bd(data, article) # добавляем в data файловых постачей, если они есть
+
+    heap = [
+        (source[article]['providerprice_parts'], key, source[article])
+        for key, source in data.items() if article in source and\
+        source[article]['availability_parts'] == 'yes'
+    ]
+    if heap:
+        # Возвращаем источник и словарь с минимальной ценой
+        _, min_key, min_data = heapq.nsmallest(1, heap, key=lambda x: x[0])[0]
+        return min_key, min_data
+    # Если артикул есть, но нет доступных товаров, сразу возвращаем дефолтное значение
+    return next(
+        ((key, {'providerprice_parts': 0, 'availability_parts': 'no'}
+        ) for key, source in data.items() if article in source),
+        None
+    )
+    return None
+
+
 def bdRemainder():
     """
     Склад
@@ -254,34 +306,6 @@ def bdCreateMain(dict_full, article):
         return None
 
     return full
-
-
-def find_min_bd(data, article):
-    """ищем мин цену от files_providers, если есть - добавляем к data,
-       возвращаем data неизменной или обновленной от files_providers
-    """
-
-    files_providers = ('itlink', 'erc', 'be', 'dw', 'pccooler')
-
-    files = Parts_full.objects.filter(
-    partnumber_parts=article, providers__name_provider__in=files_providers,
-    availability_parts='yes', providerprice_parts__gt=0)
-
-    if files.exists():
-        min_prov = files.annotate(
-        provider=F('providers__name_provider'),
-        RRP_UAH=F('rrprice_parts')
-        ).values(
-        'provider', 'providerprice_parts',
-        'RRP_UAH', 'availability_parts',
-        'name_parts', 'partnumber_parts', 'kind'
-        ).order_by('providerprice_parts').first()
-
-        dict_ = dict(min_prov)
-        if dict_:
-            data[dict_['provider']] = {dict_['partnumber_parts']: dict_}
-
-    return data
 
 
 def updateResults(dict_message, duration, short_all, short_in, sklsdWith, sklsdOnly):

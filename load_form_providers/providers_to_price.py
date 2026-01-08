@@ -14,9 +14,10 @@ OnlyGroups = {
 '8', '3', '724', '255', '1', '9', '27', '2', '23', '6', '5'
 ),
 'asbis': (
-'Monitor LCD', 'Cooling System', 'Monitor LED','CPU Desktop',
-'HDD Video Surveillance', 'SSD Client', 'Memory Desktop',
-'Video Card', 'HDD NAS', 'HDD Desktop'
+'Блок питания', 'Видеоплата', 'Корпус', 'Вентилятор', 'Жесткий диск для настольного ПК',
+'Память для игрового ПК', 'Монитор со светодиодной подсветкой LED', 'Gaming Monitor',
+'Твердотельный накопитель (SSD)', 'Память для настольных систем', 'Система охлаждения',
+'Процессор для настольного ПК'
 ),
 'elko': (
 'COC','CAS','LC3','MEM','WRA', 'MBA', 'HDS', 'VGP',
@@ -37,7 +38,35 @@ OnlyGroups = {
 (
 'Блоки живлення ATX','Корпуси', 'Системи охолодження, Cooler',
 ),
+'itlink': (
+"4d06d5bc-d49f-11ea-80c4-000c29e58d51",
+"4d06d5f4-d49f-11ea-80c4-000c29e58d51",
+"4d06d5c0-d49f-11ea-80c4-000c29e58d51",
+"4d06d5c4-d49f-11ea-80c4-000c29e58d51",
+"4d06d5c6-d49f-11ea-80c4-000c29e58d51",
+"4d06d5de-d49f-11ea-80c4-000c29e58d51",
+#"4d06d5d6-d49f-11ea-80c4-000c29e58d51", видяхи не выгружаем
+"4d06d5f8-d49f-11ea-80c4-000c29e58d51",
+"4d06d5ac-d49f-11ea-80c4-000c29e58d51",
+"4d06d5b2-d49f-11ea-80c4-000c29e58d51",
+),
 }
+
+
+def do_xml_param_itlink_(item, attrs, attrs_values):
+    """
+    вспомогательная ф для получения значения атрибута тэга xml item (для
+    примера: <param name="Модельный ряд">Red Pro</param>
+             <param other="other values">...</param>
+     attrs="name",
+    attrs_values="Модельный ряд")
+    """
+    try:
+        return [param for param in item.findall("param") if param.get(
+        attrs) == attrs_values][0].text.lower()
+    except Exception as e:
+        return None
+
 
 def GroupToKind(provider):
     """ из OnlyGroups (словарь групп-категорий поставщиков)
@@ -141,6 +170,20 @@ def edg_avail(data):
         return 'no'
 
 
+def itlinkP_avail(data, tag='available'):
+    """itlink data - тэг с параметром tag, на выходе - унифицированный статус
+    согласно словаря иначе 'no' """
+
+    avail_dict = {
+    "true":'yes',
+    'false':'no',
+    }
+    try:
+        return avail_dict[data.get(tag)]
+    except:
+        return 'no'
+
+
 class From_provders_to_dict:
     """ собираем в dict инфу от провайдеров, структура: ... """
 
@@ -166,7 +209,13 @@ class From_provders_to_dict:
                     etree.fromstring(self.content)
                     print("Тип данных: XML")
                 except:
-                    print("Тип данных: Неизвестный")
+                    #print("Тип данных: Неизвестный")
+                    try:
+                        etree.fromstring(self.content.encode('utf-8'))
+                        print("Тип данных: XML")
+                        self.content = self.content.encode('utf-8')
+                    except:
+                        print("Тип данных: Неизвестный")
         else:
             print("Тип данных: Не байт и не строка")
 
@@ -285,16 +334,18 @@ class From_provders_to_dict:
         """
         kind_item = 'vent'
         Category_main_dict = {
-        'CPU Desktop': 'proc',
-        'Cooling System': 'cool',
-        'HDD Desktop': 'hdd',
-        'HDD Video Surveillance': 'hdd',
-        'HDD NAS': 'hdd',
-        'Monitor LCD': 'mon',
-        'Monitor LED': 'mon',
-        'Video Card': 'video',
-        'SSD Client': 'ssd',
-        'Memory Desktop': 'mem',
+        'Процессор для настольного ПК': 'proc',
+        'Система охлаждения': 'cool',
+        'Жесткий диск для настольного ПК': 'hdd',
+        'Gaming Monitor': 'mon',
+        'Монитор со светодиодной подсветкой LED': 'mon',
+        'Видеоплата': 'video',
+        'Твердотельный накопитель (SSD)': 'ssd',
+        'Память для настольных систем': 'mem',
+        'Память для игрового ПК': 'mem',
+        'Блок питания': 'ps',
+        'Вентилятор': 'vent',
+        'Корпус': 'case',
         }
         if CategoryID in Category_main_dict:
             temp_kind = Category_main_dict[CategoryID]
@@ -588,7 +639,7 @@ class From_provders_to_dict:
             print('ошибка в json')
             return data
 
-        if not brain:
+        if not brain or not isinstance(brain, dict):
             return data
 
         data = {
@@ -673,6 +724,91 @@ class From_provders_to_dict:
             }
             for item in edg_price if get_text(item.find("Subcategory")) in group\
             and edg_avail(get_text(item.find("StockName"))) == 'yes'
+        }
+
+        return data
+
+
+    def _itlink_kind(self, Group, item, Vendor):
+        """Создаем 'kind' согласно Category_main_dict.
+        item - сам элемент с тэгом param и атрибутом name: Опис - это для материнок надо
+        """
+        kind_item = 'vent'
+        Category_main_dict = {
+        "4d06d5bc-d49f-11ea-80c4-000c29e58d51": 'ps',
+        "4d06d5f4-d49f-11ea-80c4-000c29e58d51": 'mem',
+        "4d06d5c0-d49f-11ea-80c4-000c29e58d51": 'mb',
+        "4d06d5c4-d49f-11ea-80c4-000c29e58d51": 'case',
+        "4d06d5c6-d49f-11ea-80c4-000c29e58d51": 'ssd',
+        "4d06d5de-d49f-11ea-80c4-000c29e58d51": 'hdd',
+        "4d06d5d6-d49f-11ea-80c4-000c29e58d51": 'video',
+        "4d06d5f8-d49f-11ea-80c4-000c29e58d51": 'proc',
+        "4d06d5ac-d49f-11ea-80c4-000c29e58d51": 'cool',
+        "4d06d5b2-d49f-11ea-80c4-000c29e58d51": 'vent',
+        }
+        if Group in Category_main_dict:
+            temp_kind = Category_main_dict[Group]
+            if temp_kind == 'proc':
+                kind_item = 'iproc' if Vendor.lower() == 'intel' else 'aproc'
+                return kind_item
+            if temp_kind == 'mb':
+                res = do_xml_param_itlink_(item, 'name', 'Чипсет')
+                if res:
+                    _ = isinstance(res, str) and res.lower().find('intel') != -1
+                    intel_or_amd = 'imb' if _ else 'amb'
+                    return intel_or_amd
+                res = do_xml_param_itlink_(item, 'name', 'Опис')
+                if res:
+                    intel_or_amd = 'imb' if res.find('intel') != -1 else 'amb'
+                    return intel_or_amd
+                return 'amb'
+
+            return Category_main_dict[Group]
+        return kind_item
+
+
+    def getItlink(self, file=None):
+        """ возвращаем словарь где ключи: партнамбера от 'itlink', а значения типа:
+            {'partnumber_parts': 'GLE850', 'name_parts': 'Блок живлення 850 Вт',
+            'availability_parts': 'yes', 'kind': 'ps',
+            'providerprice_parts': 116.0, 'RRP_UAH': 5899.0}
+        """
+
+        data = {} # пока пустой словарь
+
+        #usd = self.currency
+
+        xml = self._loadFromFile(file) if file else self.content
+
+        group = GroupToKind('itlink') # получим кортеж нужных групп от 'itlink'
+        if not group:
+            print('no group')
+            return data
+
+        try:
+            root = etree.fromstring(xml)
+        except:
+            print('ошибка в xml')
+            return data
+        try:
+            itlink_price = root.xpath("//offer")
+        except:
+            print('структура xml уже другая?')
+            return data
+
+        data = {
+            get_text(item.find("vendorCode")): {
+                "partnumber_parts": get_text(item.find("vendorCode")),
+                "name_parts": get_text(item.find("name")),
+                "availability_parts": itlinkP_avail(item),
+                "kind": self._itlink_kind(get_text(item.find("categoryId")), item,
+                get_text(item.find("vendor")),
+                ),
+                "providerprice_parts": get_float(item.find("price")),
+                "RRP_UAH": get_float(item.find("rrp")),
+            }
+            for item in itlink_price if get_text(item.find("categoryId")) in group\
+            and itlinkP_avail(item) == 'yes'
         }
 
         return data
@@ -1389,6 +1525,5 @@ def in_comps_it_all():
             )
     except:
         updated_parts_ok = []
-
 
 """
