@@ -2198,3 +2198,200 @@ class Mike(models.Model):
         ordering = ['name']
         verbose_name = 'Мiкрофон'
         verbose_name_plural = '6 Мiкрофони'
+
+
+class NB(models.Model):
+    #
+
+    name = models.CharField(max_length=300, unique=True, verbose_name="Iм'я")
+    category_ru = models.CharField(null=True, blank=True, max_length=300,
+    verbose_name='категорiя_ру')
+    category_ua = models.CharField(null=True, blank=True, max_length=300,
+    verbose_name='категорiя_укр')
+    part_number = models.CharField(max_length=300, db_index=True,
+    verbose_name='партнамбер')
+    part_number_web = models.CharField(max_length=300, db_index=True,
+    verbose_name='партнамбер_веб', default='-')
+    is_active = models.BooleanField(default=True, verbose_name='вкл/викл')
+    full = models.BooleanField(default=True, verbose_name='заповн/нi')
+    hotline = models.BooleanField(default=False, verbose_name='h')
+    delivery = models.BooleanField(default=False, verbose_name='d')
+    creditoff = models.BooleanField(default=False, verbose_name='c')
+    label = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='label')
+
+    price_rent = models.FloatField(max_length=300, db_index=True,
+    verbose_name='цiна з нац')
+    get_price_rent = models.PositiveIntegerField(default=0,
+    db_index=True, verbose_name='%')
+    discount = models.FloatField(default=0, db_index=True, verbose_name='скдк')
+    r_price = models.FloatField(max_length=300, db_index=True,
+    verbose_name='r_price')
+    rrp_price = models.FloatField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name='rrp')
+    auto = models.BooleanField(default=False, verbose_name='руч/п')
+    price_ua = models.FloatField(max_length=300, db_index=True, verbose_name='цена грн')
+    price_usd = models.FloatField(max_length=300, db_index=True,
+    verbose_name='цiна $')
+    rentability = models.FloatField(default=5, db_index=True, verbose_name='нацiнка')
+    provider = models.CharField(default='dc', max_length=300,
+    db_index=True, verbose_name='пост')
+
+    nb_vendor = models.CharField(null=True, blank=True,max_length=300,
+    db_index=True, verbose_name='vendor')
+    nb_class = models.CharField(null=True, blank=True,max_length=300,
+    db_index=True, verbose_name='клас')
+    nb_seria = models.CharField(null=True, blank=True,max_length=300,
+    db_index=True, verbose_name='серiя')
+
+    nb_sc_d = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Дiагональ екрану")
+    nb_sc_r = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Роздільна здатність екрану")
+    nb_sc_sensor = models.BooleanField(default=False, verbose_name="Сенсорний екран")
+    nb_sc_surf_ua = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Покриття екрану укр")
+    nb_sc_surf_ru = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Покриття екрану ру")
+    nb_sc_h = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Частота оновлення екрану")
+    nb_sc_t = models.CharField(null=True, blank=True,
+    max_length=300, db_index=True, verbose_name="Тип екрану")
+
+    nb_cpu_vendor = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Виробник процесора")
+    nb_cpu_seria = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Серiя процесора")
+    nb_cpu_model = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Модель процесора")
+    nb_cpu_f = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Частота процесора")
+    nb_cpu_q_core = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Кiлькiсть ядер процесора")
+
+    nb_ram_v = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Обьем ОЗУ")
+    nb_ram_type = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Тип ОЗУ")
+
+    nb_gpu_type_ua = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Тип вiдеокарти укр")
+    nb_gpu_type_ru = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Тип вiдеокарти ру")
+    nb_gpu_model = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Модель вiдеокарти")
+    nb_gpu_vol = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Обсяг ОЗУ вiдеокарти")
+
+    nb_wireless_wifi = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Wi-Fi")
+    nb_wireless_bt = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Bluetooth")
+
+    nb_pin_lan = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="LAN (RJ-45)")
+    nb_pin_usb2_0 = models.PositiveIntegerField(null=True, blank=True, default=0,
+    db_index=True, verbose_name="USB 2.0")
+    nb_pin_usb3_2 = models.PositiveIntegerField(null=True, blank=True, default=0,
+    db_index=True, verbose_name="USB 3.2")
+    nb_pin_usb4 = models.PositiveIntegerField(null=True, blank=True, default=0,
+    db_index=True, verbose_name="USB4")
+    nb_pin_usbc = models.PositiveIntegerField(null=True, blank=True, default=0,
+    db_index=True, verbose_name="USB Type-C")
+    nb_pin_hdmi = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="HDMI")
+    nb_pin_dp = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="Display Port")
+    nb_pin_crd = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="Кардридер")
+    nb_pin_th = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="Thunderbolt")
+
+
+    nb_ssd = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name="Обсяг SSD")
+
+    nb_os = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Операційна система")
+    nb_acum = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Ємність акумулятору")
+    nb_kb_light = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="Наявність підсвічування клавіатури")
+    nb_finger = models.BooleanField(null=True, blank=True, default=False,
+    db_index=True, verbose_name="Ідентифікація відбитка пальця")
+    nb_year = models.CharField(null=True, blank=True, max_length=300,
+    db_index=True, verbose_name="Модельний рік")
+
+    nb_col_ua = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='колор_укр')
+    nb_col_ru = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='колор_ру')
+    nb_body_ua = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='Матеріал корпусу_укр')
+    nb_body_ru = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='Матеріал корпусу_ру')
+    nb_weight = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='вага')
+    nb_vol = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='габарити')
+    nb_warr_ua = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='гарантия укр')
+    nb_warr_ru = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='гарантия ру')
+    you_vid = models.CharField(null=True, blank=True,max_length=300, db_index=True,
+    verbose_name='you_vid')
+    cover1 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото1')
+    cover2 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото2')
+    cover3 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото3')
+    cover4 = models.ImageField(null=True, blank=True, max_length=300,
+    verbose_name='фото4')
+    groups = models.ForeignKey(
+                               'self', on_delete=models.PROTECT,
+                               related_name="tags",
+                               related_query_name="tag",
+                               null=True, blank=True, verbose_name='Связь'
+                               )
+
+    def __str__(self):
+        return self.name
+
+    def pay_num(self):
+        # кол-во платежей ОЧ
+        try:
+            return procent_to_payment(self.get_price_rent - self.discount)
+        except Exception as e:
+            return f'{e}'
+    pay_num.short_description = 'оч'
+
+    def get_sum_part_number(self):
+        if self.tags.exists():
+            return f"{';'.join(self.tags.all().values_list('part_number', flat=True))}"
+
+        return self.part_number
+
+    get_sum_part_number.short_description = 'связь-партнм'
+
+    def get_r_price_rrp_price(self):
+        rrp = self.rrp_price if self.rrp_price else 0
+        return f"{self.r_price}/ {rrp}"
+    get_r_price_rrp_price.short_description = 'r_price/ rrp'
+
+    def get_price_rent_price_ua(self):
+        try:
+            return round((self.price_rent / self.price_ua - 1) * 100)
+        except:
+            return 0
+    get_price_rent_price_ua.short_description = '%'
+
+    def warranty(self):
+        return re.sub('\D+', '', self.mk_warr_ru)
+    warranty.short_description = 'waranty'
+
+    class Meta:
+        unique_together = ('part_number', 'is_active')
+        ordering = ['name']
+        verbose_name = 'Ноутбук'
+        verbose_name_plural = 'х16 Ноутбуки'

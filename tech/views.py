@@ -40,6 +40,7 @@ def change_discount(request, obj_pack, obj_model):
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
     'mike': Mike.objects.all(),
+    'nb': NB.objects.all(),
     }
 
     form = DiscountForm()
@@ -92,6 +93,7 @@ def change_rentability_tech(request, obj_pack, obj_model):
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
     'mike': Mike.objects.all(),
+    'nb': NB.objects.all(),
     }
 
     form = RentabilityForm()
@@ -144,6 +146,7 @@ def change_is_active_tech(request, obj_pack, obj_model):
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
     'mike': Mike.objects.all(),
+    'nb': NB.objects.all(),
     }
 
     form = IsActiveForm()
@@ -197,6 +200,7 @@ def change_auto_tech(request, obj_pack, obj_model):
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
     'mike': Mike.objects.all(),
+    'nb': NB.objects.all(),
     }
 
     form = AutoForm()
@@ -249,6 +253,7 @@ def change_few_things_obj_tech(request, obj_pack, obj_model):
     'filters': Filters.objects.all(),
     'others': Others.objects.all(),
     'mike': Mike.objects.all(),
+    'nb': NB.objects.all(),
     }
 
     form = SinglePackFewForm()
@@ -379,4 +384,7 @@ class distrib_tech(APIView):
         other = Others.objects.filter(is_active=True, groups__isnull=True)
         serializer = OthersSer(other, many=True)
         Dict_full['other'] = do_full_path(serializer.data)
+        nb = NB.objects.filter(is_active=True, groups__isnull=True)
+        serializer = NBSer(nb, many=True)
+        Dict_full['nb'] = do_full_path(serializer.data)
         return Response({"parts": Dict_full})

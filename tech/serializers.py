@@ -5,6 +5,33 @@ class MediaSerializer(serializers.Serializer):
     file = serializers.FileField()
 #
 
+class NBSer(serializers.ModelSerializer):
+
+    pay_num = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NB
+        fields = ('name', 'category_ru', 'category_ua', 'part_number',
+        'price_rent', 'pay_num', 'provider', 'nb_vendor', 'hotline', 'delivery',
+        'nb_class', 'nb_seria',
+        'nb_sc_d', 'nb_sc_r', 'nb_sc_sensor', 'nb_sc_surf_ua',
+        'nb_sc_surf_ru', 'nb_sc_h', 'nb_sc_t', 'nb_cpu_vendor', 'nb_cpu_seria',
+        'nb_cpu_model', 'nb_cpu_f', 'nb_cpu_q_core',
+        'nb_ram_v', 'nb_ram_type', 'nb_gpu_type_ua', 'nb_gpu_type_ru',
+        'nb_gpu_model', 'nb_gpu_vol', 'nb_wireless_wifi', 'nb_wireless_bt',
+        'nb_pin_lan', 'nb_pin_usb2_0', 'nb_pin_usb3_2', 'nb_pin_usb4',
+        'nb_pin_usbc', 'nb_pin_hdmi', 'nb_pin_dp', 'nb_pin_crd',
+        'nb_pin_th', 'nb_ssd', 'nb_os', 'nb_acum',
+        'nb_kb_light', 'nb_finger', 'nb_year',
+        'nb_col_ua', 'nb_col_ru', 'nb_body_ua', 'nb_body_ru',
+        'nb_weight', 'nb_vol',
+        'nb_warr_ua', 'nb_warr_ru',
+        'you_vid', 'label', 'creditoff',
+        'cover1', 'cover2', 'cover3', 'cover4', 'part_number_web')
+
+    def get_pay_num(self, obj):
+        return procent_to_payment(obj.get_price_rent - obj.discount)
+
 
 class MikeSer(serializers.ModelSerializer):
 
