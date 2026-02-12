@@ -11,10 +11,11 @@ from singleparts.models import *
 from tech.models import *
 from cat.models import Parts_full, USD, Results
 from .other_descr_catalog import From_provders_filePrices
-from .dc_descr_adv import to_False_or_True,get_discr_categ_dc,get_foto_price_name, key_in_dict
+from .dc_descr_adv import to_False_or_True,get_discr_categ_dc,get_foto_price_name,\
+key_in_dict, dict_color, key_in_dict_values
 from .dc_descr_adv import newMonitor, newKM, newKeyboards, newMouses, newPads,\
 newHeadsets, newWebcams, newWiFis, newAcoustics, newTables, newChairs,\
-newCabelsplus, newFilters, newMike
+newCabelsplus, newFilters, newMike, newNB
 
 #from load_form_providers.get_service Cooler_OTHER get_from_xml, from_price_get_new_models
 # to_model_price_from_dc upload_edit_foto to_tech_price_from_dc
@@ -623,7 +624,7 @@ def to_tech_price_from_dc(for_brain=None):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25', '970',
+    '45', '54', '648', '125', '968', '1376', '25', '970', '31',
     )
     status_ = {'*****':'yes','****':'yes','***':'yes','**':'yes','*':'yes'}
 
@@ -677,6 +678,7 @@ def to_tech_price_from_dc(for_brain=None):
     partnums_tech += list(Cabelsplus.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Filters.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Mike.objects.all().values_list('part_number',flat=True))
+    partnums_tech += list(NB.objects.all().values_list('part_number',flat=True))
 
     f = From_provders_filePrices(partnums_tech, dc_dict, usd_cuurency)
     if for_brain:
@@ -749,6 +751,9 @@ def to_tech_price_from_dc(for_brain=None):
     for obj in Mike.objects.all():
         if '970' in dc_dict:
             objects_tech_edit(obj, usd_cuurency, dc_dict['970'])
+    for obj in NB.objects.all():
+        if '31' in dc_dict:
+            objects_tech_edit(obj, usd_cuurency, dc_dict['31'])
 
 # словарь tech_ для работы с from_price_new_tech_per_kind
 # lambda для отложенного вызова функций с еще несформированными словарми,
@@ -3281,6 +3286,167 @@ def new_mike_test():
                 cover3=foto_[-1],
                 )
 
+                dict_res[dc_products['Article']] = res
+            except Exception as e:
+                error.add(e)
+                list_error.append({dc_products['Article']: e})
+    return (dict_res, error)
+
+nb_list = []
+
+def new_nb_test():
+    #
+    DC_LOGIN = 'itblok'
+    DC_PASSWORD = 'VIA5qPUv'
+    with open('load_form_providers/dclink-price.xml', 'rb') as fobj:
+        xml = fobj.read()
+    list_periphery, dict_category_periphery, dict_category_foto = get_from_xml(
+    xml, DC_LOGIN, DC_PASSWORD, periphery=True)
+    dict_res = {}
+    error = set()
+    list_error = []
+    for list_ in list_periphery:
+        if list_['CategoryID'] == '31':
+            try:
+                dc_products = list_
+                if dc_products['Article'] not in nb_list:
+                    continue # ноутов много - для ограничения, nb_list заполняется вручную
+                name_t = 'Ноутбук '
+                if NB.objects.filter(part_number=dc_products['Article']).exists():
+                    continue
+                res, foto_, temp_price, name_ = get_foto_price_name(
+                dict_category_periphery, dc_products, dict_category_foto, name_t)
+                nb_class = key_in_dict_values(res[dc_products['Code']], 'Геймерські')
+                sensor = key_in_dict_values(res[dc_products['Code']], 'Сенсорний екран',
+                dict_values={
+                'з сенсорним екраном': True, 'відсутній': False, 'default': False
+                })
+                surf = key_in_dict_values(res[dc_products['Code']], 'Покриття екрану',
+                dict_values={
+                'матове': {'ua': 'матове', 'ru': 'матовое'},
+                'глянцеве': {'ua': 'глянцеве', 'ru': 'глянцевое'},
+                'default': {'ua': '-', 'ru': '-'},
+                })
+                gpu_type = key_in_dict_values(res[dc_products['Code']], 'Тип відеокарти',
+                dict_values={
+                'інтегрована': {'ua': 'інтегрована', 'ru': 'интегрированная'},
+                'дискретна': {'ua': 'дискретна', 'ru': 'дискретная'},
+                'default': {'ua': '-', 'ru': '-'},
+                })
+                lan = key_in_dict(res[dc_products['Code']], 'LAN (RJ-45)')
+                if lan and 'відсутній' in lan:
+                    lan = '-'
+                usb2 = key_in_dict(res[dc_products['Code']], 'USB 2.0')
+                try:
+                    usb2 = int(usb2.strip())
+                except:
+                    usb2 = 0
+                usb3 = key_in_dict(res[dc_products['Code']], 'USB 3.2 Gen 1 (USB 3.0/3.1 Gen 1)')
+                try:
+                    usb3 = int(usb3.strip())
+                except:
+                    usb3 = 0
+                usb4 = key_in_dict(res[dc_products['Code']], 'USB4')
+                try:
+                    usb4 = int(usb4.strip())
+                except:
+                    usb4 = 0
+                hdmi = key_in_dict_values(res[dc_products['Code']], 'HDMI',
+                dict_values={
+                'є mini': True, 'є': True, 'відсутній': False,
+                'microHDMI': True, 'default': False
+                })
+                dp = key_in_dict_values(res[dc_products['Code']], 'Display Port',
+                dict_values={
+                'є (mini)': True, 'є': True, 'відсутній': False,
+                'є mini': True, 'default': False,
+                })
+                crd = key_in_dict_values(res[dc_products['Code']], 'Кардридер',
+                dict_values={
+                'microSD': True, 'є': True, 'Smart Card Reader': True, 'SD': True,
+                'відсутній': False, 'default': False
+                })
+                th = key_in_dict_values(res[dc_products['Code']], 'Thunderbolt 4',
+                dict_values={
+                'є': True, 'відсутній': False, 'default': False
+                })
+                ssd = key_in_dict(res[dc_products['Code']], 'Обсяг SSD')
+                if ssd == 'немає':
+                    ssd = key_in_dict(res[dc_products['Code']], 'Обсяг eMMC / UFS')
+                kb_light = key_in_dict_values(res[dc_products['Code']],
+                'Наявність підсвічування клавіатури',
+                dict_values={
+                'з підсвічуванням': True, 'без підсвічування': False, 'default': False
+                })
+                finger = key_in_dict_values(res[dc_products['Code']],
+                'Ідентифікація відбитка пальця',
+                dict_values={
+                'ідентифікація відбитка пальця': True, 'відсутня\t': False, 'default': False
+                })
+                col = key_in_dict(res[dc_products['Code']], 'Колір')
+                col_ru = dict_color[col] if col in dict_color else col
+                NB.objects.create(
+                name=name_,
+                is_active=False,
+                full=False,
+                category_ru='Ноутбук',
+                category_ua='Ноутбук',
+                part_number=dc_products['Article'],
+                price_rent=round(temp_price * 1.05 * 43),
+                r_price=round(temp_price * 1.05 * 43),
+                price_ua=round(temp_price * 43),
+                price_usd=temp_price,
+                nb_vendor=key_in_dict(dc_products, 'Vendor'),
+                nb_class_ua=nb_class['ua'],
+                nb_class_ru=nb_class['ru'],
+                nb_seria=key_in_dict(res[dc_products['Code']], 'Серія'),
+                nb_sc_d=key_in_dict(res[dc_products['Code']], 'Діагональ екрану'),
+                nb_sc_r=key_in_dict(res[dc_products['Code']], 'Роздільна здатність екрану'),
+                nb_sc_sensor=sensor,
+                nb_sc_surf_ua=surf['ua'],
+                nb_sc_surf_ru=surf['ru'],
+                nb_sc_h=key_in_dict(res[dc_products['Code']], 'Частота оновлення екрану'),
+                nb_sc_t=key_in_dict(res[dc_products['Code']], 'Тип екрану'),
+                nb_cpu_vendor=key_in_dict(res[dc_products['Code']], 'Виробник процесора'),
+                nb_cpu_seria=key_in_dict(res[dc_products['Code']], 'Серія процесора'),
+                nb_cpu_model=key_in_dict(res[dc_products['Code']], 'Модель процесора'),
+                nb_cpu_f=key_in_dict(res[dc_products['Code']], 'Частота процесора'),
+                nb_cpu_q_core=key_in_dict(res[dc_products['Code']],
+                'Кількість ядер процесора'),
+                nb_ram_v=key_in_dict(res[dc_products['Code']], "Об'єм оперативної пам'яті"),
+                nb_ram_type=key_in_dict(res[dc_products['Code']], "Тип оперативної пам'яті"),
+                nb_gpu_type_ua=gpu_type['ua'],
+                nb_gpu_type_ru=gpu_type['ru'],
+                nb_gpu_model=key_in_dict(res[dc_products['Code']], 'Модель відеокарти'),
+                nb_gpu_vol=key_in_dict(res[dc_products['Code']], "Обсяг пам'яті відеокарти"),
+                nb_wireless_wifi=key_in_dict(res[dc_products['Code']], ' Wi-Fi '),
+                nb_wireless_bt=key_in_dict(res[dc_products['Code']], 'Bluetooth'),
+                nb_pin_lan=lan,
+                nb_pin_usb2_0=usb2,
+                nb_pin_usb3_2=usb3,
+                nb_pin_usb4=usb4,
+                nb_pin_hdmi=hdmi,
+                nb_pin_dp=dp,
+                nb_pin_crd=crd,
+                nb_pin_th=th,
+                nb_ssd=ssd,
+                nb_os=key_in_dict(res[dc_products['Code']], 'Операційна система'),
+                nb_acum=key_in_dict(res[dc_products['Code']], 'Ємність акумулятору'),
+                nb_kb_light=kb_light,
+                nb_finger=finger,
+                nb_year='2025',
+                nb_col_ua=col,
+                nb_col_ru=col_ru,
+                nb_body_ua=key_in_dict(res[dc_products['Code']], 'Матеріал корпусу'),
+                nb_body_ru=key_in_dict(res[dc_products['Code']], 'Матеріал корпусу'),
+                nb_weight=key_in_dict(res[dc_products['Code']], 'Вага'),
+                nb_vol=key_in_dict(res[dc_products['Code']], 'Габарити (ШхГхВ)'),
+                nb_warr_ua='12',
+                nb_warr_ru='12',
+                cover1=foto_[0],
+                cover2=foto_[1],
+                cover3=foto_[-1],
+                )
                 dict_res[dc_products['Article']] = res
             except Exception as e:
                 error.add(e)

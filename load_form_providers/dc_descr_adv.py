@@ -9,12 +9,41 @@ import re
 from tech.models import *
 from cat.models import Parts_full, USD, Results
 
+
+dict_color = {
+'сірий': 'серый', 'платиновий': 'платиновый', 'чорний': 'черный',
+'рожевий': 'розовый', 'темно-сірий': 'темно-серый', 'сріблястий': 'серебристый',
+'білий': 'белий', 'золотистий': 'золотистый', 'сірий, зелений': 'серый, зеленый',
+'блакитний': 'голубой', 'темно-синій': 'темно-синий',
+'синій': 'синий', 'бежевий': 'бежевый',
+}
+
+
 def key_in_dict(dict_ ,key):
     # без ошибки из словаря, иначе пустая строка
     try:
         return dict_[key]
     except:
         return ''
+
+def key_in_dict_values(dict_ ,key, dict_values=None):
+    # без ошибки из словаря dict_ потом согласно dict_values, иначе default
+    # dict_values - словарь преобразований плюс default если нет в dict_values
+
+    if not dict_values:
+        dict_values = {
+        'так': {'ua': 'Ігровий', 'ru': 'Игровой'},
+        'ні': {'ua': 'Для роботи', 'ru': 'Для работы'},
+        'default': {'ua': 'Для роботи', 'ru': 'Для работы'},
+        }
+
+    try:
+        try:
+            return dict_values[dict_[key]]
+        except:
+            return dict_values['default']
+    except:
+        return dict_values['default']
 
 def to_False_or_True(str_, cifar= False, str_or_minus=False):
     # str_ строку с разными знач в булево при cifar== False, str_or_minus==False
@@ -101,6 +130,156 @@ def get_foto_price_name(dict_category_periphery, dc_products, dict_category_foto
     ).strip()[:98]
 
     return (res, foto_, temp_price, name_)
+
+
+def newNB(dict_category_periphery, dc_products, dict_category_foto):
+    # создаем одиночный микрофон
+    # dc_products - получен из dc_dict[d['CategoryID']]['Article'] hdmi
+    name_t = 'Ноутбук '
+    try:
+        if NB.objects.filter(part_number=dc_products['Article']).exists():
+            return False
+        res, foto_, temp_price, name_ = get_foto_price_name(
+        dict_category_periphery, dc_products, dict_category_foto, name_t)
+        nb_class = key_in_dict_values(res[dc_products['Code']], 'Геймерські')
+        sensor = key_in_dict_values(res[dc_products['Code']], 'Сенсорний екран',
+        dict_values={
+        'з сенсорним екраном': True, 'відсутній': False, 'default': False
+        })
+        surf = key_in_dict_values(res[dc_products['Code']], 'Покриття екрану',
+        dict_values={
+        'матове': {'ua': 'матове', 'ru': 'матовое'},
+        'глянцеве': {'ua': 'глянцеве', 'ru': 'глянцевое'},
+        'default': {'ua': '-', 'ru': '-'},
+        })
+        gpu_type = key_in_dict_values(res[dc_products['Code']], 'Тип відеокарти',
+        dict_values={
+        'інтегрована': {'ua': 'інтегрована', 'ru': 'интегрированная'},
+        'дискретна': {'ua': 'дискретна', 'ru': 'дискретная'},
+        'default': {'ua': '-', 'ru': '-'},
+        })
+        lan = key_in_dict(res[dc_products['Code']], 'LAN (RJ-45)')
+        if lan and 'відсутній' in lan:
+            lan = '-'
+        usb2 = key_in_dict(res[dc_products['Code']], 'USB 2.0')
+        try:
+            usb2 = int(usb2.strip())
+        except:
+            usb2 = 0
+        usb3 = key_in_dict(res[dc_products['Code']], 'USB 3.2 Gen 1 (USB 3.0/3.1 Gen 1)')
+        try:
+            usb3 = int(usb3.strip())
+        except:
+            usb3 = 0
+        usb4 = key_in_dict(res[dc_products['Code']], 'USB4')
+        try:
+            usb4 = int(usb4.strip())
+        except:
+            usb4 = 0
+        hdmi = key_in_dict_values(res[dc_products['Code']], 'HDMI',
+        dict_values={
+        'є mini': True, 'є': True, 'відсутній': False,
+        'microHDMI': True, 'default': False
+        })
+        dp = key_in_dict_values(res[dc_products['Code']], 'Display Port',
+        dict_values={
+        'є (mini)': True, 'є': True, 'відсутній': False,
+        'є mini': True, 'default': False,
+        })
+        crd = key_in_dict_values(res[dc_products['Code']], 'Кардридер',
+        dict_values={
+        'microSD': True, 'є': True, 'Smart Card Reader': True, 'SD': True,
+        'відсутній': False, 'default': False
+        })
+        th = key_in_dict_values(res[dc_products['Code']], 'Thunderbolt 4',
+        dict_values={
+        'є': True, 'відсутній': False, 'default': False
+        })
+        ssd = key_in_dict(res[dc_products['Code']], 'Обсяг SSD')
+        if ssd == 'немає':
+            ssd = key_in_dict(res[dc_products['Code']], 'Обсяг eMMC / UFS')
+        kb_light = key_in_dict_values(res[dc_products['Code']],
+        'Наявність підсвічування клавіатури',
+        dict_values={
+        'з підсвічуванням': True, 'без підсвічування': False, 'default': False
+        })
+        finger = key_in_dict_values(res[dc_products['Code']],
+        'Ідентифікація відбитка пальця',
+        dict_values={
+        'ідентифікація відбитка пальця': True, 'відсутня\t': False, 'default': False
+        })
+        col = key_in_dict(res[dc_products['Code']], 'Колір')
+        col_ru = dict_color[col] if col in dict_color else col
+        NB.objects.create(
+        name=name_,
+        is_active=False,
+        full=False,
+        category_ru='Ноутбук',
+        category_ua='Ноутбук',
+        part_number=dc_products['Article'],
+        price_rent=round(temp_price * 1.05 * 43),
+        r_price=round(temp_price * 1.05 * 43),
+        price_ua=round(temp_price * 43),
+        price_usd=temp_price,
+        nb_vendor=key_in_dict(dc_products, 'Vendor'),
+        nb_class_ua=nb_class['ua'],
+        nb_class_ru=nb_class['ru'],
+        nb_seria=key_in_dict(res[dc_products['Code']], 'Серія'),
+        nb_sc_d=key_in_dict(res[dc_products['Code']], 'Діагональ екрану'),
+        nb_sc_r=key_in_dict(res[dc_products['Code']], 'Роздільна здатність екрану'),
+        nb_sc_sensor=sensor,
+        nb_sc_surf_ua=surf['ua'],
+        nb_sc_surf_ru=surf['ru'],
+        nb_sc_h=key_in_dict(res[dc_products['Code']], 'Частота оновлення екрану'),
+        nb_sc_t=key_in_dict(res[dc_products['Code']], 'Тип екрану'),
+        nb_cpu_vendor=key_in_dict(res[dc_products['Code']], 'Виробник процесора'),
+        nb_cpu_seria=key_in_dict(res[dc_products['Code']], 'Серія процесора'),
+        nb_cpu_model=key_in_dict(res[dc_products['Code']], 'Модель процесора'),
+        nb_cpu_f=key_in_dict(res[dc_products['Code']], 'Частота процесора'),
+        nb_cpu_q_core=key_in_dict(res[dc_products['Code']],
+        'Кількість ядер процесора'),
+        nb_ram_v=key_in_dict(res[dc_products['Code']], "Об'єм оперативної пам'яті"),
+        nb_ram_type=key_in_dict(res[dc_products['Code']], "Тип оперативної пам'яті"),
+        nb_gpu_type_ua=gpu_type['ua'],
+        nb_gpu_type_ru=gpu_type['ru'],
+        nb_gpu_model=key_in_dict(res[dc_products['Code']], 'Модель відеокарти'),
+        nb_gpu_vol=key_in_dict(res[dc_products['Code']], "Обсяг пам'яті відеокарти"),
+        nb_wireless_wifi=key_in_dict(res[dc_products['Code']], ' Wi-Fi '),
+        nb_wireless_bt=key_in_dict(res[dc_products['Code']], 'Bluetooth'),
+        nb_pin_lan=lan,
+        nb_pin_usb2_0=usb2,
+        nb_pin_usb3_2=usb3,
+        nb_pin_usb4=usb4,
+        nb_pin_hdmi=hdmi,
+        nb_pin_dp=dp,
+        nb_pin_crd=crd,
+        nb_pin_th=th,
+        nb_ssd=ssd,
+        nb_os=key_in_dict(res[dc_products['Code']], 'Операційна система'),
+        nb_acum=key_in_dict(res[dc_products['Code']], 'Ємність акумулятору'),
+        nb_kb_light=kb_light,
+        nb_finger=finger,
+        nb_year='2025',
+        nb_col_ua=col,
+        nb_col_ru=col_ru,
+        nb_body_ua=key_in_dict(res[dc_products['Code']], 'Матеріал корпусу'),
+        nb_body_ru=key_in_dict(res[dc_products['Code']], 'Матеріал корпусу'),
+        nb_weight=key_in_dict(res[dc_products['Code']], 'Вага'),
+        nb_vol=key_in_dict(res[dc_products['Code']], 'Габарити (ШхГхВ)'),
+        nb_warr_ua='12',
+        nb_warr_ru='12',
+        cover1=foto_[0],
+        cover2=foto_[1],
+        cover3=foto_[-1],
+        )
+    except Exception as e:
+        try:
+            print(dc_products['Article'], e)
+            return False
+        except Exception as es:
+            print(es)
+            return False
+    return True
 
 
 def newMike(dict_category_periphery, dc_products, dict_category_foto):
