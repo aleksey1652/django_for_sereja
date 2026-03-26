@@ -678,7 +678,7 @@ def to_tech_price_from_dc(for_brain=None):
     partnums_tech += list(Cabelsplus.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Filters.objects.all().values_list('part_number',flat=True))
     partnums_tech += list(Mike.objects.all().values_list('part_number',flat=True))
-    partnums_tech += list(NB.objects.all().values_list('part_number',flat=True))
+    #partnums_tech += list(NB.objects.all().values_list('part_number',flat=True))
 
     f = From_provders_filePrices(partnums_tech, dc_dict, usd_cuurency)
     if for_brain:
@@ -751,9 +751,9 @@ def to_tech_price_from_dc(for_brain=None):
     for obj in Mike.objects.all():
         if '970' in dc_dict:
             objects_tech_edit(obj, usd_cuurency, dc_dict['970'])
-    for obj in NB.objects.all():
+    """for obj in NB.objects.all():
         if '31' in dc_dict:
-            objects_tech_edit(obj, usd_cuurency, dc_dict['31'])
+            objects_tech_edit(obj, usd_cuurency, dc_dict['31'])"""
 
 # словарь tech_ для работы с from_price_new_tech_per_kind
 # lambda для отложенного вызова функций с еще несформированными словарми,
@@ -3458,23 +3458,22 @@ def new_nb_test(nb_list):
         temp_price  = get_float(dict_res['providerprice_parts'])
         price_rent_ = round(temp_price * rent * usd)
         price_ua_ = round(temp_price * usd)
-
-        NB.objects.filter(part_number=dict_res['partnumber_parts']
-        ).update(price_rent=rprice_rent_,
-        r_price=rprice_rent_,
+        rentability_ = (rent - 1) * 100
+        NB.objects.filter(name=dict_res['name_parts']
+        ).update(price_rent=price_rent_,
+        r_price=price_rent_,
         price_ua=price_ua_,
-        price_usd=temp_price)
+        price_usd=temp_price,
+        rentability = rentability_,
+        provider='itlink')
 
 
     def edit_nb_from_dict(dict_res, usd, rent):
         """ """
-
-        if NB.objects.filter(part_number=dict_res['partnumber_parts']).exists():
+        if NB.objects.filter(name=dict_res['name_parts']).exists():
             _ = update_nb_from_dict(dict_res, usd, rent)
             return _
-
         temp_price  = get_float(dict_res['providerprice_parts'])
-
         _ = NB.objects.create(
         name=dict_res['name_parts'],
         is_active=False,
@@ -3485,6 +3484,7 @@ def new_nb_test(nb_list):
         price_rent=round(temp_price * rent * usd),
         r_price=round(temp_price * rent * usd),
         price_ua=round(temp_price * usd),
+        rentability=(rent - 1) * 100,
         price_usd=temp_price,
         nb_vendor=dict_res['vendor'],
         nb_seria=dict_res['seria'],
@@ -3495,11 +3495,11 @@ def new_nb_test(nb_list):
         nb_os=dict_res['os'],
         nb_warr_ua='12',
         nb_warr_ru='12',
+        provider='itlink',
         )
         return _
 
     def do_nb_from_file(dict_, usd, rent):
         """ """
-
         for value in dict_.values():
             _ = edit_nb_from_dict(value, usd, rent)
