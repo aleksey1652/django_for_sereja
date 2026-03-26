@@ -56,7 +56,7 @@ def get_from_xml(xml, DC_LOGIN, DC_PASSWORD, ff=True, periphery=False):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25', '970',
+    '45', '54', '648', '125', '968', '1376', '25', '970', '31',
     )
 
     category = category_periphery if periphery else category_main
@@ -115,7 +115,7 @@ def from_file_get_part(filename, periphery=False):
 
     category_periphery = (
     '11', '24', '33', '56', '125', '1410', '125', '5', '255',
-    '45', '54', '648', '125', '968', '1376', '25', '970',
+    '45', '54', '648', '125', '968', '1376', '25', '970', '31',
     )
 
     category = category_periphery if periphery else category_main
@@ -3294,7 +3294,7 @@ def new_mike_test():
 
 nb_list = []
 
-def new_nb_test():
+def new_nb_test(nb_list):
     #
     DC_LOGIN = 'itblok'
     DC_PASSWORD = 'VIA5qPUv'
@@ -3452,3 +3452,54 @@ def new_nb_test():
                 error.add(e)
                 list_error.append({dc_products['Article']: e})
     return (dict_res, error)
+
+    def update_nb_from_dict(dict_res, usd, rent):
+        """ """
+        temp_price  = get_float(dict_res['providerprice_parts'])
+        price_rent_ = round(temp_price * rent * usd)
+        price_ua_ = round(temp_price * usd)
+
+        NB.objects.filter(part_number=dict_res['partnumber_parts']
+        ).update(price_rent=rprice_rent_,
+        r_price=rprice_rent_,
+        price_ua=price_ua_,
+        price_usd=temp_price)
+
+
+    def edit_nb_from_dict(dict_res, usd, rent):
+        """ """
+
+        if NB.objects.filter(part_number=dict_res['partnumber_parts']).exists():
+            _ = update_nb_from_dict(dict_res, usd, rent)
+            return _
+
+        temp_price  = get_float(dict_res['providerprice_parts'])
+
+        _ = NB.objects.create(
+        name=dict_res['name_parts'],
+        is_active=False,
+        full=False,
+        category_ru='Ноутбук',
+        category_ua='Ноутбук',
+        part_number=dict_res['partnumber_parts'],
+        price_rent=round(temp_price * rent * usd),
+        r_price=round(temp_price * rent * usd),
+        price_ua=round(temp_price * usd),
+        price_usd=temp_price,
+        nb_vendor=dict_res['vendor'],
+        nb_seria=dict_res['seria'],
+        nb_sc_d=dict_res['nb_sc_d'],
+        nb_cpu_vendor=dict_res['nb_cpu_vendor'],
+        nb_cpu_model=dict_res['nb_cpu_model'],
+        nb_ram_v=dict_res['nb_ram_v'],
+        nb_os=dict_res['os'],
+        nb_warr_ua='12',
+        nb_warr_ru='12',
+        )
+        return _
+
+    def do_nb_from_file(dict_, usd, rent):
+        """ """
+
+        for value in dict_.values():
+            _ = edit_nb_from_dict(value, usd, rent)

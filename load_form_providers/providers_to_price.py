@@ -38,14 +38,14 @@ OnlyGroups = {
 (
 'Блоки живлення ATX','Корпуси', 'Системи охолодження, Cooler',
 ),
-'itlink': (
+'itlink': (# '4374ac8b-e017-11ec-80d9-000c29e58d51'
 "4d06d5bc-d49f-11ea-80c4-000c29e58d51",
 "4d06d5f4-d49f-11ea-80c4-000c29e58d51",
 "4d06d5c0-d49f-11ea-80c4-000c29e58d51",
 "4d06d5c4-d49f-11ea-80c4-000c29e58d51",
 "4d06d5c6-d49f-11ea-80c4-000c29e58d51",
 "4d06d5de-d49f-11ea-80c4-000c29e58d51",
-#"4d06d5d6-d49f-11ea-80c4-000c29e58d51", видяхи не выгружаем
+"4d06d5d6-d49f-11ea-80c4-000c29e58d51", #видяхи не выгружаем
 "4d06d5f8-d49f-11ea-80c4-000c29e58d51",
 "4d06d5ac-d49f-11ea-80c4-000c29e58d51",
 "4d06d5b2-d49f-11ea-80c4-000c29e58d51",
@@ -1072,6 +1072,16 @@ class From_file_to_bd:
 
         return count
 
+    def clearNb(self, provname='itlink'):
+        """ отключение itlink nb """
+        from tech.models import NB
+
+        count = NB.objects.filter( # выключаем все детали из provname
+        provider=provname).update(
+        is_active=False, price_ua=0, price_usd=0, rrp_price=0)
+
+        return count
+
 
     def itlink_dictToOrder(self, dict_, row_category):
         """
@@ -1097,6 +1107,57 @@ class From_file_to_bd:
         dict_['name_parts'] = dict_['name_parts'][:50]
 
         return dict_
+
+
+    def itlink_nb_dictToOrder(self, dict_):
+    """
+    обработка ноутов:
+    - нормализация RRP_UAH
+    - availability_parts -> yes/no
+    - парсинг name_parts
+    """
+
+    # RRP
+    rrp = dict_.get('RRP_UAH')
+    dict_['RRP_UAH'] = rrp if pd.notna(rrp) and rrp != '' else 0
+
+    # тип
+    dict_['kind'] = 'nb'
+
+    # наличие
+    dict_['availability_parts'] = itlink_avail(dict_.get('availability_parts'))
+
+    # парсинг имени
+    has_parts, count, parts, clean_name = name_to_parts(dict_.get('name_parts'))
+    # (True, 5, ['15.6"', 'Ryzen 7 5825U', '16', 'SSD512', 'DOS'],
+    # 'Acer Aspire Go 15 AG15-42P') - пример получаемого из name_to_parts
+
+    # дефолтные значения
+    for key in ['nb_sc_d', 'nb_cpu_model', 'nb_ram_v', 'nb_ssd', 'os',
+               'name_parts', 'vendor', 'seria']:
+        dict_[key] = ''
+
+    dict_['nb_cpu_vendor'] = 'Intel'
+
+    vendor, seria = get_vendor_series(clean_name)
+
+    # если всё ок
+    if has_parts and count >= 5:
+        nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
+
+        if 'RYZEN' in clean_name.upper():
+            dict_['nb_cpu_vendor'] = 'AMD'
+
+        dict_['nb_sc_d'] = nb_sc_d
+        dict_['nb_cpu_model'] = nb_cpu_model
+        dict_['nb_ram_v'] = nb_ram_v
+        dict_['nb_ssd'] = nb_ssd
+        dict_['os'] = os
+        dict_['name_parts'] = clean_name
+        dict_['vendor'] = vendor
+        dict_['seria'] = seria
+
+    return dict_
 
 
     def erc_dictToOrder(self, dict_, row_category):
@@ -1268,6 +1329,46 @@ class From_file_to_bd:
                 list_category, tuple(row)
                 ))
                 new_dict = self.itlink_dictToOrder(temp, itlink_catalog[current_category])
+                if new_dict['availability_parts'] == 'yes':
+                    dict_res[new_dict['partnumber_parts']] = new_dict
+
+        return dict_res
+
+
+    def get_nb_itlink(self):
+        """
+        из пандас массива получаем dict_res (для ноутов) -
+        упорядоченный/унифицированный за счет itlink_nb_dictToOrder
+        также отключем ноуты itlink с clearNb
+        """
+
+        dict_res = {}
+        itlink = self.content
+
+        itlink_catalog = {
+        'Ноутбуки':'nb'
+        }
+        list_category = (
+        'kind', 'partnumber_parts',
+        'name_parts', 'availability_parts',
+        'providerprice_parts','RRP_UAH'
+        )
+
+        count = self.clearNb()
+
+        current_category = None
+
+        for row in itlink.itertuples(index=False):
+            if row[0] in itlink_catalog:
+                current_category = row[0]
+            if row[0] not in itlink_catalog and not pd.notna(row[1]):
+                current_category = None
+            if pd.notna(row[1]) and current_category:
+                temp = dict(
+                zip(
+                list_category, tuple(row)
+                ))
+                new_dict = self.itlink_nb_dictToOrder(temp)
                 if new_dict['availability_parts'] == 'yes':
                     dict_res[new_dict['partnumber_parts']] = new_dict
 

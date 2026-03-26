@@ -110,27 +110,65 @@ def price_usd(price, usd, usd_data='usd'):
             return 0
     return get_float(price)
 
+def normalize_storage(value):
+    """ для Gb в названии """
+    if not value:
+        return ''
 
-def find_min_price(data, article):
-    """ищем мин цену из сумарного словаря поставщиков + от файловых постачей find_min_bd,
-       возвращаем кортеж, например: ('dc', {словарь с инфой, в том числе и мин ценой})
+    value = str(value).upper()
+
+    # ищем число (например 512, 1024 и т.д.)
+    match = re.search(r'(\d+)', value)
+    if not match:
+        return ''
+
+    size = int(match.group(1))
+
+    # если вдруг будет TB
+    if 'TB' in value:
+        size *= 1024
+
+    return f'{size} ГБ'
+
+def get_clean_name(name_nb):
+    """ для name_to_parts вспомагательная """
+    # убираем "Ноутбук " в начале (если есть)
+    name_nb = re.sub(r'^Ноутбук\s+', '', name_nb)
+
+    # удаляем все (...) вместе с содержимым
+    new_name = re.sub(r'\([^)]*\)', '', name_nb)
+
+    # убираем лишние пробелы
+    return ' '.join(new_name.split())
+
+def get_vendor_series(name_nb):
+    """ полчаем вендор и серию из названия ноутов
+    (первым в строке идет вендор потом серия) """
+    if not name_nb:
+        return '', ''
+
+    #clean = get_clean_name(name_nb)
+    parts = name_nb.split()
+
+    if not parts:
+        return '', ''
+
+    vendor = parts[0]
+    seria = parts[1] if len(parts) > 1 else ''
+
+    return vendor, seria
+
+def name_to_parts(name_nb):
     """
+    из имени ноута получаем параметры + тру/фалсе и размер списка параметров
+    пример name_nb: 'Ноутбук Acer Aspire (15.6"/Ryzen 7 5825U/16/SSD512/DOS)'
+    """
+    if not name_nb:
+        return False, 0, [], '-'
 
-    data = find_min_bd(data, article) # добавляем в data файловых постачей, если они есть
+    match = re.search(r'\(([^)]+)\)\s*$', name_nb)
+    if not match:
+        return False, 0, [], name_nb
 
-    heap = [
-        (source[article]['providerprice_parts'], key, source[article])
-        for key, source in data.items() if article in source and\
-        source[article]['availability_parts'] == 'yes'
-    ]
-    if heap:
-        # Возвращаем источник и словарь с минимальной ценой
-        _, min_key, min_data = heapq.nsmallest(1, heap, key=lambda x: x[0])[0]
-        return min_key, min_data
-    # Если артикул есть, но нет доступных товаров, сразу возвращаем дефолтное значение
-    return next(
-        ((key, {'providerprice_parts': 0, 'availability_parts': 'no'}
-        ) for key, source in data.items() if article in source),
-        None
-    )
-    return None
+    parts = match.group(1).split('/')
+    return True, len(parts), parts, get_clean_name(name_nb)
