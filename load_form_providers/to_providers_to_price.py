@@ -110,6 +110,65 @@ def price_usd(price, usd, usd_data='usd'):
             return 0
     return get_float(price)
 
+CPU_PATTERN = re.compile(
+    r'\b(RYZEN|INTEL|CORE|ULTRA|I[3579]|CELERON|PENTIUM|ATHLON)\b',
+    re.I
+)
+GPU_PATTERN = re.compile(r'\b(RTX|GTX|RX)\b', re.I)
+RAM_PATTERN = re.compile(r'^\d+\s*(GB)?$', re.I)
+
+def parse_nb_parts(parts):
+    """ для парсинга из строки наз ноута """
+
+    result = {
+        'nb_sc_d': '',
+        'nb_cpu_model': '',
+        'nb_ram_v': '',
+        'nb_ssd': '',
+        'nb_gpu_model': 'Integrated Graphics',
+        'os': ''
+    }
+
+    for part in parts:
+        p = part.strip()
+
+        if not p:
+            continue
+
+        # экран
+        if '"' in p:
+            result['nb_sc_d'] = p
+            continue
+
+        # игнорируем герцовку
+        if 'HZ' in p.upper():
+            continue
+
+        # SSD
+        if 'SSD' in p.upper():
+            result['nb_ssd'] = p
+            continue
+
+        # GPU
+        if GPU_PATTERN.search(p):
+            result['nb_gpu'] = p
+            continue
+
+        # CPU
+        if CPU_PATTERN.search(p):
+            result['nb_cpu_model'] = p
+            continue
+
+        # RAM
+        if RAM_PATTERN.match(p):
+            result['nb_ram_v'] = f'{p}Gb'
+            continue
+
+        # всё остальное — считаем ОС
+        result['os'] = p
+
+    return result
+
 def normalize_storage(value):
     """ для Gb в названии """
     if not value:
@@ -171,4 +230,6 @@ def name_to_parts(name_nb):
         return False, 0, [], name_nb
 
     parts = match.group(1).split('/')
-    return True, len(parts), parts, get_clean_name(name_nb)
+    dict_parts = parse_nb_parts(parts)
+
+    return True, len(parts), dict_parts, get_clean_name(name_nb)

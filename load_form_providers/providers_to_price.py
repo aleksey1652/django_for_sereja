@@ -5,6 +5,7 @@
 #import os
 from .to_providers_to_price import *
 from .from_providers_to_bd import *
+from tech.models import NB
 
 
 # ниже словарь групп-категорий поставщиков для обработки
@@ -1110,54 +1111,54 @@ class From_file_to_bd:
 
 
     def itlink_nb_dictToOrder(self, dict_):
-    """
-    обработка ноутов:
-    - нормализация RRP_UAH
-    - availability_parts -> yes/no
-    - парсинг name_parts
-    """
+        """
+        обработка ноутов:
+        - нормализация RRP_UAH
+        - availability_parts -> yes/no
+        - парсинг name_parts
+        """
 
-    # RRP
-    rrp = dict_.get('RRP_UAH')
-    dict_['RRP_UAH'] = rrp if pd.notna(rrp) and rrp != '' else 0
+        # RRP
+        rrp = dict_.get('RRP_UAH')
+        dict_['RRP_UAH'] = rrp if pd.notna(rrp) and rrp != '' else 0
 
-    # тип
-    dict_['kind'] = 'nb'
+        # тип
+        dict_['kind'] = 'nb'
 
-    # наличие
-    dict_['availability_parts'] = itlink_avail(dict_.get('availability_parts'))
+        # наличие
+        dict_['availability_parts'] = itlink_avail(dict_.get('availability_parts'))
 
-    # парсинг имени
-    has_parts, count, parts, clean_name = name_to_parts(dict_.get('name_parts'))
-    # (True, 5, ['15.6"', 'Ryzen 7 5825U', '16', 'SSD512', 'DOS'],
-    # 'Acer Aspire Go 15 AG15-42P') - пример получаемого из name_to_parts
+        # парсинг имени
+        has_parts, count, parts, clean_name = name_to_parts(dict_.get('name_parts'))
+        # (True, 5, ['15.6"', 'Ryzen 7 5825U', '16', 'SSD512', 'DOS'],
+        # 'Acer Aspire Go 15 AG15-42P') - пример получаемого из name_to_parts
 
-    # дефолтные значения
-    for key in ['nb_sc_d', 'nb_cpu_model', 'nb_ram_v', 'nb_ssd', 'os',
-               'name_parts', 'vendor', 'seria']:
-        dict_[key] = ''
+        # дефолтные значения
+        for key in ['nb_sc_d', 'nb_cpu_model', 'nb_ram_v', 'nb_ssd', 'os',
+                   'name_parts', 'vendor', 'seria']:
+            dict_[key] = ''
 
-    dict_['nb_cpu_vendor'] = 'Intel'
+        dict_['nb_cpu_vendor'] = 'Intel'
 
-    vendor, seria = get_vendor_series(clean_name)
+        vendor, seria = get_vendor_series(clean_name)
 
-    # если всё ок
-    if has_parts and count >= 5:
-        nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
+        # если всё ок
+        if has_parts and count >= 5:
+            nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
 
-        if 'RYZEN' in clean_name.upper():
-            dict_['nb_cpu_vendor'] = 'AMD'
+            if 'RYZEN' in clean_name.upper():
+                dict_['nb_cpu_vendor'] = 'AMD'
 
-        dict_['nb_sc_d'] = nb_sc_d
-        dict_['nb_cpu_model'] = nb_cpu_model
-        dict_['nb_ram_v'] = nb_ram_v
-        dict_['nb_ssd'] = nb_ssd
-        dict_['os'] = os
-        dict_['name_parts'] = clean_name
-        dict_['vendor'] = vendor
-        dict_['seria'] = seria
+            dict_['nb_sc_d'] = nb_sc_d
+            dict_['nb_cpu_model'] = nb_cpu_model
+            dict_['nb_ram_v'] = nb_ram_v
+            dict_['nb_ssd'] = nb_ssd
+            dict_['os'] = os
+            dict_['name_parts'] = clean_name
+            dict_['vendor'] = vendor
+            dict_['seria'] = seria
 
-    return dict_
+        return dict_
 
 
     def erc_dictToOrder(self, dict_, row_category):
@@ -1569,6 +1570,57 @@ class From_file_to_bd:
         return (mes, duration)
 
 
+def update_nb_from_dict(dict_res, usd, rent):
+    """ """
+    temp_price  = get_float(dict_res['providerprice_parts'])
+    price_rent_ = round(temp_price * rent * usd)
+    price_ua_ = round(temp_price * usd)
+    rentability_ = (rent - 1) * 100
+    NB.objects.filter(name=dict_res['name_parts']
+    ).update(price_rent=price_rent_,
+    r_price=price_rent_,
+    price_ua=price_ua_,
+    price_usd=temp_price,
+    rentability = rentability_,
+    provider='itlink')
+
+
+def edit_nb_from_dict(dict_res, usd, rent):
+    """ """
+    if NB.objects.filter(name=dict_res['name_parts']).exists():
+        _ = update_nb_from_dict(dict_res, usd, rent)
+        return _
+    temp_price  = get_float(dict_res['providerprice_parts'])
+    _ = NB.objects.create(
+    name=dict_res['name_parts'],
+    is_active=False,
+    full=False,
+    category_ru='Ноутбук',
+    category_ua='Ноутбук',
+    part_number=dict_res['partnumber_parts'],
+    price_rent=round(temp_price * rent * usd),
+    r_price=round(temp_price * rent * usd),
+    price_ua=round(temp_price * usd),
+    rentability=(rent - 1) * 100,
+    price_usd=temp_price,
+    nb_vendor=dict_res['vendor'],
+    nb_seria=dict_res['seria'],
+    nb_sc_d=dict_res['nb_sc_d'],
+    nb_cpu_vendor=dict_res['nb_cpu_vendor'],
+    nb_cpu_model=dict_res['nb_cpu_model'],
+    nb_ram_v=dict_res['nb_ram_v'],
+    nb_gpu_model=dict_res['nb_gpu_model'],
+    nb_os=dict_res['os'],
+    nb_warr_ua='12',
+    nb_warr_ru='12',
+    provider='itlink',
+    )
+    return _
+
+def do_nb_from_file(dict_, usd, rent):
+    """ """
+    for value in dict_.values():
+        _ = edit_nb_from_dict(value, usd, rent)
 
 """
 3,5" 3Tb Seagate

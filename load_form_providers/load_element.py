@@ -25,8 +25,7 @@ from load_form_providers.dc_descr_catalog import to_model_price_from_dc, to_tech
 from descriptions.views import shorts_in_comps, in_comps_it_all, in_comps_parts
 
 from load_form_providers.providers_to_price import *
-from load_form_providers.dc_descr_catalog import update_nb_from_dict, edit_nb_from_dict,\
-do_nb_from_file
+
 #providerprice_parts x_code price aall remainder test_comp in_comps prov
 
 def for_clear_status(part):
@@ -683,13 +682,16 @@ def from_file_provider(prov):
         return e
 
     it = From_file_to_bd(row_data, usd=usd_)
-    #_ = it.getDataFile(prov) # выключил, нужны только ноуты
-    data_nb = it.get_nb_itlink() # ноуты качаем
-    do_nb_from_file(data_nb, usd_, 1.1) # ноуты в бд
 
-    #short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
+    if prov == 'get_itlink':
+        data_nb = it.get_nb_itlink() # ноуты качаем
+        do_nb_from_file(data_nb, usd_, 1.1) # ноуты в бд
+        return None
+
+    _ = it.getDataFile(prov)
+
+    short_all = Short_per_x_code() #  цены в комп детали (после shorts_in_comps)
     #print(f'Short_per_x_code: {short_all}')
-    # short_all выключил, нужны только ноуты
 
     return _
 
