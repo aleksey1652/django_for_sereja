@@ -1135,7 +1135,7 @@ class From_file_to_bd:
 
         # дефолтные значения
         for key in ['nb_sc_d', 'nb_cpu_model', 'nb_ram_v', 'nb_ssd', 'os',
-                   'name_parts', 'vendor', 'seria']:
+                   'name_parts', 'vendor', 'seria', 'nb_gpu_model']:
             dict_[key] = ''
 
         dict_['nb_cpu_vendor'] = 'Intel'
@@ -1144,16 +1144,17 @@ class From_file_to_bd:
 
         # если всё ок
         if has_parts and count >= 5:
-            nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
+            #nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
 
             if 'RYZEN' in clean_name.upper():
                 dict_['nb_cpu_vendor'] = 'AMD'
 
-            dict_['nb_sc_d'] = nb_sc_d
-            dict_['nb_cpu_model'] = nb_cpu_model
-            dict_['nb_ram_v'] = nb_ram_v
-            dict_['nb_ssd'] = nb_ssd
-            dict_['os'] = os
+            dict_['nb_sc_d'] = parts['nb_sc_d']
+            dict_['nb_cpu_model'] = parts['nb_cpu_model']
+            dict_['nb_ram_v'] = parts['nb_ram_v']
+            dict_['nb_ssd'] = parts['nb_ssd']
+            dict_['os'] = parts['os']
+            dict_['nb_gpu_model'] = parts['nb_gpu_model']
             dict_['name_parts'] = clean_name
             dict_['vendor'] = vendor
             dict_['seria'] = seria
