@@ -111,11 +111,31 @@ def price_usd(price, usd, usd_data='usd'):
     return get_float(price)
 
 CPU_PATTERN = re.compile(
-    r'\b(RYZEN|INTEL|CORE|ULTRA|I[3579]|CELERON|PENTIUM|ATHLON)\b',
+    r'(RYZEN|INTEL|CORE|ULTRA|I[3579]|CELERON|PENTIUM|ATHLON)',
     re.I
 )
-GPU_PATTERN = re.compile(r'\b(RTX|GTX|RX)\b', re.I)
+GPU_PATTERN = re.compile(r'(RTX|GTX|RX)', re.I)
 RAM_PATTERN = re.compile(r'^\d+\s*(GB)?$', re.I)
+
+def normalize_storage(value):
+    """ для Gb в названии """
+    if not value:
+        return ''
+
+    value = str(value).upper()
+
+    # ищем число (например 512, 1024 и т.д.)
+    match = re.search(r'(\d+)', value)
+    if not match:
+        return ''
+
+    size = int(match.group(1))
+
+    # если вдруг будет TB
+    if 'TB' in value:
+        size *= 1024
+
+    return f'{size} Gb'
 
 def parse_nb_parts(parts):
     """ для парсинга из строки наз ноута """
@@ -146,12 +166,12 @@ def parse_nb_parts(parts):
 
         # SSD
         if 'SSD' in p.upper():
-            result['nb_ssd'] = p
+            result['nb_ssd'] = normalize_storage(p)
             continue
 
         # GPU
         if GPU_PATTERN.search(p):
-            result['nb_gpu'] = p
+            result['nb_gpu_model'] = p
             continue
 
         # CPU
@@ -169,25 +189,6 @@ def parse_nb_parts(parts):
 
     return result
 
-def normalize_storage(value):
-    """ для Gb в названии """
-    if not value:
-        return ''
-
-    value = str(value).upper()
-
-    # ищем число (например 512, 1024 и т.д.)
-    match = re.search(r'(\d+)', value)
-    if not match:
-        return ''
-
-    size = int(match.group(1))
-
-    # если вдруг будет TB
-    if 'TB' in value:
-        size *= 1024
-
-    return f'{size} ГБ'
 
 def get_clean_name(name_nb):
     """ для name_to_parts вспомагательная """

@@ -1146,7 +1146,7 @@ class From_file_to_bd:
         if has_parts and count >= 5:
             #nb_sc_d, nb_cpu_model, nb_ram_v, nb_ssd, os, *_ = parts
 
-            if 'RYZEN' in clean_name.upper():
+            if 'RYZEN' in parts['nb_cpu_model'].upper():
                 dict_['nb_cpu_vendor'] = 'AMD'
 
             dict_['nb_sc_d'] = parts['nb_sc_d']
@@ -1576,25 +1576,32 @@ def update_nb_from_dict(dict_res, usd, rent):
     temp_price  = get_float(dict_res['providerprice_parts'])
     price_rent_ = round(temp_price * rent * usd)
     price_ua_ = round(temp_price * usd)
-    rentability_ = (rent - 1) * 100
+    rentability_ = round((rent - 1) * 100)
     NB.objects.filter(name=dict_res['name_parts']
     ).update(price_rent=price_rent_,
     r_price=price_rent_,
     price_ua=price_ua_,
     price_usd=temp_price,
     rentability = rentability_,
+    is_active=True,
     provider='itlink')
 
 
 def edit_nb_from_dict(dict_res, usd, rent):
     """ """
+
+    if NB.objects.filter(part_number=dict_res['partnumber_parts']).exists():
+        _ = update_nb_from_dict(dict_res, usd, rent)
+        return _
     if NB.objects.filter(name=dict_res['name_parts']).exists():
         _ = update_nb_from_dict(dict_res, usd, rent)
         return _
+
     temp_price  = get_float(dict_res['providerprice_parts'])
+
     _ = NB.objects.create(
     name=dict_res['name_parts'],
-    is_active=False,
+    is_active=True,
     full=False,
     category_ru='Ноутбук',
     category_ua='Ноутбук',
@@ -1602,7 +1609,7 @@ def edit_nb_from_dict(dict_res, usd, rent):
     price_rent=round(temp_price * rent * usd),
     r_price=round(temp_price * rent * usd),
     price_ua=round(temp_price * usd),
-    rentability=(rent - 1) * 100,
+    rentability=round((rent - 1) * 100),
     price_usd=temp_price,
     nb_vendor=dict_res['vendor'],
     nb_seria=dict_res['seria'],
@@ -1612,6 +1619,7 @@ def edit_nb_from_dict(dict_res, usd, rent):
     nb_ram_v=dict_res['nb_ram_v'],
     nb_gpu_model=dict_res['nb_gpu_model'],
     nb_os=dict_res['os'],
+    nb_ssd=dict_res['nb_ssd'],
     nb_warr_ua='12',
     nb_warr_ru='12',
     provider='itlink',
