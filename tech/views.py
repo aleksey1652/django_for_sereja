@@ -111,10 +111,40 @@ def change_rentability_tech(request, obj_pack, obj_model):
             objs = dict_models[obj_model].filter(pk__in=obj_pk)
 
             rent = form.cleaned_data['rentability']
+            count_objs = 0
 
-            count_objs = objs.update(
-            rentability=rent
-            )
+            if obj_model != 'nb':
+                count_objs = objs.update(
+                rentability=rent
+                )
+
+            if obj_model == 'nb':
+                from cat.models import USD
+
+                usd = USD.objects.last()
+                usd_currency = getattr(usd, 'usd', 40)
+
+                rent_ = 1 + float(rent) / 100
+                objs_to_update = []
+
+                for obj in objs:
+                    base_price = obj.price_usd * usd_currency
+
+                    obj.price_ua = round(base_price)
+                    obj.price_rent = round(base_price * rent_)
+                    obj.r_price = round(base_price * rent_)
+                    obj.rentability = rent
+
+                    objs_to_update.append(obj)
+
+                NB.objects.bulk_update(
+                    objs_to_update,
+                    ['price_rent', 'r_price', 'price_ua', 'rentability'],
+                    batch_size=500
+                )
+
+                count_objs = len(objs_to_update)
+
             messages.success(
             request,
             f"In {count_objs} {obj_model} was update : {rent}")
@@ -336,55 +366,55 @@ class distrib_tech(APIView):
     def get(self, request):
         #usd = USD.objects.last().usd
         Dict_full = {}
-        monitors = Monitors.objects.filter(is_active=True, groups__isnull=True)
+        monitors = Monitors.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = MonitorsSer(monitors, many=True)
         Dict_full['monitors'] = do_full_path(serializer.data)
-        km = KM.objects.filter(is_active=True, groups__isnull=True)
+        km = KM.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = KMSer(km, many=True)
         Dict_full['km'] = do_full_path(serializer.data)
-        kb = Keyboards.objects.filter(is_active=True, groups__isnull=True)
+        kb = Keyboards.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = KeyboardsSer(kb, many=True)
         Dict_full['kb'] = do_full_path(serializer.data)
-        mouse = Mouses.objects.filter(is_active=True, groups__isnull=True)
+        mouse = Mouses.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = MousesSer(mouse, many=True)
         Dict_full['mouse'] = do_full_path(serializer.data)
-        pads = Pads.objects.filter(is_active=True, groups__isnull=True)
+        pads = Pads.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = PadsSer(pads, many=True)
         Dict_full['pads'] = do_full_path(serializer.data)
-        headsets = Headsets.objects.filter(is_active=True, groups__isnull=True)
+        headsets = Headsets.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = HeadsetsSer(headsets, many=True)
         Dict_full['headsets'] = do_full_path(serializer.data)
-        web = Webcams.objects.filter(is_active=True, groups__isnull=True)
+        web = Webcams.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = WebcamsSer(web, many=True)
         Dict_full['web'] = do_full_path(serializer.data)
-        wifi = WiFis.objects.filter(is_active=True, groups__isnull=True)
+        wifi = WiFis.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = WiFisSer(wifi, many=True)
         Dict_full['wifi'] = do_full_path(serializer.data)
-        mike = Mike.objects.filter(is_active=True, groups__isnull=True)
+        mike = Mike.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = MikeSer(mike, many=True)
         Dict_full['mike'] = do_full_path(serializer.data)
-        acoustics = Acoustics.objects.filter(is_active=True, groups__isnull=True)
+        acoustics = Acoustics.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = AcousticsSer(acoustics, many=True)
         Dict_full['acoustics'] = do_full_path(serializer.data)
-        tables = Tables.objects.filter(is_active=True, groups__isnull=True)
+        tables = Tables.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = TablesSer(tables, many=True)
         Dict_full['tables'] = do_full_path(serializer.data)
-        chairs = Chairs.objects.filter(is_active=True, groups__isnull=True)
+        chairs = Chairs.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = ChairsSer(chairs, many=True)
         Dict_full['chairs'] = do_full_path(serializer.data)
-        access = Accessories.objects.filter(is_active=True, groups__isnull=True)
+        access = Accessories.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = AccessoriesSer(access, many=True)
         Dict_full['access'] = do_full_path(serializer.data)
-        cab = Cabelsplus.objects.filter(is_active=True, groups__isnull=True)
+        cab = Cabelsplus.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = CabelsplusSer(cab, many=True)
         Dict_full['cab'] = do_full_path(serializer.data)
-        filters = Filters.objects.filter(is_active=True, groups__isnull=True)
+        filters = Filters.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = FiltersSer(filters, many=True)
         Dict_full['filters'] = do_full_path(serializer.data)
-        other = Others.objects.filter(is_active=True, groups__isnull=True)
+        other = Others.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = OthersSer(other, many=True)
         Dict_full['other'] = do_full_path(serializer.data)
-        nb = NB.objects.filter(is_active=True, groups__isnull=True)
+        nb = NB.objects.filter(is_active=True, full=True, groups__isnull=True)
         serializer = NBSer(nb, many=True)
         Dict_full['nb'] = do_full_path(serializer.data)
         return Response({"parts": Dict_full})
