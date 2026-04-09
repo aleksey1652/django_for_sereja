@@ -59,6 +59,36 @@ def admin_rentability_chg(request, test_pk):
 
     return render(request, 'money/admin_test.html', context)
 
+
+class mark_comps_itblok(APIView):
+    def get(self, request):
+
+        Dict_full = dict()
+        Dict_full_main = {'pc': None,}
+
+        comps =Mark_computers.objects.filter(is_active=True,
+        category__kind_assembly='outlet')
+
+        comps_ok = comps.filter(
+        price_computers__isnull=False, mb__isnull=False,
+        cpu__isnull=False, ram__isnull=False,
+        gpu__isnull=False, hdd__isnull=False,
+        ssd__isnull=False,
+        psu__isnull=False, case__isnull=False,
+        cooler__isnull=False, fan__isnull=False,
+        wifi__isnull=False, cables__isnull=False,
+        soft__isnull=False,
+        )
+
+        #serializer = Mark_shortSerializer(shorts_ok, many=True)
+        #Dict_full_main['tradein'] = serializer.data
+
+        serializer = CompsSerializer(comps_ok, many=True)
+        Dict_full_main['pc'] = serializer.data
+
+        return Response(Dict_full_main)
+
+
 class mark_comps_parts(APIView):
     def get(self, request):
 
@@ -68,7 +98,9 @@ class mark_comps_parts(APIView):
 
         shorts_ok = Mark_short.objects.filter(trade_in=True)
 
-        comps =Mark_computers.objects.filter(is_active=True)
+        comps =Mark_computers.objects.filter(is_active=True
+        ).exclude(category__kind_assembly='outlet')
+
         comps_ok = comps.filter(
         price_computers__isnull=False, mb__isnull=False,
         cpu__isnull=False, ram__isnull=False,

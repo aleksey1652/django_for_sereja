@@ -22,6 +22,7 @@ from . import views
 urlpatterns = [
     path('mark_parts/', views.mark_parts.as_view(), name='mark_parts'),
     path('mark_comps_parts/', views.mark_comps_parts.as_view(), name='mark_comps_parts'),
+    path('mark_comps_itblok/', views.mark_comps_itblok.as_view(), name='mark_comps_itblok'),
     path('admin_rentability_chg/<str:test_pk>/', views.admin_rentability_chg,
     name='admin_rentability_chg'),
 ]
