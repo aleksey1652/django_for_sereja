@@ -5,6 +5,7 @@
 #import os
 from .to_providers_to_price import *
 from .from_providers_to_bd import *
+from .dc_descr_catalog import get_price_rent_price_ua # для процента для колонки get_price_rent
 from tech.models import NB
 
 
@@ -856,7 +857,7 @@ ForFiles = {
         'Джерело живлення': 'ps',
     },
     'filename': '/прайс.xls',
-    'cols': (0,2,3,6,8,9)
+    'cols': (0,2,4,6,7,9)
 },
 'erc': {
     'mes': {
@@ -965,9 +966,9 @@ def itlink_avail(values):
     """
 
     try:
-        avail = 'yes' if int(values) > 0 else 'no'
+        avail = 'yes' if int(values) > 1 else 'no'
     except (ValueError, TypeError):
-        avail = 'yes' if values == 'есть' else 'no'
+        avail = 'yes' if '>' in values else 'no'
 
     return avail
 
@@ -1577,11 +1578,14 @@ def update_nb_from_dict(dict_res, usd, rent):
     price_rent_ = round(temp_price * rent * usd)
     price_ua_ = round(temp_price * usd)
     rentability_ = round((rent - 1) * 100)
-    NB.objects.filter(name=dict_res['name_parts']
+    get_price_rent_ = get_price_rent_price_ua(price_rent_, price_ua_) # для колонки %
+
+    NB.objects.filter(part_number=dict_res['partnumber_parts']
     ).update(price_rent=price_rent_,
     r_price=price_rent_,
     price_ua=price_ua_,
     price_usd=temp_price,
+    get_price_rent=get_price_rent_,
     rentability = rentability_,
     is_active=True,
     provider='itlink')
@@ -1589,15 +1593,17 @@ def update_nb_from_dict(dict_res, usd, rent):
 
 def edit_nb_from_dict(dict_res, usd, rent):
     """ """
-
     if NB.objects.filter(part_number=dict_res['partnumber_parts']).exists():
         _ = update_nb_from_dict(dict_res, usd, rent)
         return _
     if NB.objects.filter(name=dict_res['name_parts']).exists():
-        _ = update_nb_from_dict(dict_res, usd, rent)
+        _ = update_nb_from_dict(dict_reget_price_rent_price_uas, usd, rent)
         return _
-
     temp_price  = get_float(dict_res['providerprice_parts'])
+
+    get_price_rent_ =\
+    get_price_rent_price_ua(round(temp_price * rent * usd), round(temp_price * usd))
+    # для колонки %
 
     _ = NB.objects.create(
     name=dict_res['name_parts'],
@@ -1609,6 +1615,7 @@ def edit_nb_from_dict(dict_res, usd, rent):
     price_rent=round(temp_price * rent * usd),
     r_price=round(temp_price * rent * usd),
     price_ua=round(temp_price * usd),
+    get_price_rent=get_price_rent_,
     rentability=round((rent - 1) * 100),
     price_usd=temp_price,
     nb_vendor=dict_res['vendor'],
