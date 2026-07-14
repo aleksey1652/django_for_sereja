@@ -159,34 +159,20 @@ def in_comps_parts(short):
     для in_comps_it_all
     в данной short ставим/убираем галочку in_comps_it
     """
-
     kind, name = short.kind, short.name_parts
-
-    dict_ = {'aproc': Parts_short.objects.filter(cpu__isnull=False,
-                name_parts=name, kind=kind),
-                'iproc': Parts_short.objects.filter(cpu__isnull=False,
-                name_parts=name, kind=kind),
-                'amb': Parts_short.objects.filter(mb__isnull=False,
-                name_parts=name, kind=kind),
-                'imb': Parts_short.objects.filter(mb__isnull=False,
-                name_parts=name, kind=kind),
-                'mem': Parts_short.objects.filter(ram__isnull=False,
-                name_parts=name, kind=kind),
-                'hdd': Parts_short.objects.filter(hdd__isnull=False,
-                name_parts=name, kind=kind),
-                'ssd': Parts_short.objects.filter(ssd__isnull=False,
-                name_parts=name, kind=kind),
-                'video': Parts_short.objects.filter(gpu__isnull=False,
-                name_parts=name, kind=kind),
-                'ps': Parts_short.objects.filter(psu__isnull=False,
-                name_parts=name, kind=kind),
-                'vent': Parts_short.objects.filter(fan__isnull=False,
-                name_parts=name, kind=kind),
-                'case': Parts_short.objects.filter(case__isnull=False,
-                name_parts=name, kind=kind),
-                'cool': Parts_short.objects.filter(cooler__isnull=False,
-                name_parts=name, kind=kind),
-                }
+    dict_ = {'aproc': short.cpu.filter(is_active=True),
+            'iproc': short.cpu.filter(is_active=True),
+            'amb': short.mb.filter(is_active=True),
+            'imb': short.mb.filter(is_active=True),
+            'mem': short.ram.filter(is_active=True),
+            'hdd': short.hdd.filter(is_active=True),
+            'ssd': short.ssd.filter(is_active=True),
+            'video': short.gpu.filter(is_active=True),
+            'ps': short.psu.filter(is_active=True),
+            'vent': short.fan.filter(is_active=True),
+            'case': short.case.filter(is_active=True),
+            'cool': short.cooler.filter(is_active=True),
+            }
     if kind in dict_:
         if dict_[kind].exists():
             short.in_comps_it = True
@@ -235,6 +221,7 @@ def current_in_comps(short):
     Q(wifi_computers__exact=search_term) | Q(soft_computers__exact=search_term)|
     Q(cables_computers__exact=search_term)
     )#.exclude(pc_assembly__name_assembly='For Today') # исключаем For Today
+    queryset = queryset.filter(is_active=True)
     if queryset.exclude(pc_assembly__name_assembly='For Today').exists():
         short.in_comps = True
         short.computer_shorts.clear()
